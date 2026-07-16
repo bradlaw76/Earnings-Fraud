@@ -2,6 +2,18 @@
 
 This repository contains the full guided build for a Dynamics 365 Customer Service scenario focused on SSA earnings integrity and fraud review.
 
+## Repository Target Check
+
+Before any commit or push, confirm you are in the intended repository and branch.
+
+```powershell
+git rev-parse --show-toplevel
+git remote -v
+git branch --show-current
+```
+
+Expected top-level path should end with `Federal Earnings Fraud` for this build guide.
+
 The implementation uses:
 
 - Spec-driven planning in [specs/ssa-earnings-integrity-case-review/spec.md](specs/ssa-earnings-integrity-case-review/spec.md), [specs/ssa-earnings-integrity-case-review/plan.md](specs/ssa-earnings-integrity-case-review/plan.md), and [specs/ssa-earnings-integrity-case-review/tasks.md](specs/ssa-earnings-integrity-case-review/tasks.md)
