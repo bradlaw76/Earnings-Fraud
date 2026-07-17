@@ -292,9 +292,11 @@ pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1
+pwsh ./scripts/bootstrap/80-post-build-analysis.ps1
 ```
 
 Use script 70 when your scenario includes HTML/report web resources on forms.
+Use script 80 to generate end-of-build analysis, preview README updates, and optionally commit/push the generated summary section.
 
 All scripts are idempotent and safe to rerun.
 
@@ -303,6 +305,7 @@ Validation checkpoint after each script:
 - Script exits without errors.
 - Created/skipped counts are printed.
 - If failed count is greater than zero, stop and fix before proceeding.
+- Post-build analysis runs and asks whether to update README generated summary markers.
 
 ---
 

@@ -222,4 +222,17 @@ Write-Host ""
 Write-Host "Web resources — created: $created  updated: $updated  added to solution: $addedToSolution  skipped: $skipped  failed: $failed"
 if ($failed -gt 0) { exit 1 }
 Write-Host ""
+Write-Host "Running post-build analysis and optional README update..."
+$postBuildScript = Join-Path $PSScriptRoot "80-post-build-analysis.ps1"
+if (Test-Path $postBuildScript) {
+    try {
+        & $postBuildScript
+    } catch {
+        Write-Host "Post-build analysis warning: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "Post-build analysis script not found: $postBuildScript" -ForegroundColor Yellow
+}
+
+Write-Host ""
 Write-Host "Next step: verify web resources and form placement in Power Apps Maker."

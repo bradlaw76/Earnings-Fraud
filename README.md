@@ -102,6 +102,20 @@ Use this sequence for a 7-10 minute walkthrough:
 - Add Power Automate orchestration for intake routing and escalation
 - Add seeded demo records for repeatable stakeholder demos
 
+## Generated Build Summary Section
+
+This section is updated by [scripts/bootstrap/80-post-build-analysis.ps1](scripts/bootstrap/80-post-build-analysis.ps1) at the end of script 70 runs.
+
+<!-- BEGIN GENERATED BUILD SUMMARY -->
+### Generated Build Summary
+
+No generated summary yet. Run:
+
+```powershell
+pwsh ./scripts/bootstrap/80-post-build-analysis.ps1
+```
+<!-- END GENERATED BUILD SUMMARY -->
+
 ## Full Build Sequence
 
 Run this sequence exactly.
@@ -212,6 +226,7 @@ pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1
+pwsh ./scripts/bootstrap/80-post-build-analysis.ps1
 ```
 
 Gate after each script:
@@ -269,6 +284,7 @@ Bootstrap scripts used by this build:
 - [scripts/bootstrap/50-add-to-solution.ps1](scripts/bootstrap/50-add-to-solution.ps1)
 - [scripts/bootstrap/60-build-forms-views.ps1](scripts/bootstrap/60-build-forms-views.ps1)
 - [scripts/bootstrap/70-build-web-resources.ps1](scripts/bootstrap/70-build-web-resources.ps1)
+- [scripts/bootstrap/80-post-build-analysis.ps1](scripts/bootstrap/80-post-build-analysis.ps1)
 
 ## Supporting Documentation
 

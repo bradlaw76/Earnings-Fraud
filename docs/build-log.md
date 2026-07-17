@@ -14,6 +14,7 @@ Runner:
 Environment URL: https://<org>.crm.dynamics.com
 Build Type (Demo/Prod):
 Scripts Run (20,30,40,50,60):
+Post-Build Analysis Run (80): yes/no
 Tables (created/skipped/failed):
 Columns (created/skipped/failed):
 Relationships (created/skipped/failed):
@@ -42,4 +43,5 @@ Complete this before implementation:
 
 - Maker portal verification complete: yes/no
 - Required tasks from `tasks.md` complete: yes/no
+- README generated summary reviewed/updated: yes/no
 - Known issues captured with owner/date: yes/no
