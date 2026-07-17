@@ -1,0 +1,65 @@
+{
+  "TableLogicalName": "earnint_investigationfinding",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+      "SchemaName": "earnInt_findingtype",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Finding Type" }]
+      },
+      "OptionSet": {
+        "Options": [
+          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Discrepancy Confirmed" }] } },
+          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Discrepancy Resolved" }] } },
+          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Discrepancy Unresolved" }] } },
+          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Possible Fraud Indicator" }] } },
+          { "Value": 100000004, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "No Issue Found" }] } }
+        ],
+        "IsGlobal": false,
+        "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
+      },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnInt_findingdetails",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Finding Details" }]
+      },
+      "MaxLength": 4000,
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+      "SchemaName": "earnInt_recddisposition",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Recommended Disposition" }]
+      },
+      "OptionSet": {
+        "Options": [
+          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Close Case" }] } },
+          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Request More Information" }] } },
+          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Create Overpayment Review" }] } },
+          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Escalate as Fraud Referral" }] } }
+        ],
+        "IsGlobal": false,
+        "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
+      },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "earnInt_analystname",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Analyst Name" }]
+      },
+      "MaxLength": 200,
+      "FormatName": { "Value": "Text" },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    }
+  ]
+}

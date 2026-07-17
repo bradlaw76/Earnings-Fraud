@@ -91,7 +91,7 @@ $created = 0; $skipped = 0; $failed = 0
 
 foreach ($file in $payloads) {
     $payload = Get-Content $file.FullName -Raw | ConvertFrom-Json
-    $name    = $payload.EntityDefinition.SchemaName ?? $payload.SchemaName
+    $name    = if ($payload.PSObject.Properties.Name -contains 'EntityDefinition') { $payload.EntityDefinition.SchemaName } else { $payload.SchemaName }
     if ([string]::IsNullOrWhiteSpace($name)) {
         Write-Host "  SKIP  $($file.Name) — could not determine SchemaName" -ForegroundColor Yellow
         $skipped++; continue

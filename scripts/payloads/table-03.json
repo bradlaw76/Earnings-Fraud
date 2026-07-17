@@ -1,0 +1,79 @@
+{
+  "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+  "SchemaName": "earnint_earningsdiscrepancy",
+  "DisplayName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Earnings Discrepancy",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "DisplayCollectionName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Earnings Discrepancies",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "Description": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Wage/earnings discrepancy record",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "HasNotes": true,
+  "HasActivities": false,
+  "IsActivity": false,
+  "OwnershipType": "UserOwned",
+  "EntityColor": "#f7630c",
+  "Attributes": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "IsPrimaryName": true,
+      "SchemaName": "earnint_earningsdiscrepancy_name",
+      "AttributeType": "String",
+      "AttributeTypeName": {
+        "Value": "StringType"
+      },
+      "FormatName": {
+        "Value": "Text"
+      },
+      "MaxLength": 100,
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Discrepancy Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Discrepancy Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "RequiredLevel": {
+        "Value": "None",
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings"
+      }
+    }
+  ]
+}

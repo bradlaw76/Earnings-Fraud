@@ -14,7 +14,8 @@
 param(
     [string]$EnvironmentUrl  = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken     = $env:DV_TOKEN,
-    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX
+  [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
+  [string]$PayloadsFolder  = ""
 )
 
 Set-StrictMode -Version Latest
@@ -34,6 +35,10 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $PublisherPrefix)) {
     }
 }
 
+if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+  $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+}
+
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
             "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
@@ -42,11 +47,114 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
 }
 
-function New-StarterFormXml([string]$PrimaryField) {
+function Get-FriendlyLabel([string]$LogicalName, [string]$PrefixLower) {
+  $label = $LogicalName
+  if ($label -like "$($PrefixLower)_*") {
+    $label = $label.Substring($PrefixLower.Length + 1)
+  }
+  $label = ($label -replace "_", " ").Trim()
+  if ([string]::IsNullOrWhiteSpace($label)) { return $LogicalName }
+  $ti = [System.Globalization.CultureInfo]::CurrentCulture.TextInfo
+  return $ti.ToTitleCase($label)
+}
+
+function Get-FormFieldMap([string]$Folder, [string]$PrefixLower) {
+  $fieldMap = @{}
+  $payloads = @(Get-ChildItem -Path $Folder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
+
+  foreach ($p in $payloads) {
+    $doc = Get-Content $p.FullName -Raw | ConvertFrom-Json
+    $tableLogical = "$($doc.TableLogicalName)".ToLower()
+    if ([string]::IsNullOrWhiteSpace($tableLogical)) { continue }
+
+    if (-not $fieldMap.ContainsKey($tableLogical)) {
+      $fieldMap[$tableLogical] = New-Object System.Collections.Generic.List[object]
+    }
+
+    foreach ($col in $doc.Columns) {
+      $logical = "$($col.SchemaName)".ToLower()
+      if ([string]::IsNullOrWhiteSpace($logical)) { continue }
+      if ($logical -notlike "$($PrefixLower)_*") { continue }
+
+      $displayLabel = ""
+      if ($null -ne $col.DisplayName -and $null -ne $col.DisplayName.LocalizedLabels) {
+        $labelNode = @($col.DisplayName.LocalizedLabels | Where-Object { $_.LanguageCode -eq 1033 } | Select-Object -First 1)
+        if ($labelNode.Count -eq 0) {
+          $labelNode = @($col.DisplayName.LocalizedLabels | Select-Object -First 1)
+        }
+        if ($labelNode.Count -gt 0) {
+          $displayLabel = "$($labelNode[0].Label)"
+        }
+      }
+      if ([string]::IsNullOrWhiteSpace($displayLabel)) {
+        $displayLabel = Get-FriendlyLabel -LogicalName $logical -PrefixLower $PrefixLower
+      }
+
+      $alreadyExists = @($fieldMap[$tableLogical] | Where-Object { $_.LogicalName -eq $logical }).Count -gt 0
+      if (-not $alreadyExists) {
+        [void]$fieldMap[$tableLogical].Add([pscustomobject]@{
+          LogicalName = $logical
+          Label = $displayLabel
+        })
+      }
+    }
+  }
+
+  return $fieldMap
+}
+
+function New-StarterFormXml([string]$PrimaryField, [object[]]$Fields, [string]$PrefixLower) {
+  $allFields = New-Object System.Collections.Generic.List[object]
+  $seen = @{}
+
+  if (-not [string]::IsNullOrWhiteSpace($PrimaryField)) {
+    $primaryLogical = $PrimaryField.ToLower()
+    [void]$allFields.Add([pscustomobject]@{
+      LogicalName = $primaryLogical
+      Label = Get-FriendlyLabel -LogicalName $primaryLogical -PrefixLower $PrefixLower
+    })
+    $seen[$primaryLogical] = $true
+  }
+
+  foreach ($f in $Fields) {
+    $logical = "$($f.LogicalName)".ToLower()
+    if ([string]::IsNullOrWhiteSpace($logical)) { continue }
+    if (-not $seen.ContainsKey($logical)) {
+      [void]$allFields.Add([pscustomobject]@{
+        LogicalName = $logical
+        Label = "$($f.Label)"
+      })
+      $seen[$logical] = $true
+    }
+  }
+
+  $rows = New-Object System.Text.StringBuilder
+  for ($i = 0; $i -lt $allFields.Count; $i += 2) {
+    [void]$rows.AppendLine("                <row>")
+
+    for ($j = 0; $j -lt 2; $j++) {
+      $index = $i + $j
+      if ($index -ge $allFields.Count) { continue }
+
+      $fieldLogical = "$($allFields[$index].LogicalName)"
+      $fieldLabel = "$($allFields[$index].Label)"
+      $cellId = [guid]::NewGuid().ToString()
+      # Standard Dataverse textbox control type; works for starter layout generation.
+      $classId = "{4273EDBD-AC1D-40d3-9FB2-095C621B552D}"
+
+      [void]$rows.AppendLine("                  <cell id=`"{$cellId}`" showlabel=`"true`" locklevel=`"0`">")
+      [void]$rows.AppendLine("                    <labels><label description=`"$fieldLabel`" languagecode=`"1033`"/></labels>")
+      [void]$rows.AppendLine("                    <control id=`"$fieldLogical`" classid=`"$classId`" datafieldname=`"$fieldLogical`" disabled=`"false`"/>")
+      [void]$rows.AppendLine("                  </cell>")
+    }
+
+    [void]$rows.AppendLine("                </row>")
+  }
+
     return @"
 <form>
   <tabs>
-    <tab name="general" id="{00000000-0000-0000-0000-000000000001}" labelid="" showlabel="true" expanded="true">
+    <tab name="general" id="{00000000-0000-0000-0000-000000000001}" showlabel="true" expanded="true">
       <labels><label description="General" languagecode="1033"/></labels>
       <columns>
         <column width="100%">
@@ -54,7 +162,7 @@ function New-StarterFormXml([string]$PrimaryField) {
             <section name="general_section" showlabel="false" showbar="false">
               <labels><label description="General" languagecode="1033"/></labels>
               <rows>
-                <row><cell id="{00000000-0000-0000-0000-000000000002}"><labels><label description="$PrimaryField" languagecode="1033"/></labels><control id="$PrimaryField" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="$PrimaryField" disabled="false"/></cell></row>
+$($rows.ToString())
               </rows>
             </section>
           </sections>
@@ -98,15 +206,18 @@ Write-Host ""
 Write-Host "=== Build Forms and Views ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
 Write-Host "  Prefix:      $PublisherPrefix"
+Write-Host "  Payloads:    $PayloadsFolder"
 Write-Host ""
 
+$publisherLogicalPrefix = $PublisherPrefix.ToLower()
+$tableFieldMap = Get-FormFieldMap -Folder $PayloadsFolder -PrefixLower $publisherLogicalPrefix
 $tables = @((Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,PrimaryNameAttribute,MetadataId&`$filter=IsCustomEntity eq true").value |
-    Where-Object { $_.LogicalName -like "$($PublisherPrefix)_*" })
+  Where-Object { $_.LogicalName -like "$($publisherLogicalPrefix)_*" })
 
 Write-Host "  Custom tables found: $($tables.Count)"
 Write-Host ""
 
-$formsCreated = 0; $viewsCreated = 0; $failed = 0
+$formsCreated = 0; $formsUpdated = 0; $viewsCreated = 0; $failed = 0
 
 foreach ($t in $tables) {
     $logical  = $t.LogicalName
@@ -114,26 +225,45 @@ foreach ($t in $tables) {
     Write-Host "  $logical" -ForegroundColor Cyan
 
     # ── Form ──────────────────────────────────────────────────────────────
-    $existingForms = @((Invoke-Dv "Get" "systemforms?`$select=name,type&`$filter=objecttypecode eq '$logical' and type eq 2").value)
-    $hasMain = $existingForms | Where-Object { $_.type -eq 2 -and $_.name -like "*Main*" }
-    if ($hasMain) {
-        Write-Host "    Form (exists — skipped)" -ForegroundColor DarkGray
-    } else {
+    $existingForms = @((Invoke-Dv "Get" "systemforms?`$select=formid,name,type&`$filter=objecttypecode eq '$logical' and type eq 2").value)
+    $mainForms = @($existingForms | Where-Object { $_.type -eq 2 -and $_.name -like "*Main*" })
+    $starterMain = @($mainForms | Where-Object { $_.name -eq "Starter Main Form" } | Select-Object -First 1)
+
+    $fieldList = @()
+    $logicalKey = [string]$logical
+    if ($tableFieldMap.ContainsKey($logicalKey)) {
+      $fieldList = @($tableFieldMap[$logicalKey] | ForEach-Object { $_ })
+    }
+
+    if ($starterMain.Count -gt 0) {
         try {
-            $formXml = New-StarterFormXml $primary
-            $formBody = @{
-                name            = "Starter Main Form"
-                objecttypecode  = $logical
-                type            = 2
-                formxml         = $formXml
-            } | ConvertTo-Json -Compress
-            Invoke-Dv "Post" "systemforms" $formBody | Out-Null
-            Write-Host "    Form (created)" -ForegroundColor Green
-            $formsCreated++
+        $formXml = New-StarterFormXml $primary $fieldList $publisherLogicalPrefix
+        $patchBody = @{ "formxml" = $formXml } | ConvertTo-Json -Compress -Depth 10
+            Invoke-Dv "Patch" "systemforms($($starterMain[0].formid))" $patchBody | Out-Null
+        Write-Host "    Form (starter updated with payload fields)" -ForegroundColor Green
+        $formsUpdated++
         } catch {
-            Write-Host "    Form (FAILED: $($_.Exception.Message))" -ForegroundColor Red
+        Write-Host "    Form (FAILED update: $($_.Exception.Message))" -ForegroundColor Red
             $failed++
         }
+    } elseif ($mainForms.Count -gt 0) {
+      Write-Host "    Form (custom main exists — skipped)" -ForegroundColor DarkGray
+    } else {
+      try {
+        $formXml = New-StarterFormXml $primary $fieldList $publisherLogicalPrefix
+        $formBody = @{
+          "name"            = "Starter Main Form"
+          "objecttypecode"  = $logical
+          "type"            = 2
+          "formxml"         = $formXml
+        } | ConvertTo-Json -Compress -Depth 10
+        Invoke-Dv "Post" "systemforms" $formBody | Out-Null
+        Write-Host "    Form (created with payload fields)" -ForegroundColor Green
+        $formsCreated++
+      } catch {
+        Write-Host "    Form (FAILED create: $($_.Exception.Message))" -ForegroundColor Red
+        $failed++
+      }
     }
 
     # ── View ──────────────────────────────────────────────────────────────
@@ -146,13 +276,12 @@ foreach ($t in $tables) {
             $fetchXml  = New-StarterViewFetchXml $logical $primary
             $layoutXml = New-StarterViewLayoutXml $primary
             $viewBody = @{
-                name               = "Active Records"
-                returnedtypecode   = $logical
-                querytype          = 0
-                fetchxml           = $fetchXml
-                layoutxml          = $layoutXml
-                iscustomizable     = @{ Value = $true }
-            } | ConvertTo-Json -Compress
+                "name"               = "Active Records"
+                "returnedtypecode"   = $logical
+                "querytype"          = 0
+                "fetchxml"           = $fetchXml
+                "layoutxml"          = $layoutXml
+            } | ConvertTo-Json -Compress -Depth 10
             Invoke-Dv "Post" "savedqueries" $viewBody | Out-Null
             Write-Host "    View  (created)" -ForegroundColor Green
             $viewsCreated++
@@ -174,7 +303,7 @@ try {
 }
 
 Write-Host ""
-Write-Host "Forms created: $formsCreated  Views created: $viewsCreated  Failures: $failed"
+Write-Host "Forms created: $formsCreated  Forms updated: $formsUpdated  Views created: $viewsCreated  Failures: $failed"
 if ($failed -gt 0) { exit 1 }
 Write-Host ""
 Write-Host "Build complete. Verify in Power Apps Maker at:"

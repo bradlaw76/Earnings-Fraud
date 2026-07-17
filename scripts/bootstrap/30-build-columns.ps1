@@ -64,20 +64,22 @@ foreach ($file in $payloads) {
         $skipped++; continue
     }
 
-    Write-Host "  Table: $tableName" -ForegroundColor Cyan
+    $tableLogicalName = $tableName.ToLower()
+
+    Write-Host "  Table: $tableLogicalName" -ForegroundColor Cyan
     foreach ($col in $doc.Columns) {
         $schema = $col.SchemaName
         $logical = $schema.ToLower()
         Write-Host "    $schema " -NoNewline
 
-        if (Test-ColumnExists $tableName $logical) {
+        if (Test-ColumnExists $tableLogicalName $logical) {
             Write-Host "(exists — skipped)" -ForegroundColor DarkGray
             $skipped++; continue
         }
 
         try {
             $body = $col | ConvertTo-Json -Depth 20 -Compress
-            Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
+            Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableLogicalName')/Attributes" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green
             $created++
         } catch {

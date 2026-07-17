@@ -60,10 +60,10 @@ $created = 0; $skipped = 0; $failed = 0
 
 foreach ($file in $payloads) {
     $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-    $rels = @($doc.Relationships ?? $doc)
+    $rels = if ($doc -is [array]) { $doc } elseif ($doc.PSObject.Properties.Name -contains 'Relationships') { @($doc.Relationships) } else { @($doc) }
 
     foreach ($rel in $rels) {
-        $schema = $rel.SchemaName ?? $rel.RelationshipDefinition.SchemaName
+        $schema = if ($rel.PSObject.Properties.Name -contains 'SchemaName') { $rel.SchemaName } else { $rel.RelationshipDefinition.SchemaName }
         Write-Host "  $schema " -NoNewline
 
         if (Test-RelationshipExists $schema) {

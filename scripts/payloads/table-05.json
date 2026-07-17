@@ -1,0 +1,79 @@
+{
+  "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+  "SchemaName": "earnint_investigationfinding",
+  "DisplayName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Investigation Finding",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "DisplayCollectionName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Investigation Findings",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "Description": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Analyst findings and recommended disposition",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "HasNotes": true,
+  "HasActivities": false,
+  "IsActivity": false,
+  "OwnershipType": "UserOwned",
+  "EntityColor": "#004b50",
+  "Attributes": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "IsPrimaryName": true,
+      "SchemaName": "earnint_investigationfinding_name",
+      "AttributeType": "String",
+      "AttributeTypeName": {
+        "Value": "StringType"
+      },
+      "FormatName": {
+        "Value": "Text"
+      },
+      "MaxLength": 100,
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Finding Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Finding Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "RequiredLevel": {
+        "Value": "None",
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings"
+      }
+    }
+  ]
+}

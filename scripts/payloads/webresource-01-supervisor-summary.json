@@ -1,0 +1,12 @@
+{
+  "WebResources": [
+    {
+      "Name": "{prefix}_/report/supervisor-case-summary.html",
+      "DisplayName": "Supervisor Case Summary Report",
+      "Description": "HTML web resource for supervisor case summary and next action guidance.",
+      "SourcePath": "webresources/supervisor-case-summary.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}

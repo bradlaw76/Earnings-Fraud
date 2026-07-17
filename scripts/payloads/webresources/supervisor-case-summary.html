@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supervisor Case Summary</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fa;
+      --panel: #ffffff;
+      --text: #102542;
+      --muted: #516173;
+      --accent: #0a5fa8;
+      --border: #d9e2ec;
+      --warn: #a04600;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .note {
+      margin-top: 10px;
+      padding: 8px;
+      border-left: 4px solid var(--warn);
+      background: #fff8f1;
+      font-size: 12px;
+      color: #6f4b2a;
+    }
+
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Supervisor Case Summary</h1>
+    <p>Starter web resource surface for case-level reporting and next-action guidance.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Case Status</div>
+        <div class="value" id="caseStatus">Not bound</div>
+      </div>
+      <div class="card">
+        <div class="label">Risk Tier</div>
+        <div class="value" id="riskTier">Not bound</div>
+      </div>
+      <div class="card full">
+        <div class="label">Recommended Next Action</div>
+        <div class="value" id="nextAction">Not bound</div>
+      </div>
+    </div>
+
+    <div class="note">
+      Bind this web resource to Dataverse fields or an automation output field after it is added to the case form.
+    </div>
+  </div>
+
+  <script>
+    // Optional query-string binding for preview/testing scenarios.
+    const params = new URLSearchParams(window.location.search);
+    const caseStatus = params.get("status") || "Not bound";
+    const risk = params.get("risk") || "Not bound";
+    const next = params.get("next") || "Not bound";
+
+    document.getElementById("caseStatus").textContent = caseStatus;
+    document.getElementById("riskTier").textContent = risk;
+    document.getElementById("nextAction").textContent = next;
+  </script>
+</body>
+</html>

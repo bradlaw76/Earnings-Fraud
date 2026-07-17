@@ -47,6 +47,69 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
 }
 
+function Get-PayloadEntityNames([string]$Folder) {
+    $names = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
+    foreach ($file in @(Get-ChildItem -Path $Folder -Filter "table-*.json" -ErrorAction SilentlyContinue)) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $schema = if ($doc.PSObject.Properties.Name -contains 'EntityDefinition') { $doc.EntityDefinition.SchemaName } else { $doc.SchemaName }
+        if (-not [string]::IsNullOrWhiteSpace($schema)) { [void]$names.Add($schema.ToLower()) }
+    }
+
+    foreach ($file in @(Get-ChildItem -Path $Folder -Filter "columns-*.json" -ErrorAction SilentlyContinue)) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        if (-not [string]::IsNullOrWhiteSpace($doc.TableLogicalName)) { [void]$names.Add($doc.TableLogicalName.ToLower()) }
+    }
+
+    foreach ($file in @(Get-ChildItem -Path $Folder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $rels = if ($doc -is [array]) { $doc } elseif ($doc.PSObject.Properties.Name -contains 'Relationships') { @($doc.Relationships) } else { @($doc) }
+        foreach ($rel in $rels) {
+            if (-not [string]::IsNullOrWhiteSpace($rel.ReferencedEntity)) { [void]$names.Add($rel.ReferencedEntity.ToLower()) }
+            if (-not [string]::IsNullOrWhiteSpace($rel.ReferencingEntity)) { [void]$names.Add($rel.ReferencingEntity.ToLower()) }
+        }
+    }
+
+    return @($names)
+}
+
+function Get-PayloadAttributes([string]$Folder) {
+    $items = @()
+    foreach ($file in @(Get-ChildItem -Path $Folder -Filter "columns-*.json" -ErrorAction SilentlyContinue)) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $tableName = $doc.TableLogicalName
+        if ([string]::IsNullOrWhiteSpace($tableName)) { continue }
+        foreach ($col in $doc.Columns) {
+            if (-not [string]::IsNullOrWhiteSpace($col.SchemaName)) {
+                $items += [PSCustomObject]@{
+                    TableLogicalName = $tableName.ToLower()
+                    AttributeLogicalName = $col.SchemaName.ToLower()
+                }
+            }
+        }
+    }
+    return $items
+}
+
+function Get-PayloadRelationships([string]$Folder) {
+    $items = @()
+    foreach ($file in @(Get-ChildItem -Path $Folder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $rels = if ($doc -is [array]) { $doc } elseif ($doc.PSObject.Properties.Name -contains 'Relationships') { @($doc.Relationships) } else { @($doc) }
+        foreach ($rel in $rels) {
+            if (-not [string]::IsNullOrWhiteSpace($rel.SchemaName)) {
+                $items += $rel.SchemaName
+            }
+        }
+    }
+    return @($items | ForEach-Object { $_.ToLower() } | Sort-Object -Unique)
+}
+
+function Add-SolutionComponent([Guid]$ComponentId, [int]$ComponentType, [string]$SolutionName) {
+    $body = @{ ComponentId = $ComponentId; ComponentType = $ComponentType; SolutionUniqueName = $SolutionName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
+    Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
+}
+
 Write-Host ""
 Write-Host "=== Add to Solution ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
@@ -63,19 +126,71 @@ if ($null -eq $sol) {
 }
 Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 
-# Find all custom tables matching prefix
-$tables = (Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,MetadataId&`$filter=IsCustomEntity eq true").value
-$prefixed = @($tables | Where-Object { $_.LogicalName -like "$($PublisherPrefix)_*" })
-Write-Host "  Custom tables found: $($prefixed.Count)"
+$payloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+$entityNames = @(Get-PayloadEntityNames $payloadsFolder)
+$attributeRefs = @(Get-PayloadAttributes $payloadsFolder)
+$relationshipNames = @(Get-PayloadRelationships $payloadsFolder)
+$tables = @()
+foreach ($entityName in $entityNames) {
+    try {
+        $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$entityName')?`$select=LogicalName,MetadataId"
+        if ($null -ne $entity -and -not [string]::IsNullOrWhiteSpace($entity.LogicalName)) {
+            $tables += $entity
+        }
+    } catch {
+        Write-Host "  WARN  could not resolve entity '$entityName' from payloads" -ForegroundColor Yellow
+    }
+}
+Write-Host "  Entities found in payloads: $($tables.Count)"
+Write-Host "  Attributes found in payloads: $($attributeRefs.Count)"
+Write-Host "  Relationships found in payloads: $($relationshipNames.Count)"
 Write-Host ""
 
 $added = 0; $skipped = 0; $failed = 0
 # ComponentType 1 = Entity
-foreach ($t in $prefixed) {
+foreach ($t in $tables | Sort-Object LogicalName -Unique) {
     Write-Host "  $($t.LogicalName) " -NoNewline
     try {
-        $body = @{ ComponentId = $t.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
-        Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
+        Add-SolutionComponent -ComponentId $t.MetadataId -ComponentType 1 -SolutionName $SolutionUniqueName
+        Write-Host "(added)" -ForegroundColor Green
+        $added++
+    } catch {
+        if ($_.Exception.Message -like "*already*" -or $_.Exception.Message -like "*duplicate*") {
+            Write-Host "(already in solution)" -ForegroundColor DarkGray; $skipped++
+        } else {
+            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red; $failed++
+        }
+    }
+}
+
+# ComponentType 2 = Attribute
+foreach ($attr in $attributeRefs | Sort-Object TableLogicalName, AttributeLogicalName -Unique) {
+    Write-Host "  $($attr.TableLogicalName).$($attr.AttributeLogicalName) " -NoNewline
+    try {
+        $attribute = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$($attr.TableLogicalName)')/Attributes(LogicalName='$($attr.AttributeLogicalName)')?`$select=MetadataId,LogicalName"
+        Add-SolutionComponent -ComponentId $attribute.MetadataId -ComponentType 2 -SolutionName $SolutionUniqueName
+        Write-Host "(added)" -ForegroundColor Green
+        $added++
+    } catch {
+        if ($_.Exception.Message -like "*already*" -or $_.Exception.Message -like "*duplicate*") {
+            Write-Host "(already in solution)" -ForegroundColor DarkGray; $skipped++
+        } else {
+            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red; $failed++
+        }
+    }
+}
+
+# ComponentType 10 = Relationship
+foreach ($relationshipName in $relationshipNames) {
+    Write-Host "  $relationshipName " -NoNewline
+    try {
+        $relationship = (Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$relationshipName'&`$select=MetadataId,SchemaName").value | Select-Object -First 1
+        if ($null -eq $relationship) {
+            Write-Host "(warning: relationship metadata lookup not resolved)" -ForegroundColor Yellow
+            $skipped++
+            continue
+        }
+        Add-SolutionComponent -ComponentId $relationship.MetadataId -ComponentType 10 -SolutionName $SolutionUniqueName
         Write-Host "(added)" -ForegroundColor Green
         $added++
     } catch {

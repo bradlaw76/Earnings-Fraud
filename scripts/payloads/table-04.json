@@ -1,0 +1,79 @@
+{
+  "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+  "SchemaName": "earnint_evidenceitem",
+  "DisplayName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Evidence Item",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "DisplayCollectionName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Evidence Items",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "Description": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Supporting evidence for case review",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "HasNotes": false,
+  "HasActivities": false,
+  "IsActivity": false,
+  "OwnershipType": "UserOwned",
+  "EntityColor": "#a4373a",
+  "Attributes": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "IsPrimaryName": true,
+      "SchemaName": "earnint_evidenceitem_name",
+      "AttributeType": "String",
+      "AttributeTypeName": {
+        "Value": "StringType"
+      },
+      "FormatName": {
+        "Value": "Text"
+      },
+      "MaxLength": 100,
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Evidence Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Evidence Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "RequiredLevel": {
+        "Value": "None",
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings"
+      }
+    }
+  ]
+}
