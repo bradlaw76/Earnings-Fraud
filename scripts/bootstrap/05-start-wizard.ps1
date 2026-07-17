@@ -107,6 +107,8 @@ $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful dem
 $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment should it be built in?"
 $answers["NeedsDemoData"] = Read-RequiredValue "10. Does it need demo data?" "Yes"
 $answers["SolutionType"] = Read-RequiredValue "11. Should the output be a managed or unmanaged solution?" "Unmanaged"
+$answers["ReportTables"] = Read-RequiredValue "12. Which created/planned tables should have reports?"
+$answers["ReportTypes"] = Read-RequiredValue "13. For those tables, what report types are needed (web resource, dashboard KPI, queue/view summary)?"
 
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
@@ -145,6 +147,8 @@ $answersContent = @"
 9. Build environment: $($answers["BuildEnvironment"])
 10. Demo data needed: $($answers["NeedsDemoData"])
 11. Solution output type: $($answers["SolutionType"])
+12. Tables needing reports: $($answers["ReportTables"])
+13. Report surface types: $($answers["ReportTypes"])
 "@
 
 $specContent = @"
@@ -180,11 +184,16 @@ $($answers["NeedsDemoData"])
 ## Solution Packaging Decision
 $($answers["SolutionType"])
 
+## Report Scope (Table-Driven)
+- Tables selected for reports: $($answers["ReportTables"])
+- Report types selected: $($answers["ReportTypes"])
+
 ## Acceptance Criteria
 - The scenario is clear and approved.
 - Required entities and artifacts are identified.
 - Success measures are specific enough to validate.
 - The environment and solution type are agreed before implementation.
+- Report scope is mapped from created/planned tables before build execution.
 "@
 
 $planContent = @"
@@ -208,6 +217,7 @@ $planContent = @"
 - Confirm environment availability and permissions.
 - Confirm entity scope and artifact count.
 - Confirm whether demo data must be scripted or manual.
+- Confirm report scope for critical tables and report placement decisions.
 
 ## Validation Plan
 - Verify artifacts in Maker portal.
@@ -226,6 +236,8 @@ $tasksContent = @"
 - [ ] Approve build environment and permissions
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
+- [ ] Build report mapping matrix for tables: $($answers["ReportTables"])
+- [ ] Confirm report types/placement: $($answers["ReportTypes"])
 - [ ] Decide demo data approach: $($answers["NeedsDemoData"])
 - [ ] Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`
 - [ ] Run `pwsh ./scripts/bootstrap/10-auth-connect.ps1`
@@ -234,6 +246,7 @@ $tasksContent = @"
 - [ ] Build relationships with `40-build-relationships.ps1`
 - [ ] Add components to solution with `50-add-to-solution.ps1`
 - [ ] Build starter forms/views with `60-build-forms-views.ps1`
+- [ ] Build report/web resources with `70-build-web-resources.ps1` (when applicable)
 - [ ] Export and unpack solution
 - [ ] Commit changes to git
 - [ ] Pack and import solution

@@ -181,7 +181,7 @@ Ask the user:
 1. What are the top 3 user tasks by frequency?
 2. Which records need quick create versus full form?
 3. What views represent work queues and approvals?
-4. What dashboard metrics are needed for daily operations?
+4. What dashboard metrics and report surfaces are needed for daily operations?
 5. What accessibility requirements must be enforced?
 
 Build decisions:
@@ -189,6 +189,7 @@ Build decisions:
 - Form density and sectioning strategy.
 - View filters for triage behavior.
 - Chart/dashboard baseline KPIs.
+- Report web resource placement for supervisory summaries when needed.
 
 Exit criteria:
 - Sitemap draft approved.
@@ -204,6 +205,37 @@ Response template:
 - Forms matrix:
 - Views matrix:
 - Dashboard KPIs:
+
+## 4A. Report Scoping Wizard (Table-Driven)
+
+Goal: Determine report surfaces based on created or planned tables before implementation starts.
+
+Ask the user:
+1. Which tables are already created in the environment and solution?
+2. If not created yet, which planned tables in `spec.md` need reports?
+3. For each selected table, which report surface is required (web resource, dashboard KPI, or queue/view summary)?
+4. For each report, what decision should it support?
+5. For each report, what fields are required and who owns validation?
+
+Build decisions:
+- Create a report mapping matrix by table.
+- Identify whether each report is record-level, table-level, or both.
+- Define placement target (case form, dashboard, or queue view).
+
+Exit criteria:
+- Every critical workflow table has an explicit report decision.
+- Report mapping matrix is complete with owner and field list.
+- Any table without a report decision is documented as approved out of scope.
+
+Copilot prompt:
+"Generate a table-driven report mapping matrix from existing/planned Dataverse tables, including report type, placement, fields, owner, and validation tasks."
+
+Response template:
+- Report mapping matrix:
+- In-scope report surfaces:
+- Out-of-scope tables with rationale:
+- Report implementation tasks:
+- Report validation tasks:
 
 ## 5. Automation and Integration Wizard
 
@@ -318,7 +350,7 @@ Ask the user:
 1. Which exact existing fields will feed the prompt?
 2. What output format is required (JSON strongly recommended)?
 3. Which case field will store rendered output?
-4. Should output be plain text, HTML, or both?
+4. Should output be plain text, HTML web resource, or both?
 5. What backfill strategy is required for existing records?
 
 Recommended minimal field set:
@@ -333,12 +365,14 @@ Build decisions:
 - Parse output with `Parse JSON` before writing fields.
 - Use trigger filter columns to prevent update loops.
 - Render HTML in `cfd_recommendednextaction` and optionally present through an HTML web resource.
+- If HTML is selected, define the web resource name, form placement, and owner for the report surface.
 
 Exit criteria:
 - Prompt returns valid JSON for positive and missing-data paths.
 - Flow writes the parsed result to the target case field.
 - Form renders output correctly via rich text field or web resource.
 - Backfill run has completed for existing records.
+- Report web resource displays the intended summary content when included in the form experience.
 
 Copilot prompt:
 "Generate a Power Automate implementation checklist for AI Next Best Action on a Dataverse case table using five existing fields, JSON output parsing, and HTML rendering."

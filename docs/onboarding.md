@@ -291,7 +291,10 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/70-build-web-resources.ps1
 ```
+
+Use script 70 when your scenario includes HTML/report web resources on forms.
 
 All scripts are idempotent and safe to rerun.
 
@@ -310,6 +313,7 @@ Open [Power Apps Maker](https://make.powerapps.com), select your environment, an
 - Tables appear under **Dataverse > Tables**.
 - Forms and views appear on each table.
 - Tables appear inside the target solution.
+- Report web resources appear under the solution components when script 70 is in scope.
 
 Validation checkpoint:
 
