@@ -3,7 +3,7 @@
     {
       "Name": "{prefix}_/report/supervisor-case-summary.html",
       "DisplayName": "Supervisor Case Summary Report",
-      "Description": "HTML web resource for supervisor case summary and next action guidance.",
+      "Description": "Table-driven HTML report for supervisory summary, KPI snapshot, and disposition guidance.",
       "SourcePath": "webresources/supervisor-case-summary.html",
       "WebResourceType": 1,
       "AddToSolution": true

@@ -17,7 +17,8 @@ param(
     [string]$EnvironmentUrl     = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken        = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
-    [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX
+    [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX,
+    [string]$PayloadsFolder     = ""
 )
 
 Set-StrictMode -Version Latest
@@ -126,7 +127,20 @@ if ($null -eq $sol) {
 }
 Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 
-$payloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+$payloadsFolder = $PayloadsFolder
+if ([string]::IsNullOrWhiteSpace($payloadsFolder)) {
+    $payloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+}
+
+if (-not (Test-Path $payloadsFolder)) {
+    Write-Host "Payload folder not found: $payloadsFolder" -ForegroundColor Red
+    exit 1
+}
+
+$payloadsFolder = (Resolve-Path $payloadsFolder).Path
+$payloadsFolderDisplay = $payloadsFolder
+Write-Host "  Payloads:    $payloadsFolderDisplay"
+Write-Host ""
 $entityNames = @(Get-PayloadEntityNames $payloadsFolder)
 $attributeRefs = @(Get-PayloadAttributes $payloadsFolder)
 $relationshipNames = @(Get-PayloadRelationships $payloadsFolder)

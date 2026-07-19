@@ -18,7 +18,8 @@ param(
     [string]$AccessToken        = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX,
-    [string]$PayloadsFolder     = ""
+    [string]$PayloadsFolder     = "",
+    [int]$PublishTimeoutSeconds = 120
 )
 
 Set-StrictMode -Version Latest
@@ -46,7 +47,7 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName, $PublisherP
     }
 }
 
-function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
+function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "", [int]$TimeoutSeconds = 0) {
     $h = @{
         "Authorization" = "Bearer $AccessToken"
         "Content-Type"  = "application/json"
@@ -56,10 +57,21 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     }
 
     $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) {
-        return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body
+    $invokeArgs = @{
+        Method = $Method
+        Uri = $uri
+        Headers = $h
     }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
+
+    if ($Body) {
+        $invokeArgs["Body"] = $Body
+    }
+
+    if ($TimeoutSeconds -gt 0) {
+        $invokeArgs["TimeoutSec"] = $TimeoutSeconds
+    }
+
+    return Invoke-RestMethod @invokeArgs
 }
 
 function Add-SolutionComponent([Guid]$ComponentId, [int]$ComponentType, [string]$SolutionName) {
@@ -212,10 +224,10 @@ foreach ($payloadFile in $payloadFiles) {
 Write-Host ""
 Write-Host "Publishing all customizations..." -NoNewline
 try {
-    Invoke-Dv "Post" "PublishAllXml" "{}" | Out-Null
+    Invoke-Dv "Post" "PublishAllXml" "{}" $PublishTimeoutSeconds | Out-Null
     Write-Host " done." -ForegroundColor Green
 } catch {
-    Write-Host " warning: publish failed ($($_.Exception.Message))" -ForegroundColor Yellow
+    Write-Host " warning: publish failed or timed out after $PublishTimeoutSeconds seconds ($($_.Exception.Message))" -ForegroundColor Yellow
 }
 
 Write-Host ""

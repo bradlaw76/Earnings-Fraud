@@ -9,17 +9,24 @@
       color-scheme: light;
       --bg: #f3f6fa;
       --panel: #ffffff;
+      --panel-soft: #f8fbff;
       --text: #102542;
       --muted: #516173;
       --accent: #0a5fa8;
+      --accent-soft: #dbeeff;
       --border: #d9e2ec;
       --warn: #a04600;
+      --warn-soft: #fff8f1;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
       font-family: "Segoe UI", Tahoma, sans-serif;
-      background: var(--bg);
+      background: radial-gradient(circle at top right, #f7fbff, var(--bg) 40%);
       color: var(--text);
       padding: 12px;
     }
@@ -27,13 +34,71 @@
     .panel {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 14px;
+      box-shadow: 0 8px 22px rgba(16, 37, 66, 0.06);
+    }
+
+    .header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin: 0;
       font-size: 18px;
+      color: var(--accent);
+    }
+
+    .timestamp {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: #fff;
+      font-weight: 600;
+    }
+
+    .mode-pill.exec {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .toggle {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toggle:hover {
+      border-color: var(--accent);
       color: var(--accent);
     }
 
@@ -41,6 +106,7 @@
       margin: 0 0 12px;
       color: var(--muted);
       font-size: 13px;
+      line-height: 1.4;
     }
 
     .grid {
@@ -54,6 +120,29 @@
       border-radius: 8px;
       padding: 10px;
       background: #fbfdff;
+    }
+
+    .kpi {
+      border: 1px solid var(--accent-soft);
+      background: var(--panel-soft);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .kpi-value {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .kpi-label {
+      margin: 0;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.04em;
     }
 
     .label {
@@ -74,28 +163,126 @@
       grid-column: 1 / -1;
     }
 
+    .matrix {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .matrix-head,
+    .matrix-row {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.4fr;
+      gap: 0;
+    }
+
+    .matrix-head {
+      background: var(--panel-soft);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .matrix-row {
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .matrix-row:last-child {
+      border-bottom: none;
+    }
+
+    .cell {
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .decision {
+      font-weight: 600;
+    }
+
     .note {
       margin-top: 10px;
       padding: 8px;
       border-left: 4px solid var(--warn);
-      background: #fff8f1;
+      background: var(--warn-soft);
       font-size: 12px;
       color: #6f4b2a;
+    }
+
+    .exec-note {
+      display: none;
+    }
+
+    body.executive .matrix,
+    body.executive .note {
+      display: none;
+    }
+
+    body.executive .exec-note {
+      display: block;
+      margin-top: 10px;
+      padding: 8px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+      font-size: 12px;
+      color: #11436f;
+    }
+
+    @media (max-width: 900px) {
+      .matrix-head,
+      .matrix-row {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-head {
+        display: none;
+      }
+
+      .cell {
+        border-bottom: 1px dashed var(--border);
+      }
+
+      .matrix-row .cell:last-child {
+        border-bottom: none;
+      }
     }
 
     @media (max-width: 720px) {
       .grid {
         grid-template-columns: 1fr;
       }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
   <div class="panel">
-    <h1>Supervisor Case Summary</h1>
-    <p>Starter web resource surface for case-level reporting and next-action guidance.</p>
+    <div class="header">
+      <h1>Supervisor Case Summary</h1>
+      <div class="timestamp" id="generatedAt">Generated: --</div>
+    </div>
 
-    <div class="grid">
+    <p>
+      Record-level and table-level report snapshot for supervisor review decisions.
+      Values can be passed through query-string parameters for preview or form binding.
+    </p>
+
+    <div class="toolbar">
+      <div class="mode-pill" id="modePill">Mode: Full</div>
+      <button type="button" class="toggle" id="modeToggle">Switch to Executive Mode</button>
+    </div>
+
+    <div class="grid" style="margin-bottom:8px;">
       <div class="card">
         <div class="label">Case Status</div>
         <div class="value" id="caseStatus">Not bound</div>
@@ -110,21 +297,129 @@
       </div>
     </div>
 
+    <div class="grid" style="margin-bottom:8px;">
+      <div class="kpi">
+        <p class="kpi-value" id="openCases">0</p>
+        <p class="kpi-label">Open Cases</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi-value" id="highRiskCases">0</p>
+        <p class="kpi-label">High Risk Cases</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi-value" id="overdueCases">0</p>
+        <p class="kpi-label">Overdue Reviews</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi-value" id="evidenceBacklog">0</p>
+        <p class="kpi-label">Evidence Backlog</p>
+      </div>
+    </div>
+
+    <div class="matrix" aria-label="Report mapping matrix">
+      <div class="matrix-head">
+        <div class="cell">Table</div>
+        <div class="cell">Report Surface</div>
+        <div class="cell">Decision Supported</div>
+      </div>
+      <div class="matrix-row">
+        <div class="cell">earnint_earningsdiscrepancy</div>
+        <div class="cell" id="surfaceDiscrepancy">Web resource + Queue/View summary</div>
+        <div class="cell decision" id="decisionDiscrepancy">Escalate for overpayment or fraud referral</div>
+      </div>
+      <div class="matrix-row">
+        <div class="cell">earnint_evidenceitem</div>
+        <div class="cell" id="surfaceEvidence">Web resource + Queue/View summary</div>
+        <div class="cell decision" id="decisionEvidence">Request additional documentation or proceed</div>
+      </div>
+      <div class="matrix-row">
+        <div class="cell">earnint_investigationfinding</div>
+        <div class="cell" id="surfaceFinding">Web resource + Dashboard KPI</div>
+        <div class="cell decision" id="decisionFinding">Approve disposition and close or rework</div>
+      </div>
+    </div>
+
     <div class="note">
-      Bind this web resource to Dataverse fields or an automation output field after it is added to the case form.
+      Starter behavior: bind this web resource to Dataverse fields, queue metrics, or flow outputs after adding to the case form.
+    </div>
+
+    <div class="exec-note">
+      Executive mode is enabled. This condensed view emphasizes case status, risk, next action, and KPI signals.
     </div>
   </div>
 
   <script>
-    // Optional query-string binding for preview/testing scenarios.
-    const params = new URLSearchParams(window.location.search);
-    const caseStatus = params.get("status") || "Not bound";
-    const risk = params.get("risk") || "Not bound";
-    const next = params.get("next") || "Not bound";
+    function getParam(name, fallback) {
+      var params = new URLSearchParams(window.location.search);
+      var value = params.get(name);
+      if (value === null || value === "") {
+        return fallback;
+      }
+      return value;
+    }
 
-    document.getElementById("caseStatus").textContent = caseStatus;
-    document.getElementById("riskTier").textContent = risk;
-    document.getElementById("nextAction").textContent = next;
+    function setText(id, value) {
+      var node = document.getElementById(id);
+      if (node) {
+        node.textContent = value;
+      }
+    }
+
+    function setNumeric(id, value, fallback) {
+      var numeric = Number(value);
+      if (Number.isNaN(numeric)) {
+        setText(id, fallback);
+        return;
+      }
+      setText(id, String(Math.max(0, Math.floor(numeric))));
+    }
+
+    function setMode(isExecutive) {
+      var body = document.body;
+      var pill = document.getElementById("modePill");
+      var btn = document.getElementById("modeToggle");
+
+      if (isExecutive) {
+        body.classList.add("executive");
+        pill.textContent = "Mode: Executive";
+        pill.classList.add("exec");
+        btn.textContent = "Switch to Full Mode";
+      } else {
+        body.classList.remove("executive");
+        pill.textContent = "Mode: Full";
+        pill.classList.remove("exec");
+        btn.textContent = "Switch to Executive Mode";
+      }
+    }
+
+    setText("generatedAt", "Generated: " + new Date().toLocaleString());
+
+    setText("caseStatus", getParam("status", "Not bound"));
+    setText("riskTier", getParam("risk", "Not bound"));
+    setText("nextAction", getParam("next", "Not bound"));
+
+    setNumeric("openCases", getParam("openCases", "0"), "0");
+    setNumeric("highRiskCases", getParam("highRiskCases", "0"), "0");
+    setNumeric("overdueCases", getParam("overdueCases", "0"), "0");
+    setNumeric("evidenceBacklog", getParam("evidenceBacklog", "0"), "0");
+
+    setText("surfaceDiscrepancy", getParam("surfaceDiscrepancy", "Web resource + Queue/View summary"));
+    setText("surfaceEvidence", getParam("surfaceEvidence", "Web resource + Queue/View summary"));
+    setText("surfaceFinding", getParam("surfaceFinding", "Web resource + Dashboard KPI"));
+
+    setText("decisionDiscrepancy", getParam("decisionDiscrepancy", "Escalate for overpayment or fraud referral"));
+    setText("decisionEvidence", getParam("decisionEvidence", "Request additional documentation or proceed"));
+    setText("decisionFinding", getParam("decisionFinding", "Approve disposition and close or rework"));
+
+    var initialMode = getParam("mode", "full").toLowerCase();
+    var executive = initialMode === "executive";
+    setMode(executive);
+
+    var modeToggle = document.getElementById("modeToggle");
+    modeToggle.addEventListener("click", function () {
+      executive = !executive;
+      setMode(executive);
+    });
   </script>
 </body>
 </html>
