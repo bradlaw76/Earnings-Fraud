@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Demo Talk Track — SSA Earnings Integrity Case Review V2</title>
+<title>Demo Talk Track — SSA Earnings Integrity (30 min)</title>
 <script>
   (() => {
     const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
@@ -14,744 +14,509 @@
 <style>
 :root {
   color-scheme: light;
-  --cp-bg: #f7f4ef;
-  --cp-bg-elevated: #fcfbf8;
-  --cp-surface: #ffffff;
-  --cp-surface-soft: #f5f5f5;
-  --cp-border: #dedede;
-  --cp-border-strong: #919191;
-  --cp-text: #242424;
-  --cp-text-muted: #5c5c5c;
-  --cp-text-soft: #6f6f6f;
-  --cp-accent: #b11f4b;
-  --cp-accent-hover: #9a1a41;
-  --cp-accent-soft: rgba(177, 31, 75, 0.08);
-  --cp-accent-fg: #ffffff;
-  --cp-success: #16a34a;
-  --cp-danger: #dc2626;
-  --cp-warning: #f59e0b;
-  --cp-link: #0078d4;
-  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
-  --cp-overlay: rgba(255, 255, 255, 0.8);
-  --cp-panel: rgba(255, 255, 255, 0.86);
-  --cp-panel-strong: rgba(255, 255, 255, 0.96);
-  --cp-sheen: rgba(255, 255, 255, 0.55);
-  --cp-highlight: rgba(177, 31, 75, 0.12);
+  --cp-bg: #f7f4ef; --cp-bg-elevated: #fcfbf8; --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5; --cp-border: #dedede; --cp-border-strong: #919191;
+  --cp-text: #242424; --cp-text-muted: #5c5c5c; --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b; --cp-accent-hover: #9a1a41; --cp-accent-soft: rgba(177,31,75,0.08);
+  --cp-accent-fg: #ffffff; --cp-success: #16a34a; --cp-danger: #dc2626;
+  --cp-warning: #f59e0b; --cp-link: #0078d4; --cp-shadow: 0 18px 48px rgba(0,0,0,0.12);
+  --cp-overlay: rgba(255,255,255,0.8); --cp-panel: rgba(255,255,255,0.86);
+  --cp-panel-strong: rgba(255,255,255,0.96); --cp-sheen: rgba(255,255,255,0.55);
+  --cp-highlight: rgba(177,31,75,0.12);
 }
 html[data-theme="dark"] {
   color-scheme: dark;
-  --cp-bg: #3d3b3a;
-  --cp-bg-elevated: #343231;
-  --cp-surface: #292929;
-  --cp-surface-soft: #2e2e2e;
-  --cp-border: #474747;
-  --cp-border-strong: #5f5f5f;
-  --cp-text: #dedede;
-  --cp-text-muted: #919191;
-  --cp-text-soft: #b0b0b0;
-  --cp-accent: #fd8ea1;
-  --cp-accent-hover: #fb7b91;
-  --cp-accent-soft: rgba(253, 142, 161, 0.14);
-  --cp-accent-fg: #1a1a1a;
-  --cp-success: #4ade80;
-  --cp-danger: #f87171;
-  --cp-warning: #fbbf24;
-  --cp-link: #4da6ff;
-  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
-  --cp-overlay: rgba(41, 41, 41, 0.88);
-  --cp-panel: rgba(41, 41, 41, 0.72);
-  --cp-panel-strong: rgba(41, 41, 41, 0.96);
-  --cp-sheen: rgba(255, 255, 255, 0.04);
-  --cp-highlight: rgba(253, 142, 161, 0.12);
+  --cp-bg: #3d3b3a; --cp-bg-elevated: #343231; --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e; --cp-border: #474747; --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede; --cp-text-muted: #919191; --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1; --cp-accent-hover: #fb7b91; --cp-accent-soft: rgba(253,142,161,0.14);
+  --cp-accent-fg: #1a1a1a; --cp-success: #4ade80; --cp-danger: #f87171;
+  --cp-warning: #fbbf24; --cp-link: #4da6ff; --cp-shadow: 0 18px 48px rgba(0,0,0,0.32);
+  --cp-overlay: rgba(41,41,41,0.88); --cp-panel: rgba(41,41,41,0.72);
+  --cp-panel-strong: rgba(41,41,41,0.96); --cp-sheen: rgba(255,255,255,0.04);
+  --cp-highlight: rgba(253,142,161,0.12);
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--cp-bg);
-  color: var(--cp-text);
-  font-size: 15px;
-  line-height: 1.6;
-  padding: 0;
-}
-
-/* ── Layout ──────────────────────────────────────────────────────── */
-.page-header {
-  background: var(--cp-surface);
-  border-bottom: 1px solid var(--cp-border);
-  padding: 28px 40px 24px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.header-title { flex: 1; }
-.header-title h1 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--cp-text);
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-}
-.header-title .subtitle {
-  font-size: 0.85rem;
-  color: var(--cp-text-muted);
-  margin-top: 4px;
-}
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--cp-accent-soft);
-  color: var(--cp-accent);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
-.header-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: right;
-  font-size: 0.8rem;
-  color: var(--cp-text-soft);
-}
-
-.theme-toggle {
-  background: var(--cp-surface-soft);
-  border: 1px solid var(--cp-border);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.78rem;
-  color: var(--cp-text-muted);
-  cursor: pointer;
-  transition: background 0.15s;
-  font-family: inherit;
-  margin-top: 4px;
-}
-.theme-toggle:hover { background: var(--cp-border); }
-
-.container { max-width: 900px; margin: 0 auto; padding: 32px 40px 64px; }
-
-/* ── Sections ─────────────────────────────────────────────────────── */
-.section { margin-bottom: 32px; }
-
-.section-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--cp-text-muted);
-  margin-bottom: 12px;
-}
-
-/* ── Presenter Brief ──────────────────────────────────────────────── */
-.brief-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 8px;
-}
-.brief-item {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-.brief-item .label { font-size: 0.72rem; color: var(--cp-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.brief-item .value { font-size: 0.9rem; font-weight: 600; color: var(--cp-text); margin-top: 2px; }
-
-/* ── Data Table ───────────────────────────────────────────────────── */
-.data-table-wrap {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.data-table thead tr { background: var(--cp-surface-soft); }
-.data-table th {
-  text-align: left;
-  padding: 10px 14px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--cp-text-muted);
-  border-bottom: 1px solid var(--cp-border);
-}
-.data-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--cp-border);
-  vertical-align: top;
-}
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr.hero-row { background: var(--cp-accent-soft); }
-.data-table tr.hero-row td:first-child { border-left: 3px solid var(--cp-accent); }
-
-.case-id { font-family: Consolas, "Courier New", monospace; font-size: 0.8rem; color: var(--cp-accent); font-weight: 600; }
-.stage-pill {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.stage-active    { background: rgba(22, 163, 74, 0.12);  color: var(--cp-success); }
-.stage-research  { background: rgba(245, 158, 11, 0.12); color: var(--cp-warning); }
-.stage-hold      { background: rgba(91, 92, 92, 0.12);   color: var(--cp-text-muted); }
-.stage-resolved  { background: rgba(0, 120, 212, 0.1);   color: var(--cp-link); }
-.hero-label { font-size: 0.7rem; font-weight: 700; color: var(--cp-accent); text-transform: uppercase; letter-spacing: 0.05em; }
-
-/* ── Script Box ───────────────────────────────────────────────────── */
-.script-box {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-left: 4px solid var(--cp-accent);
-  border-radius: 10px;
-  padding: 16px 18px;
-  font-size: 0.9rem;
-  font-style: italic;
-  color: var(--cp-text-soft);
-  line-height: 1.7;
-}
-.script-box p + p { margin-top: 8px; }
-
-/* ── Step Cards ───────────────────────────────────────────────────── */
-.step-card {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-radius: 16px;
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-.step-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.15s;
-}
-.step-header:hover { background: var(--cp-surface-soft); }
-.step-num {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--cp-accent);
-  color: var(--cp-accent-fg);
-  font-weight: 700;
-  font-size: 0.85rem;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.step-title-wrap { flex: 1; }
-.step-title { font-weight: 700; font-size: 0.95rem; color: var(--cp-text); }
-.step-timing { font-size: 0.75rem; color: var(--cp-text-muted); margin-top: 1px; }
-.step-chevron {
-  color: var(--cp-text-muted);
-  font-size: 1rem;
-  transition: transform 0.2s;
-}
-.step-card.open .step-chevron { transform: rotate(180deg); }
-
-.step-body {
-  display: none;
-  border-top: 1px solid var(--cp-border);
-  padding: 0;
-}
-.step-card.open .step-body { display: block; }
-
-.step-section {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--cp-border);
-}
-.step-section:last-child { border-bottom: none; }
-.step-section-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--cp-text-muted);
-  margin-bottom: 8px;
-}
-
-.narrative-text { font-size: 0.9rem; color: var(--cp-text-soft); line-height: 1.65; }
-
-.action-list { list-style: none; padding: 0; }
-.action-list li {
-  display: flex;
-  gap: 10px;
-  padding: 5px 0;
-  font-size: 0.875rem;
-  align-items: flex-start;
-}
-.action-list li::before {
-  content: "›";
-  color: var(--cp-accent);
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.5;
-  flex-shrink: 0;
-}
-.action-list code {
-  font-family: Consolas, "Courier New", monospace;
-  font-size: 0.82rem;
-  background: var(--cp-surface-soft);
-  border: 1px solid var(--cp-border);
-  border-radius: 4px;
-  padding: 1px 5px;
-  color: var(--cp-accent);
-}
-
-.key-points { display: flex; flex-direction: column; gap: 6px; }
-.key-point {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-size: 0.875rem;
-  background: var(--cp-accent-soft);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-.key-point::before { content: "★"; color: var(--cp-accent); font-size: 0.75rem; margin-top: 2px; flex-shrink: 0; }
-
-/* ── Key Phrases ─────────────────────────────────────────────────── */
-.phrase-list { display: flex; flex-direction: column; gap: 8px; }
-.phrase {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 0.875rem;
-  font-style: italic;
-  color: var(--cp-text-soft);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-.phrase::before { content: "\""; color: var(--cp-accent); font-size: 1.5rem; line-height: 1; flex-shrink: 0; font-style: normal; font-weight: 700; }
-
-/* ── Click Path ──────────────────────────────────────────────────── */
-.click-path {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-.cp-step {
-  background: var(--cp-surface);
-  border: 1px solid var(--cp-border);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  color: var(--cp-text);
-}
-.cp-arrow { color: var(--cp-text-muted); font-size: 0.8rem; }
-
-/* ── Checklist ───────────────────────────────────────────────────── */
-.checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; }
-.checklist input[type="checkbox"] {
-  width: 16px; height: 16px;
-  border-radius: 4px;
-  accent-color: var(--cp-accent);
-  cursor: pointer;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-/* ── Progress bar ────────────────────────────────────────────────── */
-.progress-wrap { margin-bottom: 32px; }
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--cp-text-muted);
-  margin-bottom: 6px;
-}
-.progress-bar-bg {
-  height: 6px;
-  background: var(--cp-border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  background: var(--cp-accent);
-  border-radius: 4px;
-  width: 0%;
-  transition: width 0.4s ease;
-}
-
-/* ── Divider ─────────────────────────────────────────────────────── */
-.divider { border: none; border-top: 1px solid var(--cp-border); margin: 28px 0; }
-
-@media print {
-  .page-header { position: static; }
-  .step-body { display: block !important; }
-  .step-chevron { display: none; }
-  .theme-toggle { display: none; }
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Aptos,Calibri,-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cp-bg);color:var(--cp-text);font-size:15px;line-height:1.6}
+.page-header{background:var(--cp-surface);border-bottom:1px solid var(--cp-border);padding:22px 40px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;position:sticky;top:0;z-index:10}
+.header-title h1{font-size:1.2rem;font-weight:700;letter-spacing:-0.01em}
+.header-title .sub{font-size:.82rem;color:var(--cp-text-muted);margin-top:3px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;background:var(--cp-accent-soft);color:var(--cp-accent);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-blue{background:rgba(0,120,212,.1);color:var(--cp-link)}
+.hactions{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.hmeta{font-size:.77rem;color:var(--cp-text-soft);text-align:right}
+.btn{background:var(--cp-surface-soft);border:1px solid var(--cp-border);border-radius:6px;padding:4px 9px;font-size:.76rem;color:var(--cp-text-muted);cursor:pointer;font-family:inherit;transition:background .15s}
+.btn:hover{background:var(--cp-border)}
+.container{max-width:960px;margin:0 auto;padding:26px 40px 70px}
+.sec{margin-bottom:26px}
+.slabel{font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--cp-text-muted);margin-bottom:9px}
+.brief-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px}
+.brief-item{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;padding:10px 13px}
+.brief-item .lbl{font-size:.67rem;color:var(--cp-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.brief-item .val{font-size:.87rem;font-weight:600;margin-top:2px}
+.wr-ok{background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.25);border-radius:10px;padding:11px 15px;font-size:.86rem;display:flex;gap:9px;align-items:flex-start;margin-bottom:22px}
+.wr-ok .ico{color:var(--cp-success);flex-shrink:0;margin-top:1px}
+.dtw{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;overflow:hidden}
+.dt{width:100%;border-collapse:collapse;font-size:.84rem}
+.dt thead tr{background:var(--cp-surface-soft)}
+.dt th{text-align:left;padding:8px 13px;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--cp-text-muted);border-bottom:1px solid var(--cp-border)}
+.dt td{padding:8px 13px;border-bottom:1px solid var(--cp-border);vertical-align:top}
+.dt tr:last-child td{border-bottom:none}
+.dt tr.hero{background:var(--cp-accent-soft)}
+.dt tr.hero td:first-child{border-left:3px solid var(--cp-accent)}
+.cid{font-family:Consolas,"Courier New",monospace;font-size:.77rem;color:var(--cp-accent);font-weight:600}
+.hlbl{font-size:.66rem;font-weight:700;color:var(--cp-accent);text-transform:uppercase}
+.sp{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.69rem;font-weight:600;white-space:nowrap}
+.sa{background:rgba(22,163,74,.12);color:var(--cp-success)}
+.sr{background:rgba(245,158,11,.12);color:var(--cp-warning)}
+.sh{background:rgba(91,92,92,.12);color:var(--cp-text-muted)}
+.sd{background:rgba(0,120,212,.1);color:var(--cp-link)}
+.cp-path{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.cp-step{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:6px;padding:3px 9px;font-size:.78rem}
+.cp-arr{color:var(--cp-text-muted);font-size:.82rem}
+.sbox{background:var(--cp-surface);border:1px solid var(--cp-border);border-left:4px solid var(--cp-accent);border-radius:10px;padding:14px 17px;font-size:.89rem;font-style:italic;color:var(--cp-text-soft);line-height:1.75}
+.sbox p+p{margin-top:9px}
+.pw{margin-bottom:22px}
+.plbl{display:flex;justify-content:space-between;font-size:.76rem;color:var(--cp-text-muted);margin-bottom:5px}
+.pbg{height:5px;background:var(--cp-border);border-radius:4px;overflow:hidden}
+.pf{height:100%;background:var(--cp-accent);border-radius:4px;width:0%;transition:width .3s}
+.card{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:13px;margin-bottom:11px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:11px;padding:13px 17px;cursor:pointer;user-select:none;transition:background .15s}
+.ch:hover{background:var(--cp-surface-soft)}
+.snum{width:29px;height:29px;border-radius:50%;background:var(--cp-accent);color:var(--cp-accent-fg);font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.snum.pl{background:var(--cp-link)}
+.stw{flex:1}
+.stitle{font-weight:700;font-size:.9rem}
+.smeta{display:flex;gap:7px;margin-top:2px;align-items:center}
+.stime{font-size:.72rem;color:var(--cp-text-muted)}
+.tag{font-size:.66rem;font-weight:700;padding:1px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
+.tp{background:rgba(0,120,212,.1);color:var(--cp-link)}
+.td{background:rgba(22,163,74,.1);color:var(--cp-success)}
+.ta{background:rgba(245,158,11,.1);color:var(--cp-warning)}
+.tc{background:rgba(177,31,75,.1);color:var(--cp-accent)}
+.chev{color:var(--cp-text-muted);font-size:.82rem;transition:transform .2s}
+.card.open .chev{transform:rotate(180deg)}
+.cbody{display:none;border-top:1px solid var(--cp-border)}
+.card.open .cbody{display:block}
+.cs{padding:13px 17px;border-bottom:1px solid var(--cp-border)}
+.cs:last-child{border-bottom:none}
+.csl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--cp-text-muted);margin-bottom:7px}
+.narr{font-size:.865rem;color:var(--cp-text-soft);line-height:1.65}
+.al{list-style:none;padding:0}
+.al li{display:flex;gap:9px;padding:3px 0;font-size:.85rem;align-items:flex-start}
+.al li::before{content:"›";color:var(--cp-accent);font-weight:700;font-size:.98rem;line-height:1.5;flex-shrink:0}
+.al code{font-family:Consolas,"Courier New",monospace;font-size:.79rem;background:var(--cp-surface-soft);border:1px solid var(--cp-border);border-radius:4px;padding:1px 5px;color:var(--cp-accent)}
+.kps{display:flex;flex-direction:column;gap:6px}
+.kp{display:flex;gap:8px;align-items:flex-start;font-size:.85rem;background:var(--cp-accent-soft);border-radius:8px;padding:7px 11px}
+.kp::before{content:"★";color:var(--cp-accent);font-size:.7rem;margin-top:3px;flex-shrink:0}
+.pb{background:rgba(0,120,212,.06);border:1px solid rgba(0,120,212,.2);border-radius:8px;padding:10px 13px;margin-top:9px}
+.pbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--cp-link);margin-bottom:6px}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pi{font-size:.81rem;display:flex;gap:7px;align-items:flex-start}
+.pi::before{content:"◆";color:var(--cp-link);font-size:.48rem;margin-top:5px;flex-shrink:0}
+.plist{display:flex;flex-direction:column;gap:6px}
+.ph{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:9px;padding:10px 14px;font-size:.85rem;font-style:italic;color:var(--cp-text-soft);display:flex;gap:8px;align-items:flex-start}
+.ph::before{content:'"';color:var(--cp-accent);font-size:1.35rem;line-height:1;flex-shrink:0;font-style:normal;font-weight:700}
+.cklist{list-style:none;display:flex;flex-direction:column;gap:7px}
+.cklist li{display:flex;align-items:flex-start;gap:9px;font-size:.87rem}
+.cklist input[type=checkbox]{width:15px;height:15px;border-radius:4px;accent-color:var(--cp-accent);cursor:pointer;margin-top:2px;flex-shrink:0}
+hr{border:none;border-top:1px solid var(--cp-border);margin:22px 0}
+@media print{.page-header{position:static}.cbody{display:block!important}.chev,.btn{display:none}}
 </style>
 </head>
 <body>
-
-<!-- ── Header ──────────────────────────────────────────────────────── -->
 <div class="page-header">
   <div class="header-title">
     <h1>SSA Earnings Integrity Case Review V2</h1>
-    <div class="subtitle">Demo Talk Track &nbsp;·&nbsp; <span class="badge">15 min</span></div>
+    <div class="sub">Demo Talk Track <span class="badge">30 min</span><span class="badge badge-blue">D365 Customer Service</span><span class="badge">10 Steps</span></div>
   </div>
-  <div class="header-meta">
-    <span>Seeded 2026-07-30</span>
-    <span>healthconnectcenter.crm.dynamics.com</span>
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle dark mode</button>
+  <div class="hactions">
+    <div class="hmeta">Seeded 2026-07-30 · healthconnectcenter.crm.dynamics.com</div>
+    <div style="display:flex;gap:5px">
+      <button class="btn" onclick="expandAll()">Expand all</button>
+      <button class="btn" onclick="collapseAll()">Collapse all</button>
+      <button class="btn" onclick="toggleTheme()">Dark mode</button>
+    </div>
+  </div>
+</div>
+<div class="container">
+
+<div class="wr-ok"><span class="ico">✓</span><div><strong>Web resources confirmed in app (2 components, type 62):</strong> earnint_/report/supervisor-case-summary-v2.html is registered in the Earnings Integrity V2 Demo App. Both V1 and V2 supervisor summary reports exist in the environment and are accessible via the case form.</div></div>
+
+<div class="sec">
+  <div class="slabel">Presenter Brief</div>
+  <div class="brief-grid">
+    <div class="brief-item"><div class="lbl">Audience</div><div class="val">Fraud analysts &amp; supervisors</div></div>
+    <div class="brief-item"><div class="lbl">Duration</div><div class="val">30 minutes</div></div>
+    <div class="brief-item"><div class="lbl">Platform</div><div class="val">D365 Customer Service</div></div>
+    <div class="brief-item"><div class="lbl">Hero record</div><div class="val">EIR-2025-0041 (Hargrove)</div></div>
+    <div class="brief-item"><div class="lbl">D365 tables</div><div class="val">incident + contact + 3 custom</div></div>
+    <div class="brief-item"><div class="lbl">Web resources</div><div class="val">2 in app ✓</div></div>
+    <div class="brief-item"><div class="lbl">Seeded records</div><div class="val">26 total</div></div>
+    <div class="brief-item"><div class="lbl">Steps</div><div class="val">10 × 3 min</div></div>
   </div>
 </div>
 
-<div class="container">
-
-  <!-- ── Presenter Brief ─────────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Presenter Brief</div>
-    <div class="brief-grid">
-      <div class="brief-item"><div class="label">Audience</div><div class="value">Fraud analysts &amp; supervisors</div></div>
-      <div class="brief-item"><div class="label">Duration</div><div class="value">15 minutes</div></div>
-      <div class="brief-item"><div class="label">Hero record</div><div class="value">EIR-2025-0041 (Hargrove)</div></div>
-      <div class="brief-item"><div class="label">App</div><div class="value">Earnings Integrity V2 Demo App</div></div>
-      <div class="brief-item"><div class="label">Platform</div><div class="value">D365 Customer Service</div></div>
-      <div class="brief-item"><div class="label">Style</div><div class="value">Outcome-first, human-led</div></div>
-    </div>
+<div class="sec">
+  <div class="slabel">Start-of-demo click path</div>
+  <div class="cp-path">
+    <span class="cp-step">waffle / app switcher</span><span class="cp-arr">›</span>
+    <span class="cp-step">Earnings Integrity V2 Demo App</span><span class="cp-arr">›</span>
+    <span class="cp-step">Cases</span><span class="cp-arr">›</span>
+    <span class="cp-step">Active Cases – DATA</span><span class="cp-arr">›</span>
+    <span class="cp-step">EIR-2025-0041 (Hargrove)</span>
   </div>
+</div>
 
-  <!-- ── Navigation path ─────────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Menu Click Path</div>
-    <div class="click-path">
-      <span class="cp-step">App switcher</span><span class="cp-arrow">›</span>
-      <span class="cp-step">Earnings Integrity V2 Demo App</span><span class="cp-arrow">›</span>
-      <span class="cp-step">Cases</span><span class="cp-arrow">›</span>
-      <span class="cp-step">Active Cases - DATA</span><span class="cp-arrow">›</span>
-      <span class="cp-step">Open Hargrove case</span>
-    </div>
+<div class="sec">
+  <div class="slabel">Demo data reference — seeded 2026-07-30</div>
+  <div class="dtw">
+    <table class="dt">
+      <thead><tr><th>Case ID</th><th>Beneficiary</th><th>Scenario</th><th>Fraud Review fields</th><th>Stage</th></tr></thead>
+      <tbody>
+        <tr class="hero"><td><span class="cid">EIR-2025-0041</span><br><span class="hlbl">★ Hero</span></td><td><strong>Robert Hargrove</strong></td><td>Unreported SSDI wages Q1–Q2 2025 · $24,800 · Apex Logistics</td><td>Unreported Wages · High · Overpayment Review · Supervisor: No</td><td><span class="sp sa">In Progress</span></td></tr>
+        <tr><td><span class="cid">EIR-2025-0052</span></td><td>Maria Castillo</td><td>Dual employer wages 2024 · $18,400</td><td>Unreported Wages · High · RFI · Supervisor: No</td><td><span class="sp sr">Researching</span></td></tr>
+        <tr><td><span class="cid">EIR-2025-0067</span></td><td>James Whitfield</td><td>Prior overpayment + Q3 2025 · $8,750</td><td>Employer Mismatch · Medium · RFI · Supervisor: No</td><td><span class="sp sh">On Hold</span></td></tr>
+        <tr><td><span class="cid">EIR-2025-0033</span></td><td>Patricia Nguyen</td><td>IRS 1099 vs statement · $11,600</td><td>Unreported Wages · Critical · Overpayment Review · Supervisor: Yes</td><td><span class="sp sd">Resolved</span></td></tr>
+      </tbody>
+    </table>
   </div>
+</div>
 
-  <!-- ── Demo Data Reference ─────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Demo Data Reference</div>
-    <div class="data-table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Case ID</th>
-            <th>Beneficiary</th>
-            <th>Scenario</th>
-            <th>Stage</th>
-            <th>Discrepancy</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="hero-row">
-            <td><span class="case-id">EIR-2025-0041</span><br><span class="hero-label">★ Hero case</span></td>
-            <td><strong>Robert Hargrove</strong></td>
-            <td>Unreported SSDI wages Q1–Q2 2025</td>
-            <td><span class="stage-pill stage-active">In Progress — Pending Supervisor</span></td>
-            <td>$24,800 · Apex Logistics Inc</td>
-          </tr>
-          <tr>
-            <td><span class="case-id">EIR-2025-0052</span></td>
-            <td>Maria Castillo</td>
-            <td>Dual employer wages unreported 2024</td>
-            <td><span class="stage-pill stage-research">Researching — Finding In Progress</span></td>
-            <td>$18,400 · Sunrise + Metro Catering</td>
-          </tr>
-          <tr>
-            <td><span class="case-id">EIR-2025-0067</span></td>
-            <td>James Whitfield</td>
-            <td>Prior overpayment + Q3 2025 discrepancy</td>
-            <td><span class="stage-pill stage-hold">On Hold — Awaiting Employer Reply</span></td>
-            <td>$8,750 · GreenPath Construction</td>
-          </tr>
-          <tr>
-            <td><span class="case-id">EIR-2025-0033</span></td>
-            <td>Patricia Nguyen</td>
-            <td>IRS 1099 vs beneficiary statement</td>
-            <td><span class="stage-pill stage-resolved">Resolved — Overpayment Initiated</span></td>
-            <td>$11,600 · Self-employment income</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="sec">
+  <div class="slabel">Opening (1 min)</div>
+  <div class="sbox">
+    <p>"Before I show you the application, I want to set the context. SSA processes millions of benefit cases and receives wage-feed data from the IRS and employers. When a discrepancy is detected — a beneficiary who reported zero income but whose employer filed a W-2 — someone has to investigate. Today I will show you how Dynamics 365 Customer Service turns that investigation into a structured, auditable workflow."</p>
+    <p>"Our hero case is EIR-2025-0041 — the Hargrove case. A $24,800 wage discrepancy. Evidence collected. Finding written. Sitting right now in the analyst queue waiting for supervisor approval. That is where we will anchor the walkthrough."</p>
   </div>
+</div>
 
-  <!-- ── Opening Script ──────────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Opening (30–45 sec)</div>
-    <div class="script-box">
-      <p>"Today I am showing how SSA Earnings Integrity Case Review V2 helps Fraud analysts and supervisors solve a real operational problem: detecting and resolving unreported earnings discrepancies with a consistent, auditable review process."</p>
-      <p>"I will walk through the Hargrove case — a live record in this environment — showing intake, evidence review, analyst finding, and the supervisor approval path."</p>
-    </div>
+<div class="pw"><div class="plbl"><span>Demo progress</span><span id="pt">0 of 10 steps</span></div><div class="pbg"><div class="pf" id="pf"></div></div></div>
+
+<!-- Step 1 -->
+<div class="card" id="s1">
+  <div class="ch" onclick="tog('s1')">
+    <div class="snum pl">1</div>
+    <div class="stw"><div class="stitle">Why Dynamics 365 Customer Service</div><div class="smeta"><span class="stime">3 min</span><span class="tag tp">Platform</span></div></div>
+    <div class="chev">▼</div>
   </div>
-
-  <!-- ── Progress ────────────────────────────────────────────────── -->
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>Demo progress</span>
-      <span id="progress-text">0 / 5 steps</span>
-    </div>
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progress-fill"></div>
-    </div>
-  </div>
-
-  <!-- ── Steps ───────────────────────────────────────────────────── -->
-
-  <!-- Step 1 -->
-  <div class="step-card" id="step-1">
-    <div class="step-header" onclick="toggleStep('step-1')">
-      <div class="step-num">1</div>
-      <div class="step-title-wrap">
-        <div class="step-title">Open with the business problem</div>
-        <div class="step-timing">3 min</div>
-      </div>
-      <div class="step-chevron">▼</div>
-    </div>
-    <div class="step-body">
-      <div class="step-section">
-        <div class="step-section-label">Narrative</div>
-        <div class="narrative-text">Set the stage: SSA receives thousands of earnings reports and wage-feed records that must be reconciled. Discrepancies require consistent human-led review, not black-box automation. This app structures that process.</div>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Actions</div>
-        <ul class="action-list">
-          <li>In the app selector, open <code>Earnings Integrity V2 Demo App</code>.</li>
-          <li>In left navigation, click <code>Cases</code>, then open <code>Active Cases - DATA</code> view.</li>
-          <li>Show 3–4 cases in the queue — point out the EIR case numbers and stages visible in the list.</li>
-          <li>Open <code>EIR-2025-0041 — Hargrove, Robert</code> as the hero case.</li>
-        </ul>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Key Points</div>
-        <div class="key-points">
-          <div class="key-point">Say: "Every case is a structured work item with an audit trail from the moment it's created."</div>
-          <div class="key-point">Note the case description already references the wage feed source and discrepancy amount ($24,800).</div>
-          <div class="key-point">The queue shows cases at different stages — Hargrove is the most advanced and will anchor the walkthrough.</div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Before opening the app, explain why D365 Customer Service — not a custom-built tool — is the right platform. This positions every subsequent screen with platform justification rather than just feature demonstration.</div></div>
+    <div class="cs">
+      <div class="csl">Actions</div>
+      <ul class="al">
+        <li>Stay on the app selector or a blank tab. Walk through D365 capabilities verbally before clicking into anything.</li>
+        <li>Open <code>Earnings Integrity V2 Demo App</code>. Land on <code>Active Cases – DATA</code>. Say: "This is the intake queue. Every earnings discrepancy referral lands here."</li>
+        <li>Point out the OOB view columns: Title, Customer (beneficiary), Priority, Status Reason. "Zero custom development for this grid — this is D365 out of the box."</li>
+        <li>Show the filter/sort bar. "An analyst or supervisor can sort by risk, filter by disposition, or group by stage — no custom code, no BI report."</li>
+      </ul>
+      <div class="pb">
+        <div class="pbl">Built-in D365 CS capabilities leveraged by this solution</div>
+        <div class="pg">
+          <div class="pi"><strong>Case (incident) entity</strong> — OOB work item with lifecycle, timeline, activities, and SLA. No custom case table needed.</div>
+          <div class="pi"><strong>Queues &amp; routing</strong> — cases land in priority queues, assigned to analysts or teams without custom routing logic.</div>
+          <div class="pi"><strong>Activities &amp; timeline</strong> — calls, tasks, emails, and notes attach to the case automatically. Full interaction history, zero configuration.</div>
+          <div class="pi"><strong>Business Process Flow</strong> — guided stage-by-stage progression from intake to resolution. Required fields enforced at each stage gate.</div>
+          <div class="pi"><strong>Dataverse relationships</strong> — discrepancy records, evidence items, and findings link to the case with cascade-delete integrity and no custom FK logic.</div>
+          <div class="pi"><strong>Web resources</strong> — HTML/JS reports embedded in case forms. The Supervisor Summary Report V2 is a web resource registered in this app (confirmed: 2 components, type 62).</div>
+          <div class="pi"><strong>Model-driven app</strong> — security roles, sitemap, forms, and views configured in Power Apps. No custom UI framework or hosting required.</div>
+          <div class="pi"><strong>Copilot for D365 CS</strong> — case summarization, suggested responses, and knowledge search available in the same workspace (future activation — the slot is already there).</div>
         </div>
       </div>
     </div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">"SSA does not need to build a case management system. It needs to configure one. The infrastructure — queues, routing, timeline, audit log, BPF — is D365 out of the box."</div>
+      <div class="kp">The custom work in this solution is the domain vocabulary: discrepancy types, evidence categories, finding dispositions. Everything else is inherited from the platform.</div>
+    </div></div>
   </div>
+</div>
 
-  <!-- Step 2 -->
-  <div class="step-card" id="step-2">
-    <div class="step-header" onclick="toggleStep('step-2')">
-      <div class="step-num">2</div>
-      <div class="step-title-wrap">
-        <div class="step-title">Case workspace and earnings discrepancies</div>
-        <div class="step-timing">3 min</div>
-      </div>
-      <div class="step-chevron">▼</div>
-    </div>
-    <div class="step-body">
-      <div class="step-section">
-        <div class="step-section-label">Narrative</div>
-        <div class="narrative-text">Show the Hargrove case as a complete workspace — description, linked beneficiary, and the earnings records that triggered the review.</div>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Actions</div>
-        <ul class="action-list">
-          <li>On the open Hargrove case, read the description aloud: wage feed from Apex Logistics, zero-income report, $24,800 gap.</li>
-          <li>In left nav, click <code>Earnings Discrepancies</code>, then open <code>Active Earnings Discrepancies</code> view.</li>
-          <li>Show both Hargrove discrepancy records (Q1 and Q2 2025): reported = 0, authoritative = $12,400 each, source = IRS Wage Feed W-2.</li>
-          <li>Point out Employer Name and Earnings Period columns.</li>
+<!-- Step 2 -->
+<div class="card" id="s2">
+  <div class="ch" onclick="tog('s2')">
+    <div class="snum pl">2</div>
+    <div class="stw"><div class="stitle">Queue, routing, and the referral pipeline</div><div class="smeta"><span class="stime">3 min</span><span class="tag tp">Platform</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Show how a referral enters the system and how D365 queues manage analyst workload. This is the management-visibility scene — what a supervisor sees at 8 AM without opening a single case.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>On <code>Active Cases – DATA</code>, point to all four cases: EIR numbers, beneficiary names, priority, status. "A supervisor sees the entire workload in one view."</li>
+      <li>Sort by Priority (High first). Hargrove and Castillo surface. "High-priority cases rise automatically — no manual triage email."</li>
+      <li>Point to the custom Fraud Review columns in the view: Risk Rating, Case Disposition. "These are the custom columns we added to the OOB incident entity. They appear in views, filters, and dashboards — no separate report."</li>
+      <li>Explain queue concept without navigating: "In production, referrals from field offices arrive in a triage queue. Routing rules assign them by case type, region, or workload balance. The analyst gets a notification. The record is already in their queue."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">D365 queues allow work items to be picked, routed, or pushed. Supervisors see full workload visibility without micro-managing individual analysts.</div>
+      <div class="kp">"Four cases today. The same model scales to 4,000. The analyst experience is identical."</div>
+      <div class="kp">The Active Cases – DATA view is a Dataverse saved query. It can be shared, exported, and used as a Power BI source — no ETL pipeline needed.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="card" id="s3">
+  <div class="ch" onclick="tog('s3')">
+    <div class="snum">3</div>
+    <div class="stw"><div class="stitle">Beneficiary record — the Contact entity</div><div class="smeta"><span class="stime">3 min</span><span class="tag td">Data</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Before opening the Hargrove case, show the beneficiary record. D365 Contact is the OOB person entity — it carries demographics, program context, and case history. Seeing the person first reinforces that this is a human review process.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>In left nav, click <code>Contacts</code>, open the active contacts view. Show all four beneficiaries.</li>
+      <li>Open <code>Robert Hargrove</code>. Point out OOB Contact fields: Full Name, Email (r.hargrove@demo.ssa.gov), Phone.</li>
+      <li>Read the Description field: "SSDI beneficiary. Reported zero earnings Jan–Jun 2025. W-2 from employer conflicts with SSA wage feed." This is the program context — loaded at case intake, visible to every analyst who touches this record.</li>
+      <li>Scroll to the <strong>Related</strong> tab or related cases section. Show EIR-2025-0041 linked here. "The OOB customer relationship between Contact and Case means every case for this beneficiary is visible from one screen — no query, no search."</li>
+      <li>Say: "In production, the Contact carries beneficiary ID, program enrollment type (SSDI/SSI), representative payee flag, and prior overpayment history. All of it attached to the person, available in every case."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">D365 Contact is zero custom development. If SSA already uses Dynamics for service delivery, beneficiary records may already exist — earnings integrity cases attach to existing contacts with no duplicate entry.</div>
+      <div class="kp">The contact timeline shows all activities: calls, emails, notes, case actions. Full cross-program interaction history for the beneficiary in one place.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Step 4 -->
+<div class="card" id="s4">
+  <div class="ch" onclick="tog('s4')">
+    <div class="snum">4</div>
+    <div class="stw"><div class="stitle">Case workspace and Fraud Review fields</div><div class="smeta"><span class="stime">3 min</span><span class="tag td">Data</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Open the hero case. Walk the form top-to-bottom: OOB fields first, then the custom Fraud Review section. Extending the OOB incident entity with domain columns keeps all built-in D365 capabilities intact — audit log, BPF visibility, security roles, view filters.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>From the case list, open <code>EIR-2025-0041 — Hargrove, Robert</code>.</li>
+      <li>OOB fields at top: Case Title, Customer = Robert Hargrove (linked), Priority = High, Status Reason = In Progress.</li>
+      <li>Read the Description aloud: "IRS W-2 feed from Apex Logistics Inc shows $24,800 in wages. Beneficiary reported zero income. Case referred to Program Integrity."</li>
+      <li>Scroll to the <strong>Fraud Review</strong> section. Walk each custom field:
+        <ul class="al" style="margin-left:16px;margin-top:5px">
+          <li><strong>Discrepancy Type</strong> = Unreported Wages — controlled vocabulary, no free text, queryable across all cases.</li>
+          <li><strong>Risk Rating</strong> = High — drives queue priority; supervisors filter by this field to find their most urgent cases.</li>
+          <li><strong>Case Disposition</strong> = Create Overpayment Review — the intended outcome. Four choices: Close, RFI, Overpayment Review, Escalate as Fraud Referral.</li>
+          <li><strong>Supervisor Approval</strong> = No — this is the gate. The disposition cannot be executed until a supervisor flips this to Yes.</li>
         </ul>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Key Points</div>
-        <div class="key-points">
-          <div class="key-point">"The discrepancy records are created from wage-feed comparison — the analyst doesn't have to calculate the gap."</div>
-          <div class="key-point">Two records covering two quarters = $24,800 total exposure.</div>
-          <div class="key-point">Every record links back to the parent case, so closing the case cascades to all related records.</div>
-        </div>
-      </div>
-    </div>
+      </li>
+      <li>Point to the <strong>Case Timeline</strong>: "This is the OOB D365 audit trail. Every field change, every note, every activity — timestamped. No custom logging. It is on by default."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">The Fraud Review fields are custom columns on the OOB incident entity — not a separate table. They inherit all D365 features automatically: audit log, BPF gate, view filter, security role enforcement.</div>
+      <div class="kp">Supervisor Approval as a boolean is a deliberate design choice: binary, explicit, timestamped, and immutable once set. Not a comment field — a decision field.</div>
+      <div class="kp">"Every field on this form can be required at a specific BPF stage. You cannot advance the case to Resolution without Risk Rating populated. The system enforces the process."</div>
+    </div></div>
   </div>
+</div>
 
-  <!-- Step 3 -->
-  <div class="step-card" id="step-3">
-    <div class="step-header" onclick="toggleStep('step-3')">
-      <div class="step-num">3</div>
-      <div class="step-title-wrap">
-        <div class="step-title">Evidence review</div>
-        <div class="step-timing">3 min</div>
-      </div>
-      <div class="step-chevron">▼</div>
-    </div>
-    <div class="step-body">
-      <div class="step-section">
-        <div class="step-section-label">Narrative</div>
-        <div class="narrative-text">Show the evidence package assembled for the Hargrove case. This is what the analyst reviews before writing a finding.</div>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Actions</div>
-        <ul class="action-list">
-          <li>In left nav click <code>Evidence Items</code>, open <code>Active Evidence Items</code> view.</li>
-          <li>Show Hargrove's 3 evidence records: W-2 (verified), Beneficiary Statement (under review), Employer Confirmation (verified).</li>
-          <li>Open the <code>IRS W-2</code> record: point out Document Name, Evidence Type, Evidence Description, Verified By.</li>
-          <li>Open the <code>Beneficiary Statement</code>: note Verified By is blank — statement is not yet credible.</li>
-          <li>Open the <code>Employer Confirmation</code>: Apex Logistics confirmed employment. This is the decisive evidence.</li>
+<!-- Step 5 -->
+<div class="card" id="s5">
+  <div class="ch" onclick="tog('s5')">
+    <div class="snum">5</div>
+    <div class="stw"><div class="stitle">Earnings discrepancies — the wage-feed comparison</div><div class="smeta"><span class="stime">3 min</span><span class="tag td">Data</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Navigate to the earnings discrepancy records. This is the quantitative core of the case — the structured comparison between what the beneficiary reported and what the IRS wage feed says.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>In left nav click <code>Earnings Discrepancies</code>, open <code>Active Earnings Discrepancies</code>.</li>
+      <li>Show all 6 records across the 4 cases. "Each record is one period–employer combination. Castillo has two employers — two records."</li>
+      <li>Open <code>Hargrove — Q1 2025</code>: Reported = $0, Authoritative = $12,400, Discrepancy = $12,400, Period = Q1 2025, Employer = Apex Logistics Inc, Source = IRS Wage Feed W-2.</li>
+      <li>Open <code>Hargrove — Q2 2025</code>: same employer, same pattern. Total = $24,800. "Six months of wages, not reported."</li>
+      <li>Briefly show Castillo's two records (Sunrise + Metro Catering). "Same structure, two employers. The model handles any number of discrepancy records per case without schema changes."</li>
+      <li>Explain: "These records link to the parent case via a one-to-many Dataverse relationship with cascade delete. Close the case, all discrepancy records go with it — no orphaned data."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">In production, discrepancy records are created automatically by a Power Automate flow triggered by the wage-feed comparison engine — not entered manually by analysts.</div>
+      <div class="kp">Reported / Authoritative / Discrepancy Amount is a three-field pattern giving auditors the full picture: what was claimed, what the record shows, and the gap.</div>
+      <div class="kp">"This is structured data, not a note or a PDF. The total discrepancy amount across all open cases is a live aggregate in Dataverse — the program's exposure right now."</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Step 6 -->
+<div class="card" id="s6">
+  <div class="ch" onclick="tog('s6')">
+    <div class="snum">6</div>
+    <div class="stw"><div class="stitle">Evidence review — building the evidence package</div><div class="smeta"><span class="stime">3 min</span><span class="tag td">Data</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Show the Hargrove evidence package. Each evidence item is a structured record — not a document attached to an email — with type, description, document reference, and verification status.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>In left nav click <code>Evidence Items</code>, open <code>Active Evidence Items</code>.</li>
+      <li>Point to Hargrove's 3 records: IRS W-2 (verified), Beneficiary Statement (unverified), Employer Confirmation (verified).</li>
+      <li>Open <code>Hargrove — IRS W-2 2025 Q1-Q2</code>: Type = W-2 Form, Document = W2_Hargrove_Apex_2025.pdf, Verified By = J. Reyes. Read description. "$24,800 in wages confirmed by IRS feed."</li>
+      <li>Open <code>Hargrove — Beneficiary Statement</code>: Verified By = <em>blank</em>. Read: "Beneficiary claims wages belonged to a family member. Under review." Pause: "Verified By is blank. This has not been corroborated."</li>
+      <li>Open <code>Hargrove — Employer Confirmation</code>: Verified By = J. Reyes. "Apex Logistics confirmed Hargrove as active employee Jan–Jun 2025. This is the decisive piece."</li>
+      <li>"The analyst now has three evidence types telling two stories. IRS record and employer confirmation agree. Beneficiary statement does not. That conflict is exactly why supervisor review is required."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">Evidence items are structured Dataverse records — queryable: "Show all cases where a Beneficiary Statement exists but Verified By is blank." That is a one-line filter, not a manual review.</div>
+      <div class="kp">The Evidence Type picklist (W-2, 1099, Wage Statement, Beneficiary Statement, Employer Confirmation) is a controlled vocabulary. Consistent across all analysts, all cases, all time.</div>
+      <div class="kp">"Copilot could read these three records and generate a natural-language summary. That is what the Supervisor Summary Report approximates today — and what Copilot for D365 CS would do natively."</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Step 7 -->
+<div class="card" id="s7">
+  <div class="ch" onclick="tog('s7')">
+    <div class="snum">7</div>
+    <div class="stw"><div class="stitle">Analyst finding — structured disposition</div><div class="smeta"><span class="stime">3 min</span><span class="tag ta">Approval</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Show the Investigation Finding the analyst wrote for Hargrove. This is the formal product of the review — the analyst's conclusion, supported by evidence, with a recommended disposition. Everything the supervisor needs to make a decision is in one record.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>In left nav click <code>Investigation Findings</code>, open <code>Active Investigation Findings</code>.</li>
+      <li>Open <code>Hargrove — Finding: Discrepancy Confirmed — Pending Supervisor</code>.</li>
+      <li>Walk each field:
+        <ul class="al" style="margin-left:16px;margin-top:5px">
+          <li><strong>Finding Type</strong> = Discrepancy Confirmed. Not "possible." The analyst has evidence.</li>
+          <li><strong>Recommended Disposition</strong> = Create Overpayment Review. One of four: Close, RFI, Overpayment Review, Escalate as Fraud Referral.</li>
+          <li><strong>Analyst Name</strong> = J. Reyes. Accountable by name, not just by login.</li>
         </ul>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Key Points</div>
-        <div class="key-points">
-          <div class="key-point">"Three evidence types are already in the system — the analyst didn't have to chase documents manually."</div>
-          <div class="key-point">The beneficiary statement and employer confirmation tell opposite stories — this is exactly the conflict that triggers supervisor review.</div>
-          <div class="key-point">Evidence is attached to the case and visible in the case timeline.</div>
-        </div>
-      </div>
-    </div>
+      </li>
+      <li>Read the <strong>Finding Details</strong> field in full. "$24,800 discrepancy confirmed across Q1 and Q2 2025. Beneficiary statement not credible. Employer confirmation received and verified. Recommended action: initiate overpayment review. Case ready for supervisor approval."</li>
+      <li>"This record travels to the supervisor. No phone call. No forwarded email thread. The entire case context is visible in the same environment."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">Finding Type and Recommended Disposition are controlled picklists. No analyst-specific language — consistent vocabulary across all cases, all regions, all programs.</div>
+      <div class="kp">"Four disposition paths give SSA a clear taxonomy of outcomes: close (no issue), RFI (need more), overpayment review (benefit recalculation), fraud escalation (criminal referral). Every case ends in one of these four states."</div>
+      <div class="kp">The Finding Details memo is the analyst's narrative layer — free text within a structured container. In a Copilot deployment, this field is AI-generated from the evidence records. The slot is already there.</div>
+    </div></div>
   </div>
+</div>
 
-  <!-- Step 4 -->
-  <div class="step-card" id="step-4">
-    <div class="step-header" onclick="toggleStep('step-4')">
-      <div class="step-num">4</div>
-      <div class="step-title-wrap">
-        <div class="step-title">Analyst finding and supervisor approval</div>
-        <div class="step-timing">3 min</div>
-      </div>
-      <div class="step-chevron">▼</div>
-    </div>
-    <div class="step-body">
-      <div class="step-section">
-        <div class="step-section-label">Narrative</div>
-        <div class="narrative-text">Show the finding the analyst wrote for Hargrove, then show what the supervisor sees and decides.</div>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Actions</div>
-        <ul class="action-list">
-          <li>In left nav click <code>Investigation Findings</code>, open <code>Active Investigation Findings</code> view.</li>
-          <li>Open <code>Hargrove — Finding: Discrepancy Confirmed — Pending Supervisor</code>.</li>
-          <li>Read key fields: Finding Type = Discrepancy Confirmed, Recommended Disposition = Create Overpayment Review, Analyst = J. Reyes.</li>
-          <li>Read the Finding Details field — it summarizes the full evidence picture for the supervisor.</li>
-          <li>Say: "This is what goes to the supervisor. No phone call, no email — the record speaks for itself."</li>
-          <li>Optional: click back to the Hargrove case and show the <code>Supervisor Case Summary Report V2</code> web resource tab.</li>
+<!-- Step 8 -->
+<div class="card" id="s8">
+  <div class="ch" onclick="tog('s8')">
+    <div class="snum pl">8</div>
+    <div class="stw"><div class="stitle">Supervisor Case Summary Report (web resource)</div><div class="smeta"><span class="stime">3 min</span><span class="tag tp">Platform</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Navigate back to the Hargrove case and show the Supervisor Case Summary Report V2 — an HTML web resource embedded in the case form. This is the single-page brief a supervisor reads before approving or returning a case. Both V1 and V2 are confirmed in the app.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>Navigate back to the Hargrove case (EIR-2025-0041).</li>
+      <li>Find the <strong>Supervisor Case Summary Report V2</strong> tab or section. Web resource name: <code>earnint_/report/supervisor-case-summary-v2.html</code>.</li>
+      <li>Explain the mechanism: "This is a D365 web resource — an HTML file stored in Dataverse, registered as an app component (confirmed: type 62, 2 components in this app), and rendered inside the case form. No external portal, no token exchange, no PDF generation."</li>
+      <li>Walk the report sections: case header, discrepancy summary table, evidence list with verification status, finding recommendation, next-action guidance.</li>
+      <li>"A supervisor reads this tab and makes a decision — then flips Supervisor Approval to Yes on the same form. The entire approval cycle stays in Dynamics. No email, no meeting, no system hop."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">Web resources are first-class D365 components — HTML/JS/CSS stored in Dataverse and rendered inside forms. Version-controlled, solution-packaged, role-secured.</div>
+      <div class="kp">"This is the difference between a data system and a decision-support tool. The supervisor brief is generated and embedded in the workspace — not emailed as a PDF."</div>
+      <div class="kp">In a Copilot-enabled deployment, the report content is AI-generated from the structured Dataverse records. The web resource slot is already registered in this app — it just needs the Copilot content source wired in.</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Step 9 -->
+<div class="card" id="s9">
+  <div class="ch" onclick="tog('s9')">
+    <div class="snum pl">9</div>
+    <div class="stw"><div class="stitle">Dashboard, reporting, and management visibility</div><div class="smeta"><span class="stime">3 min</span><span class="tag tp">Platform</span></div></div>
+    <div class="chev">▼</div>
+  </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Zoom out from the individual case. D365 has built-in dashboards and charts giving supervisors and program directors aggregate visibility without a separate BI tool.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>Navigate to the D365 dashboard area (Home or named dashboard if configured).</li>
+      <li>If using OOB dashboard, narrate what a configured program integrity dashboard would show:
+        <ul class="al" style="margin-left:16px;margin-top:5px">
+          <li>Cases by Stage — bar chart: Intake, Researching, Evidence Review, Supervisor Review, Resolved.</li>
+          <li>Cases by Risk Rating — pie: Low / Medium / High / Critical. Today: 2 High, 1 Medium, 1 Critical.</li>
+          <li>Total discrepancy exposure by week — sum of Discrepancy Amount across open cases.</li>
+          <li>Pending supervisor approvals — count where Supervisor Approval = No and a Finding exists. Today: 2.</li>
+          <li>Resolution disposition breakdown — Close / RFI / Overpayment Review / Fraud Referral.</li>
         </ul>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Key Points</div>
-        <div class="key-points">
-          <div class="key-point">Finding Type and Recommended Disposition are controlled vocabularies — no free-text decisions.</div>
-          <div class="key-point">The supervisor sees: what was found, who found it, what action is recommended, and the evidence behind it.</div>
-          <div class="key-point">"Copilot could generate the Finding Details summary automatically — this was hand-authored for demo clarity."</div>
-        </div>
-      </div>
-    </div>
+      </li>
+      <li>Return to <code>Active Cases – DATA</code>. "Even this view is a live KPI. The row count is the current open caseload. No refresh button. No report run."</li>
+      <li>Mention Power BI: "The same Dataverse tables feed directly into Power BI via the connector — Direct Query, no ETL. Executive dashboards and program-level reporting from the same data analysts work in every day."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">D365 dashboards are built on saved views and charts — the same data analysts work in, aggregated without ETL. Operational reporting out of the box.</div>
+      <div class="kp">"The total discrepancy amount across all open cases is a live number in Dataverse. A program director can see the exposure right now — not last Tuesday's spreadsheet export."</div>
+      <div class="kp">Power BI integration extends to executive reporting with zero data duplication — one source, two audiences.</div>
+    </div></div>
   </div>
+</div>
 
-  <!-- Step 5 -->
-  <div class="step-card" id="step-5">
-    <div class="step-header" onclick="toggleStep('step-5')">
-      <div class="step-num">5</div>
-      <div class="step-title-wrap">
-        <div class="step-title">Close with the resolved case and the queue</div>
-        <div class="step-timing">3 min</div>
-      </div>
-      <div class="step-chevron">▼</div>
-    </div>
-    <div class="step-body">
-      <div class="step-section">
-        <div class="step-section-label">Narrative</div>
-        <div class="narrative-text">End with the Nguyen case as the resolved example, then zoom out to show the full queue — demonstrating that this is a system for managing many cases, not just one.</div>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Actions</div>
-        <ul class="action-list">
-          <li>In left nav click <code>Cases</code>, open <code>Active Cases - DATA</code> view.</li>
-          <li>Point out all four cases and their stages: resolved (Nguyen), pending supervisor (Hargrove), on hold (Whitfield), researching (Castillo).</li>
-          <li>Open <code>EIR-2025-0033 — Nguyen, Patricia</code> (the resolved case).</li>
-          <li>Show the finding: Finding Type = Possible Fraud Indicator, Disposition = Create Overpayment Review, Supervisor = S. Kim, Approved.</li>
-          <li>Say: "This case is closed. Every discrepancy record, every evidence item, every finding — preserved and cannot be altered."</li>
-        </ul>
-      </div>
-      <div class="step-section">
-        <div class="step-section-label">Key Points</div>
-        <div class="key-points">
-          <div class="key-point">The queue gives supervisors full visibility into workload and stage.</div>
-          <div class="key-point">Resolution paths are explicit: Close, RFI, Overpayment Review, Fraud Escalation.</div>
-          <div class="key-point">Every case produces the same artifact structure — consistency is the product.</div>
-        </div>
-      </div>
-    </div>
+<!-- Step 10 -->
+<div class="card" id="s10">
+  <div class="ch" onclick="tog('s10')">
+    <div class="snum">10</div>
+    <div class="stw"><div class="stitle">Resolution, audit trail, and the Nguyen closed case</div><div class="smeta"><span class="stime">3 min</span><span class="tag tc">Close</span></div></div>
+    <div class="chev">▼</div>
   </div>
-
-  <hr class="divider" />
-
-  <!-- ── Closing Script ──────────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Closing (20–30 sec)</div>
-    <div class="script-box">
-      <p>"We just walked four live cases — from a fresh referral in the queue to a resolved overpayment review — using structured Dataverse records, an auditable evidence package, and a controlled analyst-to-supervisor approval path."</p>
-      <p>"Dynamics 365 Customer Service structures the work. SSA staff retain control of every finding, approval, and outcome. Next, we can review pacing, expand the Copilot analysis scene, or tailor the talk track for a specific audience."</p>
-    </div>
+  <div class="cbody">
+    <div class="cs"><div class="csl">Narrative</div><div class="narr">Close the demo with the Nguyen resolved case as proof the full lifecycle works. Then pan out to show all four cases at their stages — the program in operation.</div></div>
+    <div class="cs"><div class="csl">Actions</div><ul class="al">
+      <li>Open <code>Active Cases – DATA</code>. "One resolved, one pending supervisor, one on hold, one researching. A program in operation."</li>
+      <li>Open <code>EIR-2025-0033 — Nguyen, Patricia</code>.</li>
+      <li>Walk the resolved case: Status = Resolved, Discrepancy Type = Unreported Wages, Risk Rating = Critical, Case Disposition = Create Overpayment Review, Supervisor Approval = Yes.</li>
+      <li>Navigate to the Nguyen finding: Finding Type = Possible Fraud Indicator, Analyst = S. Kim, Disposition = Overpayment Review. Read finding detail.</li>
+      <li>"S. Kim wrote this finding. The supervisor read it, reviewed the evidence, and approved. That approval is timestamped. If this case is ever audited — by OIG, by Congress, by the beneficiary's attorney — every action is here."</li>
+      <li>Return to the Hargrove case. "This is where the Hargrove case is heading. The analyst has done the work. The finding is written. The supervisor needs to act."</li>
+    </ul></div>
+    <div class="cs"><div class="csl">Key Points</div><div class="kps">
+      <div class="kp">D365 audit logging captures every field change: user, timestamp, old value, new value. Supervisor Approval flipping from No to Yes is a permanent, timestamped record. Not a checkbox in a spreadsheet.</div>
+      <div class="kp">"The audit trail is not a feature SSA builds. It is a feature SSA inherits from Dynamics 365. Audit is on by default at the entity level."</div>
+      <div class="kp">Resolution paths are explicit and finite: Close, RFI, Overpayment Review, Fraud Escalation. Every resolved case ends in exactly one of these four states — no ambiguous outcomes, no lost cases.</div>
+    </div></div>
   </div>
+</div>
 
-  <!-- ── Key Phrases ─────────────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Key Phrases To Use</div>
-    <div class="phrase-list">
-      <div class="phrase">Defaults plus benefits of how this tool can be used for a variety of use cases and can be configured to support future scopes.</div>
-      <div class="phrase">We can trace this outcome directly to the scenario requirements and mapping.</div>
-      <div class="phrase">What you are seeing aligns to the defined success measure.</div>
-      <div class="phrase">The implementation stays aligned to the scenario files and explicit mapping.</div>
-    </div>
+<hr />
+
+<div class="sec">
+  <div class="slabel">Closing (1 min)</div>
+  <div class="sbox">
+    <p>"What you have just seen is not a prototype. It is a configured Dynamics 365 Customer Service environment running live Dataverse records. Every screen — the queue, the case form, the evidence records, the finding, the supervisor report, the resolved audit trail — is running on the same platform Microsoft operates for thousands of organizations worldwide."</p>
+    <p>"The work SSA needs to do is not to build case management software. It is to configure domain vocabulary, define lifecycle stages, and activate the capabilities D365 already provides. Copilot, audit logging, queue routing, Power BI — all of it is available in the platform you are already looking at."</p>
+    <p>"The next conversation I want to have is about the specific stages of your current earnings integrity review process and how we map them to the Business Process Flow you just saw. What does your current triage look like?"</p>
   </div>
+</div>
 
-  <!-- ── Presenter Checklist ─────────────────────────────────────── -->
-  <div class="section">
-    <div class="section-label">Presenter Checklist</div>
-    <ul class="checklist">
-      <li><input type="checkbox" /> Keep language outcome-first, not implementation-heavy.</li>
-      <li><input type="checkbox" /> Call out the hero record (Hargrove / EIR-2025-0041) and business impact clearly.</li>
-      <li><input type="checkbox" /> End by restating measurable success criteria.</li>
-      <li><input type="checkbox" /> Manually resolve Nguyen case (EIR-2025-0033) in Maker portal before demo.</li>
-      <li><input type="checkbox" /> Pre-open hero case in second browser tab.</li>
-    </ul>
+<hr />
+
+<div class="sec">
+  <div class="slabel">Key phrases to use</div>
+  <div class="plist">
+    <div class="ph">SSA does not need to build a case management system. It needs to configure one.</div>
+    <div class="ph">The custom work is the domain vocabulary. The infrastructure is D365 out of the box.</div>
+    <div class="ph">The audit trail is not a feature SSA builds. It is a feature SSA inherits from Dynamics 365.</div>
+    <div class="ph">Every resolved case ends in exactly one of four states — no ambiguous outcomes, no lost cases.</div>
+    <div class="ph">The Copilot slot is already there — it just needs the content source wired in.</div>
+    <div class="ph">Four cases today. The same model scales to 4,000. The analyst experience is identical.</div>
+    <div class="ph">The total discrepancy amount across all open cases is a live number in Dataverse. Not last Tuesday's spreadsheet.</div>
   </div>
+</div>
 
-</div><!-- /container -->
+<div class="sec">
+  <div class="slabel">Presenter Checklist</div>
+  <ul class="cklist">
+    <li><input type="checkbox" /> Open <code>Active Cases – DATA</code> view as starting screen before audience joins.</li>
+    <li><input type="checkbox" /> Pre-open Hargrove case (EIR-2025-0041) in a second browser tab.</li>
+    <li><input type="checkbox" /> Manually resolve Nguyen case (EIR-2025-0033) in Maker portal if not already resolved.</li>
+    <li><input type="checkbox" /> Verify Supervisor Case Summary Report V2 tab is visible on the Hargrove case form.</li>
+    <li><input type="checkbox" /> Know the four disposition paths: Close · RFI · Overpayment Review · Fraud Escalation.</li>
+    <li><input type="checkbox" /> Explain D365 platform in Step 1 before showing any data.</li>
+    <li><input type="checkbox" /> End every step by connecting back to the business outcome, not the technical feature.</li>
+    <li><input type="checkbox" /> Have the closing question ready: "What does your current triage look like?"</li>
+  </ul>
+</div>
 
+</div>
 <script>
-function toggleStep(id) {
-  const card = document.getElementById(id);
-  card.classList.toggle('open');
-  updateProgress();
-}
-
-function updateProgress() {
-  const total = 5;
-  const open = document.querySelectorAll('.step-card.open').length;
-  document.getElementById('progress-text').textContent = open + ' / ' + total + ' steps';
-  document.getElementById('progress-fill').style.width = (open / total * 100) + '%';
-}
-
-function toggleTheme() {
-  const html = document.documentElement;
-  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
-
-// Open step 1 by default
-document.getElementById('step-1').classList.add('open');
-updateProgress();
+const T=10;
+function tog(id){document.getElementById(id).classList.toggle('open');upd()}
+function expandAll(){for(let i=1;i<=T;i++)document.getElementById('s'+i).classList.add('open');upd()}
+function collapseAll(){for(let i=1;i<=T;i++)document.getElementById('s'+i).classList.remove('open');upd()}
+function upd(){const o=document.querySelectorAll('.card.open').length;document.getElementById('pt').textContent=o+' of '+T+' steps';document.getElementById('pf').style.width=(o/T*100)+'%'}
+function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark')}
+document.getElementById('s1').classList.add('open');upd();
 </script>
 </body>
 </html>
