@@ -1,44 +1,183 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Supervisor Case Summary V2</title>
-  <style>
-    body { font-family: "Segoe UI", Tahoma, sans-serif; margin: 0; padding: 12px; background: #f5f8fc; color: #102542; }
-    .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 10px; padding: 14px; }
-    h1 { margin: 0 0 8px; font-size: 18px; color: #0a5fa8; }
-    p { margin: 0 0 10px; color: #516173; font-size: 13px; }
-    .kpis { display: grid; grid-template-columns: repeat(4, minmax(110px, 1fr)); gap: 8px; margin: 10px 0; }
-    .kpi { border: 1px solid #dbeeff; background: #f8fbff; border-radius: 8px; padding: 8px; text-align: center; }
-    .kpi strong { display: block; font-size: 18px; color: #0a5fa8; }
-    .kpi span { font-size: 11px; color: #516173; text-transform: uppercase; letter-spacing: 0.04em; }
-    .note { margin-top: 10px; border-left: 4px solid #0a5fa8; background: #eaf4ff; padding: 8px; font-size: 12px; }
-    @media (max-width: 760px) { .kpis { grid-template-columns: 1fr 1fr; } }
-  </style>
-</head>
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supervisor Case Brief</title>
+<style>
+:root{--bg:#f4f6f9;--surface:#fff;--border:#dde3ea;--text:#1b2535;--muted:#6b778c;
+--accent:#0052cc;--accent-soft:#e6f0ff;--success:#0a6640;--success-soft:#e3fcef;
+--danger:#bf2600;--danger-soft:#ffebe6;--warn:#974f0c;--warn-soft:#fff4e5;
+--info:#0747a6;--info-soft:#deebff;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding:12px}
+h1{font-size:16px;font-weight:700;color:var(--accent)}
+h2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.header-card{border-left:4px solid var(--accent)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.field{flex:1;min-width:120px}
+.field .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.field .val{font-size:13px;font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.risk-critical{background:#ffebe6;color:#bf2600}
+.risk-high{background:#fff4e5;color:#974f0c}
+.risk-medium{background:#fffae6;color:#6b5700}
+.risk-low{background:#e3fcef;color:#006644}
+.approval-yes{background:var(--success-soft);color:var(--success)}
+.approval-no{background:var(--warn-soft);color:var(--warn)}
+.disp-fraud{background:var(--danger-soft);color:var(--danger)}
+.disp-op{background:var(--warn-soft);color:var(--warn)}
+.disp-rfi{background:var(--info-soft);color:var(--info)}
+.disp-close{background:var(--success-soft);color:var(--success)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;background:#f4f6f9;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.gap-amount{font-weight:700;color:var(--danger)}
+.ev-row td:first-child{font-weight:600}
+.ev-verified{color:var(--success);font-weight:700}
+.ev-unverified{color:var(--warn);font-weight:700}
+.finding-block{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:6px;padding:10px 12px;font-size:12px;line-height:1.6;color:var(--text)}
+.decision-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.decision-opt{flex:1;min-width:120px;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11px;font-weight:600}
+.decision-opt.recommended{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.decision-opt .label{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.decision-opt .action{font-size:13px}
+.total-row td{font-weight:700;background:#f4f6f9}
+.spinner{text-align:center;padding:30px;color:var(--muted);font-style:italic}
+.err{background:var(--danger-soft);color:var(--danger);padding:10px;border-radius:6px;font-size:12px;margin-bottom:10px}
+</style></head>
 <body>
-  <div class="panel">
-    <h1>Supervisor Case Summary V2</h1>
-    <p>Clean-slate v2 report web resource for second-solution validation.</p>
-    <div class="kpis">
-      <div class="kpi"><strong id="openCases">0</strong><span>Open Cases</span></div>
-      <div class="kpi"><strong id="highRiskCases">0</strong><span>High Risk</span></div>
-      <div class="kpi"><strong id="overdueCases">0</strong><span>Overdue</span></div>
-      <div class="kpi"><strong id="pendingApprovals">0</strong><span>Pending Approval</span></div>
+<div id="root"><div class="spinner">Loading case data...</div></div>
+<script>
+const RISK_LABELS={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RISK_CLASS={100000000:"risk-low",100000001:"risk-medium",100000002:"risk-high",100000003:"risk-critical"};
+const DISP_LABELS={100000000:"Close Case",100000001:"Request More Information",100000002:"Create Overpayment Review",100000003:"Escalate as Fraud Referral"};
+const DISP_CLASS={100000000:"disp-close",100000001:"disp-rfi",100000002:"disp-op",100000003:"disp-fraud"};
+const DTYPE_LABELS={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+const STATUS_LABELS={1:"In Progress",2:"On Hold",4:"Researching",5:"Problem Solved"};
+const ETYPE_LABELS={100000000:"Tax Return",100000001:"W-2 Form",100000002:"1099 Form",100000003:"Wage Statement",100000004:"Beneficiary Statement",100000005:"Employer Confirmation",100000006:"Other"};
+const FTYPE_LABELS={100000000:"Discrepancy Confirmed",100000001:"Discrepancy Resolved",100000002:"Discrepancy Unresolved",100000003:"Possible Fraud Indicator",100000004:"No Issue Found"};
+
+// Sample fallback data (Hargrove hero case)
+const SAMPLE = {
+  case:{title:"EIR-2025-0041 \u2014 Hargrove, Robert \u2014 Unreported SSDI Wages Q1-Q2 2025",customer:"Robert Hargrove",statuscode:1,earnint_riskrating:100000002,earnint_discrepancytype:100000000,earnint_casedisposition:100000002,earnint_supervisorapproval:false,createdon:"2025-03-15"},
+  discrepancies:[
+    {earnint_earningsdiscrepancy_name:"Hargrove \u2014 Q1 2025 Wage Discrepancy",earnint_reportedearnings:0,earnint_authoritativeearnings:12400,earnint_discrepancyamount:12400,earnint_earningsperiod:"Q1 2025",earnint_employername:"Apex Logistics Inc",earnint_sourcesystem:"IRS Wage Feed W-2"},
+    {earnint_earningsdiscrepancy_name:"Hargrove \u2014 Q2 2025 Wage Discrepancy",earnint_reportedearnings:0,earnint_authoritativeearnings:12400,earnint_discrepancyamount:12400,earnint_earningsperiod:"Q2 2025",earnint_employername:"Apex Logistics Inc",earnint_sourcesystem:"IRS Wage Feed W-2"}
+  ],
+  evidence:[
+    {earnint_evidenceitem_name:"Hargrove \u2014 IRS W-2 2025 Q1-Q2",earnint_evidencetype:100000001,earnint_documentname:"W2_Hargrove_Apex_2025.pdf",earnint_verifiedby:"J. Reyes, Analyst",earnint_evidencedesc:"IRS W-2 confirms $24,800 in wages for Jan-Jun 2025."},
+    {earnint_evidenceitem_name:"Hargrove \u2014 Beneficiary Statement",earnint_evidencetype:100000004,earnint_documentname:"BeneStatement_Hargrove_Jul2025.pdf",earnint_verifiedby:"",earnint_evidencedesc:"Beneficiary claims wages belonged to a family member. Under review for credibility."},
+    {earnint_evidenceitem_name:"Hargrove \u2014 Employer Confirmation",earnint_evidencetype:100000005,earnint_documentname:"EmployerConf_Apex_Hargrove.pdf",earnint_verifiedby:"J. Reyes, Analyst",earnint_evidencedesc:"Apex Logistics confirmed Hargrove as active employee Jan-Jun 2025."}
+  ],
+  findings:[
+    {earnint_investigationfinding_name:"Hargrove \u2014 Finding: Discrepancy Confirmed \u2014 Pending Supervisor",earnint_findingtype:100000000,earnint_recddisposition:100000002,earnint_analystname:"J. Reyes",earnint_findingdetails:"Earnings discrepancy of $24,800 confirmed across Q1 and Q2 2025. Beneficiary statement not credible. Employer confirmation received and verified. Recommended: initiate overpayment review for SSDI benefit adjustment."}
+  ]
+};
+
+function fmt(n){return n==null?"\u2014":"$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+async function load(){
+  let caseId="", orgUrl="";
+  try{
+    const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;
+    if(xrm&&xrm.Page&&xrm.Page.data){caseId=xrm.Page.data.entity.getId().replace(/[{}]/g,"");orgUrl=window.location.origin;}
+  }catch(e){}
+  const params=new URLSearchParams(window.location.search);
+  if(!caseId)caseId=params.get("id")||"";
+  if(!orgUrl)orgUrl=params.get("orgUrl")||window.location.origin;
+
+  let data=SAMPLE;
+  if(caseId){
+    try{
+      const base=`${orgUrl}/api/data/v9.2`;
+      const headers={"OData-Version":"4.0","Accept":"application/json","Content-Type":"application/json"};
+      const [c,d,ev,f]=await Promise.all([
+        fetch(`${base}/incidents(${caseId})?$select=title,_customerid_value,statuscode,earnint_riskrating,earnint_discrepancytype,earnint_casedisposition,earnint_supervisorapproval,createdon`,{headers}).then(r=>r.json()),
+        fetch(`${base}/earnint_earningsdiscrepancies?$filter=_earnint_caseid_discrepancy_value eq '${caseId}'&$select=earnint_earningsdiscrepancy_name,earnint_reportedearnings,earnint_authoritativeearnings,earnint_discrepancyamount,earnint_earningsperiod,earnint_employername,earnint_sourcesystem`,{headers}).then(r=>r.json()),
+        fetch(`${base}/earnint_evidenceitems?$filter=_earnint_caseid_evidence_value eq '${caseId}'&$select=earnint_evidenceitem_name,earnint_evidencetype,earnint_documentname,earnint_verifiedby,earnint_evidencedesc`,{headers}).then(r=>r.json()),
+        fetch(`${base}/earnint_investigationfindings?$filter=_earnint_caseid_finding_value eq '${caseId}'&$select=earnint_investigationfinding_name,earnint_findingtype,earnint_recddisposition,earnint_analystname,earnint_findingdetails`,{headers}).then(r=>r.json())
+      ]);
+      const custName=c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||c["customerid_contact@OData.Community.Display.V1.FormattedValue"]||"";
+      data={case:{...c,customer:custName},discrepancies:d.value||[],evidence:ev.value||[],findings:f.value||[]};
+    }catch(e){document.getElementById("root").insertAdjacentHTML("afterbegin",`<div class="err">Live data unavailable \u2014 showing sample data. (${e.message})</div>`);}
+  }
+  render(data);
+}
+
+function render(d){
+  const c=d.case;
+  const totalGap=(d.discrepancies||[]).reduce((s,r)=>s+(r.earnint_discrepancyamount||0),0);
+  const verified=(d.evidence||[]).filter(e=>e.earnint_verifiedby).length;
+  const total=(d.evidence||[]).length;
+  const finding=(d.findings||[])[0]||null;
+  const rr=c.earnint_riskrating;
+  const disp=c.earnint_casedisposition;
+  const approved=c.earnint_supervisorapproval;
+
+  const discRows=(d.discrepancies||[]).map(r=>`
+    <tr>
+      <td>${esc(r.earnint_earningsperiod||"\u2014")}</td>
+      <td>${esc(r.earnint_employername||"\u2014")}</td>
+      <td>${esc(r.earnint_sourcesystem||"\u2014")}</td>
+      <td>${fmt(r.earnint_reportedearnings)}</td>
+      <td>${fmt(r.earnint_authoritativeearnings)}</td>
+      <td class="gap-amount">${fmt(r.earnint_discrepancyamount)}</td>
+    </tr>`).join("")+`<tr class="total-row"><td colspan="5" style="text-align:right">Total discrepancy exposure</td><td class="gap-amount">${fmt(totalGap)}</td></tr>`;
+
+  const evRows=(d.evidence||[]).map(r=>`
+    <tr class="ev-row">
+      <td>${esc(ETYPE_LABELS[r.earnint_evidencetype]||"Document")}</td>
+      <td>${esc(r.earnint_documentname||"\u2014")}</td>
+      <td class="${r.earnint_verifiedby?"ev-verified":"ev-unverified"}">${r.earnint_verifiedby?"\u2713 "+esc(r.earnint_verifiedby):"\u2717 Not verified"}</td>
+      <td style="font-size:11px;color:#6b778c">${esc(r.earnint_evidencedesc||"")}</td>
+    </tr>`).join("");
+
+  const findingHtml=finding?`
+    <div class="finding-block">
+      <div class="row" style="margin-bottom:8px">
+        <div class="field"><div class="lbl">Finding</div><div class="val">${esc(FTYPE_LABELS[finding.earnint_findingtype]||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Recommendation</div><div class="val"><span class="badge ${DISP_CLASS[finding.earnint_recddisposition]||""}">${esc(DISP_LABELS[finding.earnint_recddisposition]||"\u2014")}</span></div></div>
+        <div class="field"><div class="lbl">Analyst</div><div class="val">${esc(finding.earnint_analystname||"\u2014")}</div></div>
+      </div>
+      <div style="font-size:12px;line-height:1.6">${esc(finding.earnint_findingdetails||"")}</div>
+    </div>`:"<p style='color:#6b778c;font-style:italic'>No investigation finding submitted yet.</p>";
+
+  const decisionOpts=[
+    {v:100000002,label:"Approve — Overpayment Review",desc:"Analyst recommendation aligns with evidence. Initiate benefit adjustment review."},
+    {v:100000001,label:"Return — More Information",desc:"Key evidence gap or unverified items require analyst follow-up before approval."},
+    {v:100000003,label:"Escalate — Fraud Referral",desc:"Pattern of non-reporting warrants formal fraud referral package."},
+    {v:100000000,label:"Close — No Action",desc:"Evidence does not support discrepancy or beneficiary explanation accepted."}
+  ].map(o=>`<div class="decision-opt ${o.v===disp?"recommended":""}"><div class="label">${o.v===disp?"Analyst Recommended":"Option"}</div><div class="action">${esc(o.label)}</div><div style="font-size:10px;color:#6b778c;margin-top:3px">${esc(o.desc)}</div></div>`).join("");
+
+  document.getElementById("root").innerHTML=`
+    <div class="card header-card">
+      <div class="row" style="margin-bottom:8px;align-items:center">
+        <div style="flex:1"><h1>Supervisor Case Brief</h1><div style="color:#6b778c;font-size:11px;margin-top:2px">${esc(c.title||"")}</div></div>
+        <span class="badge ${RISK_CLASS[rr]||""}">${esc(RISK_LABELS[rr]||"Unknown")} Risk</span>
+        <span class="badge ${approved?"approval-yes":"approval-no"}">${approved?"\u2713 Approved":"\u23F3 Pending Approval"}</span>
+      </div>
+      <div class="row">
+        <div class="field"><div class="lbl">Beneficiary</div><div class="val">${esc(c.customer||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Case Status</div><div class="val">${esc(STATUS_LABELS[c.statuscode]||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Discrepancy Type</div><div class="val">${esc(DTYPE_LABELS[c.earnint_discrepancytype]||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Total Exposure</div><div class="val gap-amount">${fmt(totalGap)}</div></div>
+        <div class="field"><div class="lbl">Evidence Quality</div><div class="val">${verified} of ${total} verified</div></div>
+      </div>
     </div>
-    <div class="note">Use query params to preview values, e.g. ?openCases=12&highRiskCases=4&overdueCases=3&pendingApprovals=2</div>
-  </div>
-  <script>
-    function param(name, fallback) {
-      var p = new URLSearchParams(window.location.search);
-      var v = p.get(name);
-      return (v === null || v === "") ? fallback : v;
-    }
-    document.getElementById("openCases").textContent = param("openCases", "0");
-    document.getElementById("highRiskCases").textContent = param("highRiskCases", "0");
-    document.getElementById("overdueCases").textContent = param("overdueCases", "0");
-    document.getElementById("pendingApprovals").textContent = param("pendingApprovals", "0");
-  </script>
-</body>
-</html>
+    <div class="card"><h2>Earnings Discrepancy Records</h2>
+      <table><thead><tr><th>Period</th><th>Employer</th><th>Source</th><th>Reported</th><th>Authoritative</th><th>Gap</th></tr></thead>
+      <tbody>${discRows}</tbody></table>
+    </div>
+    <div class="card"><h2>Evidence Package</h2>
+      <table><thead><tr><th>Type</th><th>Document</th><th>Verification</th><th>Summary</th></tr></thead>
+      <tbody>${evRows||"<tr><td colspan='4' style='color:#6b778c;font-style:italic'>No evidence items on record.</td></tr>"}</tbody></table>
+    </div>
+    <div class="card"><h2>Investigation Finding &amp; Analyst Recommendation</h2>${findingHtml}</div>
+    <div class="card"><h2>Supervisor Decision Options</h2>
+      <div style="font-size:11px;color:#6b778c;margin-bottom:8px">The analyst has recommended: <strong>${esc(DISP_LABELS[disp]||"not set")}</strong>. Select an action below and update the Case Disposition and Supervisor Approval fields on the case form.</div>
+      <div class="decision-row">${decisionOpts}</div>
+    </div>`;
+}
+load();
+</script></body></html>

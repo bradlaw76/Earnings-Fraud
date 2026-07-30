@@ -1,0 +1,154 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analyst Case Workbench</title>
+<style>
+:root{--bg:#f4f6f9;--surface:#fff;--border:#dde3ea;--text:#1b2535;--muted:#6b778c;
+--accent:#0052cc;--accent-soft:#e6f0ff;--success:#0a6640;--success-soft:#e3fcef;
+--danger:#bf2600;--danger-soft:#ffebe6;--warn:#974f0c;--warn-soft:#fff4e5;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding:12px}
+h1{font-size:16px;font-weight:700;color:var(--accent)}
+h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.field{flex:1;min-width:110px}
+.field .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.field .val{font-size:13px;font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.risk-critical{background:#ffebe6;color:#bf2600}.risk-high{background:#fff4e5;color:#974f0c}
+.risk-medium{background:#fffae6;color:#6b5700}.risk-low{background:#e3fcef;color:#006644}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;background:#f4f6f9;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.total-row td{font-weight:700;background:#f4f6f9}
+.gap-amount{font-weight:700;color:var(--danger)}
+.ev-ok{color:var(--success);font-weight:700}.ev-no{color:var(--warn);font-weight:700}
+.step{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.step:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-num.done{background:var(--success)}
+.step-num.blocked{background:var(--warn)}
+.step-body .title{font-weight:700;font-size:12px}
+.step-body .desc{font-size:11px;color:var(--muted);margin-top:2px}
+.gap-alert{background:var(--warn-soft);border-left:3px solid #974f0c;padding:8px 10px;border-radius:4px;font-size:12px;margin-bottom:8px}
+.spinner{text-align:center;padding:30px;color:var(--muted);font-style:italic}
+.err{background:var(--danger-soft);color:var(--danger);padding:10px;border-radius:6px;font-size:12px;margin-bottom:10px}
+</style></head>
+<body>
+<div id="root"><div class="spinner">Loading case workbench...</div></div>
+<script>
+const RISK_LABELS={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RISK_CLASS={100000000:"risk-low",100000001:"risk-medium",100000002:"risk-high",100000003:"risk-critical"};
+const DISP_LABELS={100000000:"Close Case",100000001:"Request More Information",100000002:"Create Overpayment Review",100000003:"Escalate as Fraud Referral"};
+const DTYPE_LABELS={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+const STATUS_LABELS={1:"In Progress",2:"On Hold",4:"Researching",5:"Problem Solved"};
+const ETYPE_LABELS={100000000:"Tax Return",100000001:"W-2 Form",100000002:"1099 Form",100000003:"Wage Statement",100000004:"Beneficiary Statement",100000005:"Employer Confirmation",100000006:"Other"};
+const REQUIRED_EV_TYPES=[100000001,100000005,100000004]; // W-2, Employer Confirmation, Beneficiary Statement
+const REQUIRED_EV_NAMES=["W-2 Form","Employer Confirmation","Beneficiary Statement"];
+const SAMPLE={
+  case:{title:"EIR-2025-0041 \u2014 Hargrove, Robert \u2014 Unreported SSDI Wages Q1-Q2 2025",customer:"Robert Hargrove",statuscode:1,earnint_riskrating:100000002,earnint_discrepancytype:100000000,earnint_casedisposition:100000002,earnint_supervisorapproval:false,createdon:"2025-03-15T00:00:00Z"},
+  discrepancies:[
+    {earnint_earningsdiscrepancy_name:"Q1 2025",earnint_reportedearnings:0,earnint_authoritativeearnings:12400,earnint_discrepancyamount:12400,earnint_earningsperiod:"Q1 2025",earnint_employername:"Apex Logistics Inc",earnint_sourcesystem:"IRS Wage Feed W-2"},
+    {earnint_earningsdiscrepancy_name:"Q2 2025",earnint_reportedearnings:0,earnint_authoritativeearnings:12400,earnint_discrepancyamount:12400,earnint_earningsperiod:"Q2 2025",earnint_employername:"Apex Logistics Inc",earnint_sourcesystem:"IRS Wage Feed W-2"}
+  ],
+  evidence:[
+    {earnint_evidenceitem_name:"IRS W-2 2025 Q1-Q2",earnint_evidencetype:100000001,earnint_documentname:"W2_Hargrove_Apex_2025.pdf",earnint_verifiedby:"J. Reyes, Analyst",earnint_evidencedesc:"IRS W-2 wage record. Confirms $24,800 in wages for Jan-Jun 2025."},
+    {earnint_evidenceitem_name:"Beneficiary Statement",earnint_evidencetype:100000004,earnint_documentname:"BeneStatement_Hargrove_Jul2025.pdf",earnint_verifiedby:"",earnint_evidencedesc:"Beneficiary claims wages belonged to a family member. Not yet corroborated."},
+    {earnint_evidenceitem_name:"Employer Confirmation",earnint_evidencetype:100000005,earnint_documentname:"EmployerConf_Apex_Hargrove.pdf",earnint_verifiedby:"J. Reyes, Analyst",earnint_evidencedesc:"Apex Logistics confirmed Hargrove as active employee Jan-Jun 2025."}
+  ],
+  findings:[]
+};
+
+function fmt(n){return n==null?"\u2014":"$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:2})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function daysSince(d){return d?Math.floor((Date.now()-new Date(d))/(86400000)):"?"}
+
+async function load(){
+  let caseId="",orgUrl="";
+  try{const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;if(xrm&&xrm.Page&&xrm.Page.data){caseId=xrm.Page.data.entity.getId().replace(/[{}]/g,"");orgUrl=window.location.origin;}}catch(e){}
+  const params=new URLSearchParams(window.location.search);
+  if(!caseId)caseId=params.get("id")||"";
+  if(!orgUrl)orgUrl=params.get("orgUrl")||window.location.origin;
+  let data=SAMPLE;
+  if(caseId){
+    try{
+      const base=`${orgUrl}/api/data/v9.2`,h={"OData-Version":"4.0","Accept":"application/json"};
+      const [c,disc,ev,fi]=await Promise.all([
+        fetch(`${base}/incidents(${caseId})?$select=title,_customerid_value,statuscode,earnint_riskrating,earnint_discrepancytype,earnint_casedisposition,earnint_supervisorapproval,createdon`,{headers:h}).then(r=>r.json()),
+        fetch(`${base}/earnint_earningsdiscrepancies?$filter=_earnint_caseid_discrepancy_value eq '${caseId}'&$select=earnint_earningsdiscrepancy_name,earnint_reportedearnings,earnint_authoritativeearnings,earnint_discrepancyamount,earnint_earningsperiod,earnint_employername,earnint_sourcesystem`,{headers:h}).then(r=>r.json()),
+        fetch(`${base}/earnint_evidenceitems?$filter=_earnint_caseid_evidence_value eq '${caseId}'&$select=earnint_evidenceitem_name,earnint_evidencetype,earnint_documentname,earnint_verifiedby,earnint_evidencedesc`,{headers:h}).then(r=>r.json()),
+        fetch(`${base}/earnint_investigationfindings?$filter=_earnint_caseid_finding_value eq '${caseId}'&$select=earnint_investigationfinding_name,earnint_findingtype,earnint_recddisposition,earnint_analystname,earnint_findingdetails`,{headers:h}).then(r=>r.json())
+      ]);
+      data={case:{...c,customer:c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||""},discrepancies:disc.value||[],evidence:ev.value||[],findings:fi.value||[]};
+    }catch(e){document.getElementById("root").insertAdjacentHTML("afterbegin",`<div class="err">Live data unavailable \u2014 showing sample data.</div>`);}
+  }
+  render(data);
+}
+
+function render(d){
+  const c=d.case,disc=d.discrepancies||[],evs=d.evidence||[],fis=d.findings||[];
+  const totalGap=disc.reduce((s,r)=>s+(r.earnint_discrepancyamount||0),0);
+  const evPresent=evs.map(e=>e.earnint_evidencetype);
+  const missingTypes=REQUIRED_EV_TYPES.filter(t=>!evPresent.includes(t));
+  const unverified=evs.filter(e=>!e.earnint_verifiedby);
+  const hasFinding=fis.length>0;
+  const days=daysSince(c.createdon);
+
+  const discRows=disc.map(r=>`<tr>
+    <td>${esc(r.earnint_earningsperiod||"\u2014")}</td><td>${esc(r.earnint_employername||"\u2014")}</td>
+    <td>${esc(r.earnint_sourcesystem||"\u2014")}</td><td>${fmt(r.earnint_reportedearnings)}</td>
+    <td>${fmt(r.earnint_authoritativeearnings)}</td><td class="gap-amount">${fmt(r.earnint_discrepancyamount)}</td></tr>`).join("")+
+    `<tr class="total-row"><td colspan="5" style="text-align:right">Total gap</td><td class="gap-amount">${fmt(totalGap)}</td></tr>`;
+
+  const evRows=evs.map(r=>`<tr><td>${esc(ETYPE_LABELS[r.earnint_evidencetype]||"Doc")}</td>
+    <td>${esc(r.earnint_documentname||"\u2014")}</td>
+    <td class="${r.earnint_verifiedby?"ev-ok":"ev-no"}">${r.earnint_verifiedby?"\u2713 "+esc(r.earnint_verifiedby):"\u26A0 Pending verification"}</td>
+    <td style="font-size:11px;color:#6b778c">${esc(r.earnint_evidencedesc||"")}</td></tr>`).join("")||
+    `<tr><td colspan="4" style="color:#6b778c;font-style:italic">No evidence items recorded.</td></tr>`;
+
+  const gapAlert=missingTypes.length?`<div class="gap-alert">\u26A0 Missing evidence: ${missingTypes.map(t=>ETYPE_LABELS[t]).join(", ")}. Collect before submitting finding.</div>`:"";
+  const uvAlert=unverified.length?`<div class="gap-alert">\u26A0 ${unverified.length} evidence item(s) not yet verified. Complete verification before supervisory review.</div>`:"";
+
+  // Next steps logic
+  const steps=[
+    {done:disc.length>0,blocked:false,title:"Discrepancy records confirmed",desc:`${disc.length} discrepancy record(s) on file. Total gap: ${fmt(totalGap)}.`},
+    {done:evs.length>0,blocked:false,title:"Evidence collection started",desc:`${evs.length} evidence item(s) on file.`},
+    {done:missingTypes.length===0,blocked:evs.length===0,title:"Evidence package complete",desc:missingTypes.length?`Still needed: ${missingTypes.map(t=>ETYPE_LABELS[t]).join(", ")}.`:"All standard evidence types present."},
+    {done:unverified.length===0&&evs.length>0,blocked:evs.length===0,title:"All evidence verified",desc:unverified.length?`${unverified.length} item(s) awaiting verification.`:"All evidence items verified by analyst."},
+    {done:hasFinding,blocked:unverified.length>0||evs.length===0,title:"Investigation finding submitted",desc:hasFinding?`Finding recorded. Recommended: ${esc(DISP_LABELS[(fis[0]||{}).earnint_recddisposition]||"\u2014")}.`:"Write and submit an Investigation Finding record."},
+    {done:c.earnint_supervisorapproval===true,blocked:!hasFinding,title:"Supervisor approval obtained",desc:c.earnint_supervisorapproval?"Supervisor has approved the finding.":"Awaiting supervisor review and Supervisor Approval = Yes."}
+  ];
+
+  const stepsHtml=steps.map((s,i)=>`<div class="step">
+    <div class="step-num ${s.done?"done":s.blocked?"blocked":""}">${s.done?"\u2713":i+1}</div>
+    <div class="step-body"><div class="title">${esc(s.title)}</div><div class="desc">${s.desc}</div></div>
+  </div>`).join("");
+
+  document.getElementById("root").innerHTML=`
+    <div class="card" style="border-left:4px solid var(--accent)">
+      <div class="row" style="align-items:center;margin-bottom:8px">
+        <div style="flex:1"><h1>Analyst Case Workbench</h1><div style="font-size:11px;color:#6b778c;margin-top:2px">${esc(c.title||"")}</div></div>
+        <span class="badge ${RISK_CLASS[c.earnint_riskrating]||""}">${esc(RISK_LABELS[c.earnint_riskrating]||"?")}</span>
+      </div>
+      <div class="row">
+        <div class="field"><div class="lbl">Beneficiary</div><div class="val">${esc(c.customer||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Status</div><div class="val">${esc(STATUS_LABELS[c.statuscode]||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Type</div><div class="val">${esc(DTYPE_LABELS[c.earnint_discrepancytype]||"\u2014")}</div></div>
+        <div class="field"><div class="lbl">Days Open</div><div class="val">${days}</div></div>
+        <div class="field"><div class="lbl">Total Exposure</div><div class="val gap-amount">${fmt(totalGap)}</div></div>
+      </div>
+    </div>
+    <div class="card"><h2>Earnings Discrepancy Comparison</h2>
+      <table><thead><tr><th>Period</th><th>Employer</th><th>Source</th><th>Reported</th><th>Authoritative</th><th>Gap</th></tr></thead>
+      <tbody>${discRows}</tbody></table>
+    </div>
+    <div class="card"><h2>Evidence Collection</h2>
+      ${gapAlert}${uvAlert}
+      <table><thead><tr><th>Type</th><th>Document</th><th>Verification</th><th>Notes</th></tr></thead>
+      <tbody>${evRows}</tbody></table>
+    </div>
+    <div class="card"><h2>Case Progress Checklist</h2>${stepsHtml}</div>`;
+}
+load();
+</script></body></html>

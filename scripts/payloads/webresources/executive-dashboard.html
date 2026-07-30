@@ -1,0 +1,144 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Executive Program Dashboard</title>
+<style>
+:root{--bg:#f4f6f9;--surface:#fff;--border:#dde3ea;--text:#1b2535;--muted:#6b778c;
+--accent:#0052cc;--accent-soft:#e6f0ff;--success:#0a6640;--success-soft:#e3fcef;
+--danger:#bf2600;--danger-soft:#ffebe6;--warn:#974f0c;--warn-soft:#fff4e5;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding:12px}
+h1{font-size:16px;font-weight:700;color:var(--accent)}
+h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px;text-align:center}
+.kpi.alert{border-color:#974f0c;background:var(--warn-soft)}
+.kpi.good{border-color:#0a6640;background:var(--success-soft)}
+.kpi.danger{border-color:#bf2600;background:var(--danger-soft)}
+.kpi-val{font-size:22px;font-weight:700;color:var(--accent);display:block}
+.kpi.alert .kpi-val{color:#974f0c}
+.kpi.good .kpi-val{color:#0a6640}
+.kpi.danger .kpi-val{color:#bf2600}
+.kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:3px;display:block}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;background:#f4f6f9;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.risk-critical{background:#ffebe6;color:#bf2600}.risk-high{background:#fff4e5;color:#974f0c}
+.risk-medium{background:#fffae6;color:#6b5700}.risk-low{background:#e3fcef;color:#006644}
+.sp-active{background:#e6f0ff;color:#0052cc}.sp-hold{background:#f4f6f9;color:#6b778c}
+.sp-research{background:#fffae6;color:#6b5700}.sp-resolved{background:#e3fcef;color:#0a6640}
+.bar-wrap{background:#dde3ea;border-radius:4px;height:10px;overflow:hidden;min-width:80px}
+.bar-fill{height:100%;border-radius:4px;background:var(--accent)}
+.bar-fill.danger{background:#bf2600}.bar-fill.warn{background:#974f0c}.bar-fill.ok{background:#0a6640}
+.gap-amount{font-weight:700;color:#bf2600}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.spinner{text-align:center;padding:30px;color:var(--muted);font-style:italic}
+.err{background:var(--danger-soft);color:var(--danger);padding:10px;border-radius:6px;font-size:12px;margin-bottom:10px}
+.ts{font-size:10px;color:var(--muted);margin-top:4px}
+</style></head>
+<body>
+<div id="root"><div class="spinner">Loading program dashboard...</div></div>
+<script>
+const RISK_LABELS={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RISK_CLASS={100000000:"risk-low",100000001:"risk-medium",100000002:"risk-high",100000003:"risk-critical"};
+const DISP_LABELS={100000000:"Close Case",100000001:"RFI",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
+const STATUS_LABELS={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
+const STATUS_CLASS={1:"sp-active",2:"sp-hold",4:"sp-research",5:"sp-resolved"};
+const DTYPE_LABELS={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+
+const SAMPLE_CASES=[
+  {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,earnint_discrepancytype:100000000,totalGap:24800},
+  {incidentid:"a2",title:"EIR-2025-0052",customer:"Maria Castillo",earnint_riskrating:100000002,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:4,earnint_discrepancytype:100000000,totalGap:18400},
+  {incidentid:"a3",title:"EIR-2025-0067",customer:"James Whitfield",earnint_riskrating:100000001,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:2,earnint_discrepancytype:100000002,totalGap:8750},
+  {incidentid:"a4",title:"EIR-2025-0033",customer:"Patricia Nguyen",earnint_riskrating:100000003,earnint_casedisposition:100000002,earnint_supervisorapproval:true,statuscode:5,earnint_discrepancytype:100000000,totalGap:11600}
+];
+
+function fmt(n){return "$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+async function load(){
+  let orgUrl="";
+  try{const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;if(xrm)orgUrl=window.location.origin;}catch(e){}
+  const params=new URLSearchParams(window.location.search);
+  if(!orgUrl)orgUrl=params.get("orgUrl")||window.location.origin;
+
+  let cases=SAMPLE_CASES,discAll=[];
+  try{
+    const base=`${orgUrl}/api/data/v9.2`,h={"OData-Version":"4.0","Accept":"application/json"};
+    const cr=await fetch(`${base}/incidents?$select=incidentid,title,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,earnint_discrepancytype,_customerid_value&$filter=startswith(title,'EIR')&$orderby=earnint_riskrating desc`,{headers:h}).then(r=>r.json());
+    const dr=await fetch(`${base}/earnint_earningsdiscrepancies?$select=_earnint_caseid_discrepancy_value,earnint_discrepancyamount`,{headers:h}).then(r=>r.json());
+    discAll=dr.value||[];
+    cases=(cr.value||[]).map(c=>({...c,customer:c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||"",totalGap:discAll.filter(d=>d["_earnint_caseid_discrepancy_value"]===c.incidentid).reduce((s,d)=>s+(d.earnint_discrepancyamount||0),0)}));
+    if(!cases.length)cases=SAMPLE_CASES;
+  }catch(e){document.getElementById("root").insertAdjacentHTML("afterbegin",`<div class="err">Live data unavailable \u2014 showing sample data.</div>`);}
+  render(cases);
+}
+
+function render(cases){
+  const open=cases.filter(c=>c.statuscode!==5);
+  const resolved=cases.filter(c=>c.statuscode===5);
+  const pendingApproval=cases.filter(c=>c.earnint_supervisorapproval===false&&c.statuscode!==5);
+  const totalExposure=open.reduce((s,c)=>s+(c.totalGap||0),0);
+  const critHigh=cases.filter(c=>c.earnint_riskrating>=100000002).length;
+
+  // Risk distribution
+  const riskCounts={};
+  cases.forEach(c=>{const k=c.earnint_riskrating;riskCounts[k]=(riskCounts[k]||0)+1;});
+  const riskRows=[100000003,100000002,100000001,100000000].filter(k=>riskCounts[k]).map(k=>{
+    const pct=Math.round(riskCounts[k]/cases.length*100);
+    const cls=k>=100000003?"danger":k===100000002?"warn":"ok";
+    return `<tr><td><span class="badge ${RISK_CLASS[k]||""}">${RISK_LABELS[k]}</span></td>
+      <td>${riskCounts[k]}</td>
+      <td><div class="bar-wrap"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div></td>
+      <td>${pct}%</td></tr>`;
+  }).join("");
+
+  // Disposition breakdown (resolved cases only, or all)
+  const dispCounts={};
+  cases.forEach(c=>{if(c.earnint_casedisposition!=null){const k=c.earnint_casedisposition;dispCounts[k]=(dispCounts[k]||0)+1;}});
+  const dispRows=Object.entries(dispCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr>
+    <td>${esc(DISP_LABELS[k]||"\u2014")}</td><td>${v}</td>
+    <td><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(v/cases.length*100)}%"></div></div></td></tr>`).join("");
+
+  // Case table
+  const caseRows=cases.map(c=>`<tr>
+    <td style="font-family:monospace;font-size:11px">${esc(c.title||"")}</td>
+    <td>${esc(c.customer||"\u2014")}</td>
+    <td><span class="badge ${RISK_CLASS[c.earnint_riskrating]||""}">${esc(RISK_LABELS[c.earnint_riskrating]||"?")}</span></td>
+    <td><span class="badge ${STATUS_CLASS[c.statuscode]||""}">${esc(STATUS_LABELS[c.statuscode]||"?")}</span></td>
+    <td class="gap-amount">${fmt(c.totalGap||0)}</td>
+    <td>${c.earnint_supervisorapproval?'<span style="color:#0a6640;font-weight:700">\u2713 Yes</span>':'<span style="color:#974f0c;font-weight:700">\u23F3 No</span>'}</td>
+    <td style="font-size:11px">${esc(DTYPE_LABELS[c.earnint_discrepancytype]||"\u2014")}</td></tr>`).join("");
+
+  document.getElementById("root").innerHTML=`
+    <div class="card" style="border-left:4px solid var(--accent)">
+      <h1>Earnings Integrity — Program Dashboard</h1>
+      <div class="ts">All EIR cases in environment &nbsp;&middot;&nbsp; Generated ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><span class="kpi-val">${open.length}</span><span class="kpi-lbl">Open Cases</span></div>
+      <div class="kpi ${pendingApproval.length>0?"alert":"good"}"><span class="kpi-val">${pendingApproval.length}</span><span class="kpi-lbl">Pending Approval</span></div>
+      <div class="kpi ${critHigh>0?"alert":"good"}"><span class="kpi-val">${critHigh}</span><span class="kpi-lbl">High / Critical Risk</span></div>
+      <div class="kpi danger"><span class="kpi-val">${fmt(totalExposure)}</span><span class="kpi-lbl">Total Open Exposure</span></div>
+      <div class="kpi good"><span class="kpi-val">${resolved.length}</span><span class="kpi-lbl">Resolved Cases</span></div>
+      <div class="kpi"><span class="kpi-val">${cases.length}</span><span class="kpi-lbl">Total Cases</span></div>
+    </div>
+    <div class="two-col">
+      <div class="card"><h2>Cases by Risk Rating</h2>
+        <table><thead><tr><th>Risk</th><th>#</th><th>Share</th><th>%</th></tr></thead>
+        <tbody>${riskRows||"<tr><td colspan='4'>No data</td></tr>"}</tbody></table>
+      </div>
+      <div class="card"><h2>Cases by Disposition</h2>
+        <table><thead><tr><th>Disposition</th><th>#</th><th>Share</th></tr></thead>
+        <tbody>${dispRows||"<tr><td colspan='3'>No data</td></tr>"}</tbody></table>
+      </div>
+    </div>
+    <div class="card"><h2>All Cases — Detail</h2>
+      <table><thead><tr><th>Case ID</th><th>Beneficiary</th><th>Risk</th><th>Status</th><th>Exposure</th><th>Approved</th><th>Type</th></tr></thead>
+      <tbody>${caseRows}</tbody></table>
+    </div>`;
+}
+load();
+</script></body></html>

@@ -1,0 +1,20 @@
+{
+  "WebResources": [
+    {
+      "Name": "{prefix}_/report/analyst-case-view.html",
+      "DisplayName": "Analyst Case Workbench",
+      "Description": "Analyst-facing report: discrepancy comparison, evidence checklist, gap analysis, and case progress checklist. Reads live Dataverse data for the current case.",
+      "SourcePath": "webresources/analyst-case-view.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    },
+    {
+      "Name": "{prefix}_/report/executive-dashboard.html",
+      "DisplayName": "Earnings Integrity Executive Dashboard",
+      "Description": "Program-level executive dashboard: aggregate KPIs, risk distribution, total exposure, pending approvals, and case list across all EIR cases.",
+      "SourcePath": "webresources/executive-dashboard.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}
