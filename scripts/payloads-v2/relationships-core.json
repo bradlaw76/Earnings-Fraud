@@ -1,0 +1,88 @@
+[
+  {
+    "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+    "SchemaName": "earnfrd2_case_discrepancy",
+    "ReferencedEntity": "earnfrd2_case",
+    "ReferencedAttribute": "earnfrd2_caseid",
+    "ReferencingEntity": "earnfrd2_discrepancy",
+    "Lookup": {
+      "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+      "SchemaName": "earnfrd2_caseid_discrepancy",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "Case"
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    "AssociatedMenuConfiguration": {
+      "Order": null,
+      "Behavior": "DoNotDisplay",
+      "Group": "Details",
+      "Label": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": []
+      }
+    },
+    "CascadeConfiguration": {
+      "Unshare": "NoCascade",
+      "Share": "NoCascade",
+      "Delete": "Cascade",
+      "Assign": "NoCascade",
+      "Reparent": "NoCascade",
+      "Merge": "NoCascade"
+    }
+  },
+  {
+    "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+    "SchemaName": "earnfrd2_case_finding",
+    "ReferencedEntity": "earnfrd2_case",
+    "ReferencedAttribute": "earnfrd2_caseid",
+    "ReferencingEntity": "earnfrd2_finding",
+    "Lookup": {
+      "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+      "SchemaName": "earnfrd2_caseid_finding",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "Case"
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    "AssociatedMenuConfiguration": {
+      "Order": null,
+      "Behavior": "DoNotDisplay",
+      "Group": "Details",
+      "Label": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": []
+      }
+    },
+    "CascadeConfiguration": {
+      "Unshare": "NoCascade",
+      "Share": "NoCascade",
+      "Delete": "Cascade",
+      "Assign": "NoCascade",
+      "Reparent": "NoCascade",
+      "Merge": "NoCascade"
+    }
+  }
+]

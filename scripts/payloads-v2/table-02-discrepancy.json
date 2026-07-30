@@ -1,0 +1,69 @@
+{
+  "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+  "SchemaName": "earnfrd2_discrepancy",
+  "DisplayName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Earnings Discrepancy V2",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "DisplayCollectionName": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Earnings Discrepancies V2",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "Description": {
+    "LocalizedLabels": [
+      {
+        "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+        "Label": "Independent v2 discrepancy table for clean wizard testing.",
+        "LanguageCode": 1033
+      }
+    ],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "HasNotes": true,
+  "HasActivities": false,
+  "IsActivity": false,
+  "OwnershipType": "UserOwned",
+  "EntityColor": "#c23934",
+  "Attributes": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "IsPrimaryName": true,
+      "SchemaName": "earnfrd2_discrepancy_name",
+      "AttributeType": "String",
+      "AttributeTypeName": {
+        "Value": "StringType"
+      },
+      "FormatName": {
+        "Value": "Text"
+      },
+      "MaxLength": 120,
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "Label": "Discrepancy Name",
+            "LanguageCode": 1033
+          }
+        ],
+        "@odata.type": "Microsoft.Dynamics.CRM.Label"
+      },
+      "RequiredLevel": {
+        "Value": "None",
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings"
+      }
+    }
+  ]
+}

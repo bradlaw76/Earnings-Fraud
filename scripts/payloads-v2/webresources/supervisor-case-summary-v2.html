@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supervisor Case Summary V2</title>
+  <style>
+    body { font-family: "Segoe UI", Tahoma, sans-serif; margin: 0; padding: 12px; background: #f5f8fc; color: #102542; }
+    .panel { background: #fff; border: 1px solid #d9e2ec; border-radius: 10px; padding: 14px; }
+    h1 { margin: 0 0 8px; font-size: 18px; color: #0a5fa8; }
+    p { margin: 0 0 10px; color: #516173; font-size: 13px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(110px, 1fr)); gap: 8px; margin: 10px 0; }
+    .kpi { border: 1px solid #dbeeff; background: #f8fbff; border-radius: 8px; padding: 8px; text-align: center; }
+    .kpi strong { display: block; font-size: 18px; color: #0a5fa8; }
+    .kpi span { font-size: 11px; color: #516173; text-transform: uppercase; letter-spacing: 0.04em; }
+    .note { margin-top: 10px; border-left: 4px solid #0a5fa8; background: #eaf4ff; padding: 8px; font-size: 12px; }
+    @media (max-width: 760px) { .kpis { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Supervisor Case Summary V2</h1>
+    <p>Clean-slate v2 report web resource for second-solution validation.</p>
+    <div class="kpis">
+      <div class="kpi"><strong id="openCases">0</strong><span>Open Cases</span></div>
+      <div class="kpi"><strong id="highRiskCases">0</strong><span>High Risk</span></div>
+      <div class="kpi"><strong id="overdueCases">0</strong><span>Overdue</span></div>
+      <div class="kpi"><strong id="pendingApprovals">0</strong><span>Pending Approval</span></div>
+    </div>
+    <div class="note">Use query params to preview values, e.g. ?openCases=12&highRiskCases=4&overdueCases=3&pendingApprovals=2</div>
+  </div>
+  <script>
+    function param(name, fallback) {
+      var p = new URLSearchParams(window.location.search);
+      var v = p.get(name);
+      return (v === null || v === "") ? fallback : v;
+    }
+    document.getElementById("openCases").textContent = param("openCases", "0");
+    document.getElementById("highRiskCases").textContent = param("highRiskCases", "0");
+    document.getElementById("overdueCases").textContent = param("overdueCases", "0");
+    document.getElementById("pendingApprovals").textContent = param("pendingApprovals", "0");
+  </script>
+</body>
+</html>

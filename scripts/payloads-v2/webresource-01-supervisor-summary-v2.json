@@ -1,0 +1,12 @@
+{
+  "WebResources": [
+    {
+      "Name": "{prefix}_/report/supervisor-case-summary-v2.html",
+      "DisplayName": "Supervisor Case Summary Report V2",
+      "Description": "V2 executive-friendly HTML report for clean second-solution testing.",
+      "SourcePath": "webresources/supervisor-case-summary-v2.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}

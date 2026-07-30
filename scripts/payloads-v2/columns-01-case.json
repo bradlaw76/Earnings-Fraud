@@ -1,0 +1,92 @@
+{
+  "TableLogicalName": "earnfrd2_case",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "earnfrd2_caseownername",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "Case Owner Name"
+          }
+        ]
+      },
+      "MaxLength": 120,
+      "FormatName": {
+        "Value": "Text"
+      },
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+      "SchemaName": "earnfrd2_casestatus",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "Case Status"
+          }
+        ]
+      },
+      "OptionSet": {
+        "Options": [
+          {
+            "Label": {
+              "@odata.type": "Microsoft.Dynamics.CRM.Label",
+              "LocalizedLabels": [
+                {
+                  "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+                  "Label": "Open",
+                  "LanguageCode": 1033
+                }
+              ]
+            },
+            "Value": 100000000
+          },
+          {
+            "Label": {
+              "@odata.type": "Microsoft.Dynamics.CRM.Label",
+              "LocalizedLabels": [
+                {
+                  "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+                  "Label": "Under Review",
+                  "LanguageCode": 1033
+                }
+              ]
+            },
+            "Value": 100000001
+          },
+          {
+            "Label": {
+              "@odata.type": "Microsoft.Dynamics.CRM.Label",
+              "LocalizedLabels": [
+                {
+                  "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+                  "Label": "Closed",
+                  "LanguageCode": 1033
+                }
+              ]
+            },
+            "Value": 100000002
+          }
+        ],
+        "IsGlobal": false,
+        "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
+      },
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    }
+  ]
+}
