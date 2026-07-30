@@ -137,38 +137,58 @@ Write-Host "--- Step 2: Cases (Incidents) ---" -ForegroundColor Yellow
 # statuscode: 1=In Progress, 2=On Hold, 4=Researching, 5=Problem Solved
 # statecode:  0=Active, 1=Resolved
 # prioritycode: 1=High, 2=Normal, 3=Low
+# earnint_discrepancytype:   100000000=Unreported Wages, 100000001=Excess Earnings, 100000002=Employer Mismatch
+# earnint_riskrating:        100000000=Low, 100000001=Medium, 100000002=High, 100000003=Critical
+# earnint_casedisposition:   100000000=Close Case, 100000001=RFI, 100000002=Overpayment Review, 100000003=Escalate Fraud
+# earnint_supervisorapproval: boolean
 $cases = @(
     @{
-        title        = "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025"
-        description  = "Beneficiary reported zero earned income for Jan-Jun 2025. IRS W-2 feed from Apex Logistics Inc shows `$24,800 in wages for the same period. Discrepancy flagged by automated wage comparison. Case referred to Program Integrity for review."
-        prioritycode = 1
-        statuscode   = 1
-        statecode    = 0
-        contactName  = "Robert Hargrove"
+        title          = "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025"
+        description    = "Beneficiary reported zero earned income for Jan-Jun 2025. IRS W-2 feed from Apex Logistics Inc shows `$24,800 in wages for the same period. Discrepancy flagged by automated wage comparison. Case referred to Program Integrity for review."
+        prioritycode   = 1
+        statuscode     = 1
+        statecode      = 0
+        contactName    = "Robert Hargrove"
+        discrepancytype    = 100000000  # Unreported Wages
+        riskrating         = 100000002  # High
+        casedisposition    = 100000002  # Create Overpayment Review
+        supervisorapproval = $false
     }
     @{
-        title        = "EIR-2025-0052 — Castillo, Maria — Dual Employer Earnings Not Reported 2024"
-        description  = "SSI beneficiary failed to report part-time earnings from two employers: Sunrise Cleaning Services (`$9,200) and Metro Catering LLC (`$9,200) during tax year 2024. Total unreported wages: `$18,400. Wage statements obtained. Finding in progress."
-        prioritycode = 1
-        statuscode   = 4
-        statecode    = 0
-        contactName  = "Maria Castillo"
+        title          = "EIR-2025-0052 — Castillo, Maria — Dual Employer Earnings Not Reported 2024"
+        description    = "SSI beneficiary failed to report part-time earnings from two employers: Sunrise Cleaning Services (`$9,200) and Metro Catering LLC (`$9,200) during tax year 2024. Total unreported wages: `$18,400. Wage statements obtained. Finding in progress."
+        prioritycode   = 1
+        statuscode     = 4
+        statecode      = 0
+        contactName    = "Maria Castillo"
+        discrepancytype    = 100000000  # Unreported Wages
+        riskrating         = 100000002  # High
+        casedisposition    = 100000001  # Request More Information
+        supervisorapproval = $false
     }
     @{
-        title        = "EIR-2025-0067 — Whitfield, James — Prior Overpayment / Q3 2025 Wage Discrepancy"
-        description  = "Beneficiary has prior overpayment history (2022, `$6,400 recovered). New discrepancy identified for Q3 2025 at employer GreenPath Construction. Employer verification letter sent. Awaiting employer response within 30-day window."
-        prioritycode = 2
-        statuscode   = 2
-        statecode    = 0
-        contactName  = "James Whitfield"
+        title          = "EIR-2025-0067 — Whitfield, James — Prior Overpayment / Q3 2025 Wage Discrepancy"
+        description    = "Beneficiary has prior overpayment history (2022, `$6,400 recovered). New discrepancy identified for Q3 2025 at employer GreenPath Construction. Employer verification letter sent. Awaiting employer response within 30-day window."
+        prioritycode   = 2
+        statuscode     = 2
+        statecode      = 0
+        contactName    = "James Whitfield"
+        discrepancytype    = 100000002  # Employer Mismatch
+        riskrating         = 100000001  # Medium
+        casedisposition    = 100000001  # Request More Information
+        supervisorapproval = $false
     }
     @{
-        title        = "EIR-2025-0033 — Nguyen, Patricia — IRS 1099 vs Beneficiary Statement Conflict"
-        description  = "IRS 1099 data shows `$11,600 in self-employment income for 2024. Beneficiary statement claims income was a gift/loan, not wages. Field office referred for formal integrity review. Case resolved: overpayment review initiated per supervisor approval."
-        prioritycode = 2
-        statuscode   = 5
-        statecode    = 1
-        contactName  = "Patricia Nguyen"
+        title          = "EIR-2025-0033 — Nguyen, Patricia — IRS 1099 vs Beneficiary Statement Conflict"
+        description    = "IRS 1099 data shows `$11,600 in self-employment income for 2024. Beneficiary statement claims income was a gift/loan, not wages. Field office referred for formal integrity review. Case resolved: overpayment review initiated per supervisor approval."
+        prioritycode   = 2
+        statuscode     = 5
+        statecode      = 1
+        contactName    = "Patricia Nguyen"
+        discrepancytype    = 100000000  # Unreported Wages
+        riskrating         = 100000003  # Critical
+        casedisposition    = 100000002  # Create Overpayment Review
+        supervisorapproval = $true
     }
 )
 
@@ -189,6 +209,10 @@ foreach ($c in $cases) {
             prioritycode = $c.prioritycode
             statuscode   = $createStatusCode
             casetypecode = 2   # Problem
+            earnint_discrepancytype    = $c.discrepancytype
+            earnint_riskrating         = $c.riskrating
+            earnint_casedisposition    = $c.casedisposition
+            earnint_supervisorapproval = $c.supervisorapproval
         }
         if ($contactIds.ContainsKey($c.contactName)) {
             $body["customerid_contact@odata.bind"] = "/contacts($($contactIds[$c.contactName]))"
