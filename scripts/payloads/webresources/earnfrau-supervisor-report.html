@@ -1,0 +1,121 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Federal Earnings Fraud - Supervisor Oversight Report</title>
+<style>
+:root{--dyn-primary:#0078d4;--dyn-primary-strong:#005a9e;--dyn-bg:#f3f9fd;--dyn-surface:#ffffff;--dyn-border:#d0e6f8;--dyn-text:#1f2937;--dyn-muted:#5f6b7a;--dyn-good:#0f766e;--dyn-good-bg:#f0fdf4;--dyn-warn:#b45309;--dyn-warn-bg:#fffbeb;--dyn-danger:#b91c1c;--dyn-danger-bg:#fef2f2;}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,sans-serif;color:var(--dyn-text);background:radial-gradient(circle at 80% -10%,rgba(80,230,255,.18),transparent 45%),radial-gradient(circle at -20% 120%,rgba(0,120,212,.12),transparent 38%),var(--dyn-bg)}
+.page{max-width:1100px;margin:0 auto;padding:20px;display:grid;gap:14px}
+.hero{background:linear-gradient(130deg,var(--dyn-primary-strong),var(--dyn-primary));color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 12px 28px rgba(0,90,158,.22)}
+.hero h1{margin:0 0 4px;font-size:22px;letter-spacing:.1px}
+.hero p{margin:0;opacity:.9;font-size:13px}
+.hero-meta{font-size:12px;opacity:.8;margin-top:6px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kpi-card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:12px;text-align:center;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.kpi-card.urgent{border-color:#f59e0b;background:var(--dyn-warn-bg)}
+.kpi-card.danger{border-color:#ef4444;background:var(--dyn-danger-bg)}
+.kpi-val{font-size:26px;font-weight:700;color:var(--dyn-primary-strong);line-height:1;display:block}
+.kpi-card.urgent .kpi-val{color:var(--dyn-warn)}
+.kpi-card.danger .kpi-val{color:var(--dyn-danger)}
+.kpi-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dyn-muted);margin-top:4px;display:block}
+.card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:14px;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.card h2{margin:0 0 10px;font-size:14px;color:var(--dyn-primary-strong);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:7px 10px;background:#f0f7ff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dyn-muted);border-bottom:1px solid var(--dyn-border)}
+td{padding:7px 10px;border-bottom:1px solid var(--dyn-border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700}
+.r-critical{background:#fee2e2;color:#b91c1c}.r-high{background:#fef3c7;color:#92400e}
+.r-medium{background:#fef9c3;color:#713f12}.r-low{background:#dcfce7;color:#166534}
+.a-yes{background:#dcfce7;color:#166534}.a-no{background:#fef3c7;color:#92400e}
+.s-inprog{background:#dbeafe;color:#1e40af}.s-hold{background:#f3f4f6;color:#374151}
+.s-research{background:#fef9c3;color:#713f12}.s-resolved{background:#dcfce7;color:#166534}
+.exposure{font-weight:700;color:var(--dyn-danger)}
+.action-needed{background:#fff7ed;border-left:3px solid #f59e0b;border-radius:6px;padding:8px 12px;font-size:12px;margin-bottom:10px}
+.spinner{text-align:center;padding:40px;color:var(--dyn-muted);font-style:italic}
+</style></head>
+<body><div class="page">
+<div class="hero">
+  <h1>Federal Earnings Fraud — Supervisor Oversight Report</h1>
+  <p>Cases requiring supervisor attention, evidence quality, and pending approval decisions.</p>
+  <div class="hero-meta" id="hero-meta">Loading...</div>
+</div>
+<div id="kpis" class="kpi-grid"><div class="spinner">Loading...</div></div>
+<div id="pending-section"></div>
+<div id="all-section"></div>
+</div>
+<script>
+const RL={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RC={100000000:"r-low",100000001:"r-medium",100000002:"r-high",100000003:"r-critical"};
+const DL={100000000:"Close Case",100000001:"Request More Info",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
+const SL={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
+const SC={1:"s-inprog",2:"s-hold",4:"s-research",5:"s-resolved"};
+const DTL={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy"};
+const SAMPLE=[
+  {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,earnint_discrepancytype:100000000,gap:24800,hasFinding:true,analyst:"J. Reyes"},
+  {incidentid:"a2",title:"EIR-2025-0052",customer:"Maria Castillo",earnint_riskrating:100000002,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:4,earnint_discrepancytype:100000000,gap:18400,hasFinding:false,analyst:"T. Morales"},
+  {incidentid:"a3",title:"EIR-2025-0067",customer:"James Whitfield",earnint_riskrating:100000001,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:2,earnint_discrepancytype:100000002,gap:8750,hasFinding:false,analyst:""},
+  {incidentid:"a4",title:"EIR-2025-0033",customer:"Patricia Nguyen",earnint_riskrating:100000003,earnint_casedisposition:100000002,earnint_supervisorapproval:true,statuscode:5,earnint_discrepancytype:100000000,gap:11600,hasFinding:true,analyst:"S. Kim"}
+];
+function fmt(n){return"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:0})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+async function load(){
+  let cases=SAMPLE,orgUrl="";
+  try{const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;if(xrm)orgUrl=window.location.origin;}catch(e){}
+  try{
+    const base=`${orgUrl}/api/data/v9.2`,h={"OData-Version":"4.0","Accept":"application/json"};
+    const cr=await fetch(`${base}/incidents?$select=incidentid,title,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,earnint_discrepancytype,_customerid_value&$filter=startswith(title,'EIR')&$orderby=earnint_riskrating desc`,{headers:h}).then(r=>r.json());
+    const dr=await fetch(`${base}/earnint_earningsdiscrepancies?$select=_earnint_caseid_discrepancy_value,earnint_discrepancyamount`,{headers:h}).then(r=>r.json());
+    const fr=await fetch(`${base}/earnint_investigationfindings?$select=_earnint_caseid_finding_value,earnint_analystname`,{headers:h}).then(r=>r.json());
+    const discs=dr.value||[],findings=fr.value||[];
+    cases=(cr.value||[]).map(c=>({...c,customer:c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||"",gap:discs.filter(d=>d["_earnint_caseid_discrepancy_value"]===c.incidentid).reduce((s,d)=>s+(d.earnint_discrepancyamount||0),0),hasFinding:findings.some(f=>f["_earnint_caseid_finding_value"]===c.incidentid),analyst:(findings.find(f=>f["_earnint_caseid_finding_value"]===c.incidentid)||{}).earnint_analystname||""}));
+    if(!cases.length)cases=SAMPLE;
+  }catch(e){}
+  render(cases);
+}
+function render(cases){
+  const open=cases.filter(c=>c.statuscode!==5);
+  const needsApproval=cases.filter(c=>!c.earnint_supervisorapproval&&c.hasFinding&&c.statuscode!==5);
+  const pendingNoFinding=cases.filter(c=>!c.earnint_supervisorapproval&&!c.hasFinding&&c.statuscode!==5);
+  const critHigh=cases.filter(c=>c.earnint_riskrating>=100000002&&c.statuscode!==5);
+  const totalExposure=open.reduce((s,c)=>s+(c.gap||0),0);
+  const resolved=cases.filter(c=>c.statuscode===5);
+  document.getElementById("hero-meta").textContent=`${cases.length} total cases · Generated ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi-card ${needsApproval.length>0?"urgent":""}"><span class="kpi-val">${needsApproval.length}</span><span class="kpi-lbl">Awaiting Approval</span></div>
+    <div class="kpi-card ${critHigh.length>0?"danger":""}"><span class="kpi-val">${critHigh.length}</span><span class="kpi-lbl">High / Critical</span></div>
+    <div class="kpi-card danger"><span class="kpi-val">${fmt(totalExposure)}</span><span class="kpi-lbl">Open Exposure</span></div>
+    <div class="kpi-card"><span class="kpi-val">${open.length}</span><span class="kpi-lbl">Active Cases</span></div>
+    <div class="kpi-card"><span class="kpi-val">${resolved.length}</span><span class="kpi-lbl">Resolved</span></div>
+    <div class="kpi-card ${pendingNoFinding.length>0?"urgent":""}"><span class="kpi-val">${pendingNoFinding.length}</span><span class="kpi-lbl">No Finding Yet</span></div>`;
+  const pendingRows=needsApproval.map(c=>`<tr>
+    <td style="font-family:monospace;font-size:12px">${esc(c.title)}</td>
+    <td>${esc(c.customer)}</td>
+    <td><span class="badge ${RC[c.earnint_riskrating]||""}">${RL[c.earnint_riskrating]||"?"}</span></td>
+    <td class="exposure">${fmt(c.gap)}</td>
+    <td>${esc(DL[c.earnint_casedisposition]||"—")}</td>
+    <td>${esc(c.analyst||"—")}</td>
+    <td><span class="badge a-no">Action Required</span></td></tr>`).join("");
+  const allRows=cases.map(c=>`<tr>
+    <td style="font-family:monospace;font-size:12px">${esc(c.title)}</td>
+    <td>${esc(c.customer)}</td>
+    <td><span class="badge ${RC[c.earnint_riskrating]||""}">${RL[c.earnint_riskrating]||"?"}</span></td>
+    <td><span class="badge ${SC[c.statuscode]||""}">${SL[c.statuscode]||"?"}</span></td>
+    <td class="exposure">${fmt(c.gap)}</td>
+    <td>${c.hasFinding?"✓ Yes":"— No"}</td>
+    <td><span class="badge ${c.earnint_supervisorapproval?"a-yes":"a-no"}">${c.earnint_supervisorapproval?"Approved":"Pending"}</span></td></tr>`).join("");
+  document.getElementById("pending-section").innerHTML=needsApproval.length?`
+    <div class="card">
+      <div class="action-needed">⚠ ${needsApproval.length} case(s) have an investigation finding submitted and are waiting for your approval decision.</div>
+      <h2>Cases Requiring Approval Decision</h2>
+      <table><thead><tr><th>Case ID</th><th>Beneficiary</th><th>Risk</th><th>Exposure</th><th>Recommendation</th><th>Analyst</th><th>Action</th></tr></thead>
+      <tbody>${pendingRows}</tbody></table>
+    </div>`:"<div class=\"card\"><h2>Cases Requiring Approval</h2><p style=\"color:#5f6b7a;padding:8px 0\">No cases currently awaiting supervisor approval.</p></div>";
+  document.getElementById("all-section").innerHTML=`
+    <div class="card"><h2>All Cases — Full Caseload View</h2>
+      <table><thead><tr><th>Case ID</th><th>Beneficiary</th><th>Risk</th><th>Status</th><th>Exposure</th><th>Finding</th><th>Approval</th></tr></thead>
+      <tbody>${allRows}</tbody></table>
+    </div>`;
+}
+load();
+</script></body></html>

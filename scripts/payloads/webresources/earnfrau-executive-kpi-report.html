@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Federal Earnings Fraud - Executive Summary KPI Report</title>
+<style>
+:root{--dyn-primary:#0078d4;--dyn-primary-strong:#005a9e;--dyn-bg:#f3f9fd;--dyn-surface:#fff;--dyn-border:#d0e6f8;--dyn-text:#1f2937;--dyn-muted:#5f6b7a;--dyn-good:#0f766e;--dyn-good-bg:#f0fdf4;--dyn-warn:#b45309;--dyn-warn-bg:#fffbeb;--dyn-danger:#b91c1c;--dyn-danger-bg:#fef2f2;}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,sans-serif;color:var(--dyn-text);background:radial-gradient(circle at 80% -10%,rgba(80,230,255,.18),transparent 45%),radial-gradient(circle at -20% 120%,rgba(0,120,212,.12),transparent 38%),var(--dyn-bg)}
+.page{max-width:1100px;margin:0 auto;padding:20px;display:grid;gap:14px}
+.hero{background:linear-gradient(130deg,var(--dyn-primary-strong),var(--dyn-primary));color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 12px 28px rgba(0,90,158,.22)}
+.hero h1{margin:0 0 4px;font-size:22px;letter-spacing:.1px}
+.hero p{margin:0;opacity:.9;font-size:13px}
+.hero-meta{font-size:12px;opacity:.8;margin-top:6px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.kpi-card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:12px;text-align:center;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.kpi-card.warn{border-color:#f59e0b;background:var(--dyn-warn-bg)}
+.kpi-card.danger{border-color:#ef4444;background:var(--dyn-danger-bg)}
+.kpi-card.good{border-color:#22c55e;background:var(--dyn-good-bg)}
+.kpi-val{font-size:26px;font-weight:700;color:var(--dyn-primary-strong);line-height:1;display:block}
+.kpi-card.warn .kpi-val{color:var(--dyn-warn)}
+.kpi-card.danger .kpi-val{color:var(--dyn-danger)}
+.kpi-card.good .kpi-val{color:var(--dyn-good)}
+.kpi-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dyn-muted);margin-top:4px;display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:14px;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.card h2{margin:0 0 10px;font-size:14px;color:var(--dyn-primary-strong);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:7px 10px;background:#f0f7ff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dyn-muted);border-bottom:1px solid var(--dyn-border)}
+td{padding:7px 10px;border-bottom:1px solid var(--dyn-border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700}
+.r-critical{background:#fee2e2;color:#b91c1c}.r-high{background:#fef3c7;color:#92400e}
+.r-medium{background:#fef9c3;color:#713f12}.r-low{background:#dcfce7;color:#166634}
+.bar-bg{background:#e0ecf8;border-radius:4px;height:10px;overflow:hidden;min-width:70px}
+.bar-fill{height:100%;border-radius:4px;background:var(--dyn-primary)}
+.bar-fill.d{background:#b91c1c}.bar-fill.w{background:#b45309}.bar-fill.g{background:#0f766e}
+.exposure{font-weight:700;color:var(--dyn-danger)}
+</style></head>
+<body><div class="page">
+<div class="hero">
+  <h1>Federal Earnings Fraud — Executive Summary KPI Report</h1>
+  <p>Outcome-focused program metrics for leadership decision support and investment tracking.</p>
+  <div class="hero-meta" id="hero-meta">Loading...</div>
+</div>
+<div id="kpis" class="kpi-grid"></div>
+<div class="two-col" id="dist-row"></div>
+<div id="case-table"></div>
+</div>
+<script>
+const RL={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RC={100000000:"r-low",100000001:"r-medium",100000002:"r-high",100000003:"r-critical"};
+const DL={100000000:"Close Case",100000001:"RFI",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
+const SL={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
+const DTL={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+const SAMPLE=[
+  {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,earnint_discrepancytype:100000000,gap:24800},
+  {incidentid:"a2",title:"EIR-2025-0052",customer:"Maria Castillo",earnint_riskrating:100000002,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:4,earnint_discrepancytype:100000000,gap:18400},
+  {incidentid:"a3",title:"EIR-2025-0067",customer:"James Whitfield",earnint_riskrating:100000001,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:2,earnint_discrepancytype:100000002,gap:8750},
+  {incidentid:"a4",title:"EIR-2025-0033",customer:"Patricia Nguyen",earnint_riskrating:100000003,earnint_casedisposition:100000002,earnint_supervisorapproval:true,statuscode:5,earnint_discrepancytype:100000000,gap:11600}
+];
+function fmt(n){return"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:0})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+async function load(){
+  let cases=SAMPLE,orgUrl="";
+  try{const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;if(xrm)orgUrl=window.location.origin;}catch(e){}
+  try{
+    const base=`${orgUrl}/api/data/v9.2`,h={"OData-Version":"4.0","Accept":"application/json"};
+    const cr=await fetch(`${base}/incidents?$select=incidentid,title,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,earnint_discrepancytype,_customerid_value&$filter=startswith(title,'EIR')&$orderby=earnint_riskrating desc`,{headers:h}).then(r=>r.json());
+    const dr=await fetch(`${base}/earnint_earningsdiscrepancies?$select=_earnint_caseid_discrepancy_value,earnint_discrepancyamount`,{headers:h}).then(r=>r.json());
+    const discs=dr.value||[];
+    cases=(cr.value||[]).map(c=>({...c,customer:c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||"",gap:discs.filter(d=>d["_earnint_caseid_discrepancy_value"]===c.incidentid).reduce((s,d)=>s+(d.earnint_discrepancyamount||0),0)}));
+    if(!cases.length)cases=SAMPLE;
+  }catch(e){}
+  render(cases);
+}
+function render(cases){
+  const open=cases.filter(c=>c.statuscode!==5);
+  const resolved=cases.filter(c=>c.statuscode===5);
+  const totalExposure=open.reduce((s,c)=>s+(c.gap||0),0);
+  const recoverable=resolved.reduce((s,c)=>s+(c.gap||0),0);
+  const pending=cases.filter(c=>!c.earnint_supervisorapproval&&c.statuscode!==5);
+  const critHigh=cases.filter(c=>c.earnint_riskrating>=100000002);
+  const resRate=cases.length?Math.round(resolved.length/cases.length*100):0;
+  document.getElementById("hero-meta").textContent=`Program snapshot · ${cases.length} total cases · Generated ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi-card"><span class="kpi-val">${cases.length}</span><span class="kpi-lbl">Total Cases</span></div>
+    <div class="kpi-card danger"><span class="kpi-val">${fmt(totalExposure)}</span><span class="kpi-lbl">Open Exposure</span></div>
+    <div class="kpi-card good"><span class="kpi-val">${fmt(recoverable)}</span><span class="kpi-lbl">Resolved Exposure</span></div>
+    <div class="kpi-card ${pending.length>0?"warn":"good"}"><span class="kpi-val">${pending.length}</span><span class="kpi-lbl">Pending Approval</span></div>
+    <div class="kpi-card ${critHigh.length>0?"warn":"good"}"><span class="kpi-val">${critHigh.length}</span><span class="kpi-lbl">High / Critical</span></div>
+    <div class="kpi-card good"><span class="kpi-val">${resRate}%</span><span class="kpi-lbl">Resolution Rate</span></div>`;
+  const riskCounts={};cases.forEach(c=>{const k=c.earnint_riskrating;riskCounts[k]=(riskCounts[k]||0)+1;});
+  const riskRows=[100000003,100000002,100000001,100000000].filter(k=>riskCounts[k]).map(k=>{
+    const pct=Math.round(riskCounts[k]/cases.length*100),cls=k>=100000003?"d":k===100000002?"w":"g";
+    return`<tr><td><span class="badge ${RC[k]||""}">${RL[k]}</span></td><td>${riskCounts[k]}</td><td><div class="bar-bg"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div></td><td>${pct}%</td></tr>`;}).join("");
+  const dispCounts={};cases.forEach(c=>{if(c.earnint_casedisposition!=null){const k=c.earnint_casedisposition;dispCounts[k]=(dispCounts[k]||0)+1;}});
+  const dispRows=Object.entries(dispCounts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(DL[k]||"—")}</td><td>${v}</td><td><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(v/cases.length*100)}%"></div></div></td><td>${Math.round(v/cases.length*100)}%</td></tr>`).join("");
+  const typeRows=Object.entries(cases.reduce((m,c)=>{if(c.earnint_discrepancytype!=null){const k=c.earnint_discrepancytype;m[k]=(m[k]||{count:0,exp:0});m[k].count++;m[k].exp+=(c.gap||0);}return m;},{})).sort((a,b)=>b[1].exp-a[1].exp).map(([k,v])=>`<tr><td>${esc(DTL[k]||"Other")}</td><td>${v.count}</td><td class="exposure">${fmt(v.exp)}</td></tr>`).join("");
+  document.getElementById("dist-row").innerHTML=`
+    <div class="card"><h2>Cases by Risk Rating</h2><table><thead><tr><th>Risk</th><th>#</th><th>Share</th><th>%</th></tr></thead><tbody>${riskRows||"<tr><td colspan='4'>No data</td></tr>"}</tbody></table></div>
+    <div class="card"><h2>Cases by Disposition Path</h2><table><thead><tr><th>Disposition</th><th>#</th><th>Share</th><th>%</th></tr></thead><tbody>${dispRows||"<tr><td colspan='4'>No data</td></tr>"}</tbody></table></div>`;
+  const caseRows=cases.map(c=>`<tr><td style="font-family:monospace;font-size:12px">${esc(c.title)}</td><td>${esc(c.customer)}</td><td><span class="badge ${RC[c.earnint_riskrating]||""}">${RL[c.earnint_riskrating]||"?"}</span></td><td>${esc(SL[c.statuscode]||"?")}</td><td class="exposure">${fmt(c.gap)}</td><td>${c.earnint_supervisorapproval?"✓ Yes":"⏳ No"}</td></tr>`).join("");
+  document.getElementById("case-table").innerHTML=`<div class="card"><h2>Full Case Register</h2><table><thead><tr><th>Case ID</th><th>Beneficiary</th><th>Risk</th><th>Status</th><th>Exposure</th><th>Approved</th></tr></thead><tbody>${caseRows}</tbody></table></div>`;
+  document.getElementById("dist-row").insertAdjacentHTML("afterend",`<div class="card"><h2>Exposure by Discrepancy Type</h2><table><thead><tr><th>Type</th><th>#</th><th>Exposure</th></tr></thead><tbody>${typeRows||"<tr><td colspan='3'>No data</td></tr>"}</tbody></table></div>`);
+}
+load();
+</script></body></html>

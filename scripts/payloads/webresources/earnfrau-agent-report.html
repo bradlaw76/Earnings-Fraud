@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Federal Earnings Fraud - Agent Performance Report</title>
+<style>
+:root{--dyn-primary:#0078d4;--dyn-primary-strong:#005a9e;--dyn-bg:#f3f9fd;--dyn-surface:#fff;--dyn-border:#d0e6f8;--dyn-text:#1f2937;--dyn-muted:#5f6b7a;--dyn-good:#0f766e;--dyn-good-bg:#f0fdf4;--dyn-warn:#b45309;--dyn-warn-bg:#fffbeb;--dyn-danger:#b91c1c;--dyn-danger-bg:#fef2f2;}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,sans-serif;color:var(--dyn-text);background:radial-gradient(circle at 80% -10%,rgba(80,230,255,.18),transparent 45%),radial-gradient(circle at -20% 120%,rgba(0,120,212,.12),transparent 38%),var(--dyn-bg)}
+.page{max-width:1100px;margin:0 auto;padding:20px;display:grid;gap:14px}
+.hero{background:linear-gradient(130deg,var(--dyn-primary-strong),var(--dyn-primary));color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 12px 28px rgba(0,90,158,.22)}
+.hero h1{margin:0 0 4px;font-size:22px;letter-spacing:.1px}
+.hero p{margin:0;opacity:.9;font-size:13px}
+.hero-meta{font-size:12px;opacity:.8;margin-top:6px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kpi-card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:12px;text-align:center;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.kpi-card.warn{border-color:#f59e0b;background:var(--dyn-warn-bg)}
+.kpi-card.good{border-color:#22c55e;background:var(--dyn-good-bg)}
+.kpi-val{font-size:26px;font-weight:700;color:var(--dyn-primary-strong);line-height:1;display:block}
+.kpi-card.warn .kpi-val{color:var(--dyn-warn)}
+.kpi-card.good .kpi-val{color:var(--dyn-good)}
+.kpi-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dyn-muted);margin-top:4px;display:block}
+.card{background:var(--dyn-surface);border:1px solid var(--dyn-border);border-radius:12px;padding:14px;box-shadow:0 4px 10px rgba(0,120,212,.06)}
+.card h2{margin:0 0 10px;font-size:14px;color:var(--dyn-primary-strong);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:7px 10px;background:#f0f7ff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dyn-muted);border-bottom:1px solid var(--dyn-border)}
+td{padding:7px 10px;border-bottom:1px solid var(--dyn-border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700}
+.r-critical{background:#fee2e2;color:#b91c1c}.r-high{background:#fef3c7;color:#92400e}
+.r-medium{background:#fef9c3;color:#713f12}.r-low{background:#dcfce7;color:#166534}
+.s-inprog{background:#dbeafe;color:#1e40af}.s-hold{background:#f3f4f6;color:#374151}
+.s-research{background:#fef9c3;color:#713f12}.s-resolved{background:#dcfce7;color:#166534}
+.ev-ok{color:#166534;font-weight:700}.ev-no{color:#92400e;font-weight:700}
+.step{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--dyn-border);align-items:flex-start;font-size:13px}
+.step:last-child{border-bottom:none}
+.sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.sn.done{background:#22c55e;color:#fff}.sn.next{background:var(--dyn-primary);color:#fff}.sn.blocked{background:#f59e0b;color:#fff}.sn.todo{background:#e5e7eb;color:#374151}
+.exposure{font-weight:700;color:var(--dyn-danger)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+</style></head>
+<body><div class="page">
+<div class="hero">
+  <h1>Federal Earnings Fraud — Analyst Case Report</h1>
+  <p>Frontline case activity, evidence status, and per-case progress for analyst review and accountability.</p>
+  <div class="hero-meta" id="hero-meta">Loading...</div>
+</div>
+<div id="kpis" class="kpi-grid"></div>
+<div id="case-rows"></div>
+</div>
+<script>
+const RL={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
+const RC={100000000:"r-low",100000001:"r-medium",100000002:"r-high",100000003:"r-critical"};
+const DL={100000000:"Close Case",100000001:"RFI",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
+const SL={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
+const SC={1:"s-inprog",2:"s-hold",4:"s-research",5:"s-resolved"};
+const EL={100000001:"W-2 Form",100000002:"1099 Form",100000003:"Wage Statement",100000004:"Beneficiary Statement",100000005:"Employer Confirmation"};
+const SAMPLE={
+  cases:[
+    {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,gap:24800},
+    {incidentid:"a2",title:"EIR-2025-0052",customer:"Maria Castillo",earnint_riskrating:100000002,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:4,gap:18400},
+    {incidentid:"a3",title:"EIR-2025-0067",customer:"James Whitfield",earnint_riskrating:100000001,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:2,gap:8750},
+    {incidentid:"a4",title:"EIR-2025-0033",customer:"Patricia Nguyen",earnint_riskrating:100000003,earnint_casedisposition:100000002,earnint_supervisorapproval:true,statuscode:5,gap:11600}
+  ],
+  evidence:[
+    {id:"a1",items:[{t:100000001,v:"J. Reyes"},{t:100000004,v:""},{t:100000005,v:"J. Reyes"}]},
+    {id:"a2",items:[{t:100000003,v:"T. Morales"},{t:100000003,v:"T. Morales"},{t:100000000,v:""}]},
+    {id:"a3",items:[{t:100000001,v:""}]},
+    {id:"a4",items:[{t:100000002,v:"S. Kim"},{t:100000004,v:"S. Kim"}]}
+  ],
+  findings:[
+    {id:"a1",analyst:"J. Reyes",disposition:100000002},
+    {id:"a4",analyst:"S. Kim",disposition:100000002}
+  ]
+};
+function fmt(n){return"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:0})}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+async function load(){
+  let data=SAMPLE,orgUrl="";
+  try{const xrm=window.parent&&window.parent.Xrm?window.parent.Xrm:window.Xrm;if(xrm)orgUrl=window.location.origin;}catch(e){}
+  try{
+    const base=`${orgUrl}/api/data/v9.2`,h={"OData-Version":"4.0","Accept":"application/json"};
+    const [cr,dr,er,fr]=await Promise.all([
+      fetch(`${base}/incidents?$select=incidentid,title,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,earnint_discrepancytype,_customerid_value&$filter=startswith(title,'EIR')&$orderby=earnint_riskrating desc`,{headers:h}).then(r=>r.json()),
+      fetch(`${base}/earnint_earningsdiscrepancies?$select=_earnint_caseid_discrepancy_value,earnint_discrepancyamount`,{headers:h}).then(r=>r.json()),
+      fetch(`${base}/earnint_evidenceitems?$select=_earnint_caseid_evidence_value,earnint_evidencetype,earnint_verifiedby`,{headers:h}).then(r=>r.json()),
+      fetch(`${base}/earnint_investigationfindings?$select=_earnint_caseid_finding_value,earnint_analystname,earnint_recddisposition`,{headers:h}).then(r=>r.json())
+    ]);
+    const discs=dr.value||[],evs=er.value||[],fis=fr.value||[];
+    const cases=(cr.value||[]).map(c=>({...c,customer:c["_customerid_value@OData.Community.Display.V1.FormattedValue"]||"",gap:discs.filter(d=>d["_earnint_caseid_discrepancy_value"]===c.incidentid).reduce((s,d)=>s+(d.earnint_discrepancyamount||0),0)}));
+    if(cases.length)data={cases,evidence:cases.map(c=>({id:c.incidentid,items:evs.filter(e=>e["_earnint_caseid_evidence_value"]===c.incidentid).map(e=>({t:e.earnint_evidencetype,v:e.earnint_verifiedby||""}))})),findings:fis.map(f=>({id:f["_earnint_caseid_finding_value"],analyst:f.earnint_analystname,disposition:f.earnint_recddisposition}))};
+  }catch(e){}
+  render(data);
+}
+function render(data){
+  const {cases,evidence,findings}=data;
+  const open=cases.filter(c=>c.statuscode!==5);
+  const withFinding=findings.length;
+  const evFlat=evidence.flatMap(e=>e.items);
+  const unverified=evFlat.filter(e=>!e.v).length;
+  const totalEvidence=evFlat.length;
+  document.getElementById("hero-meta").textContent=`${cases.length} cases · ${totalEvidence} evidence items · Generated ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi-card"><span class="kpi-val">${open.length}</span><span class="kpi-lbl">Active Cases</span></div>
+    <div class="kpi-card"><span class="kpi-val">${totalEvidence}</span><span class="kpi-lbl">Evidence Items</span></div>
+    <div class="kpi-card ${unverified>0?"warn":"good"}"><span class="kpi-val">${unverified}</span><span class="kpi-lbl">Unverified</span></div>
+    <div class="kpi-card ${withFinding<open.length?"warn":"good"}"><span class="kpi-val">${withFinding}</span><span class="kpi-lbl">Findings Written</span></div>
+    <div class="kpi-card ${cases.filter(c=>c.earnint_supervisorapproval&&c.statuscode!==5).length>0?"good":""}"><span class="kpi-val">${cases.filter(c=>c.earnint_supervisorapproval).length}</span><span class="kpi-lbl">Supervisor Approved</span></div>`;
+  const caseBlocks=cases.map(c=>{
+    const ev=(evidence.find(e=>e.id===c.incidentid)||{items:[]}).items;
+    const fi=findings.find(f=>f.id===c.incidentid)||null;
+    const uvCount=ev.filter(e=>!e.v).length;
+    const steps=[
+      {done:true,label:"Case created and assigned"},
+      {done:(evidence.find(e=>e.id===c.incidentid)||{items:[]}).items.length>0,label:`Evidence collection (${ev.length} item${ev.length!==1?"s":""} on file)`},
+      {done:uvCount===0&&ev.length>0,label:uvCount>0?`Verify evidence (${uvCount} pending)`:"All evidence verified"},
+      {done:fi!==null,label:fi?`Finding submitted by ${fi.analyst||"analyst"} — ${DL[fi.disposition]||""}` :"Submit investigation finding"},
+      {done:c.earnint_supervisorapproval===true,label:c.earnint_supervisorapproval?"Supervisor approved":"Await supervisor approval"}
+    ];
+    const stepsHtml=steps.map((s,i)=>{const cls=s.done?"done":i===steps.findIndex(x=>!x.done)?"next":"todo";return`<div class="step"><div class="sn ${cls}">${s.done?"✓":i+1}</div><div>${esc(s.label)}</div></div>`;}).join("");
+    const evRows=ev.map(e=>`<tr><td>${esc(EL[e.t]||"Document")}</td><td class="${e.v?"ev-ok":"ev-no"}">${e.v?"✓ "+esc(e.v):"⚠ Not verified"}</td></tr>`).join("")||`<tr><td colspan="2" style="color:#5f6b7a;font-style:italic">No evidence items.</td></tr>`;
+    return`<div class="card" style="border-left:4px solid var(--dyn-primary)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div><div style="font-family:monospace;font-size:12px;color:var(--dyn-muted)">${esc(c.title)}</div><div style="font-weight:700;font-size:15px;margin-top:2px">${esc(c.customer)}</div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge ${RC[c.earnint_riskrating]||""}">${RL[c.earnint_riskrating]||"?"}</span>
+          <span class="badge ${SC[c.statuscode]||""}">${SL[c.statuscode]||"?"}</span>
+          <span style="font-weight:700;color:#b91c1c">${fmt(c.gap)}</span>
+        </div>
+      </div>
+      <div class="two-col">
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dyn-muted);margin-bottom:6px">Case Progress</div>${stepsHtml}</div>
+        <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dyn-muted);margin-bottom:6px">Evidence Package</div>
+          <table><thead><tr><th>Type</th><th>Status</th></tr></thead><tbody>${evRows}</tbody></table></div>
+      </div>
+    </div>`;}).join("");
+  document.getElementById("case-rows").innerHTML=caseBlocks;
+}
+load();
+</script></body></html>
