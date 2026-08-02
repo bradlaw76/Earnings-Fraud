@@ -1,0 +1,170 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic",
+  "description": "AI Builder Summary Flow — Federal Earnings Fraud (V1 earnint solution). Reads case + related records from Dataverse, builds a structured prompt, calls AI Builder Text Generation, parses the JSON response, and writes back to earnint_ fields on the incident record. Import this blueprint into Power Automate manually.",
+  "name": "EarnInt AI Case Summary",
+  "_architecture_note": "Power Automate does not support multiple trigger types in a single flow. Build TWO separate flows using the same action steps (01-09): (1) EarnInt AI Summary - Auto: trigger = 'When a row is added, modified or deleted' on incident. (2) EarnInt AI Summary - Manual: trigger = 'For a selected row' on incident, which creates the ribbon button. Optionally add a third flow with an HTTP Request trigger to support the web resource Refresh button.",
+  "triggers": {
+    "When_a_row_is_added_or_modified": {
+      "type": "OpenApiConnection",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "SubscribeWebhookTrigger" },
+        "parameters": {
+          "subscriptionRequest/message": 3,
+          "subscriptionRequest/entityname": "incident",
+          "subscriptionRequest/scope": 4,
+          "subscriptionRequest/filteringattributes": "earnint_discrepancytype,earnint_riskrating"
+        }
+      },
+      "recurrence": { "frequency": "Minute", "interval": 1 }
+    },
+    "For_a_selected_row_manual": {
+      "type": "OpenApiConnectionWebhook",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "SubscribeOnSelectedFilePickerEvent" },
+        "parameters": { "entityName": "incident" }
+      },
+      "_note": "This trigger appears as 'Run AI Analysis' in the Case record ribbon after the Flow is saved."
+    }
+  },
+  "actions": {
+    "01_Get_Case_Row": {
+      "order": 1,
+      "type": "OpenApiConnection",
+      "description": "Fetch the full incident record including all earnint_ fields.",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "GetItem" },
+        "parameters": {
+          "entityName": "incidents",
+          "recordId": "@triggerOutputs()?['body/incidentid']",
+          "$select": "title,earnint_discrepancytype,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,ticketnumber"
+        }
+      }
+    },
+    "02_List_Discrepancy_Rows": {
+      "order": 2,
+      "type": "OpenApiConnection",
+      "description": "Get all earnings discrepancy child records for this case.",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "ListRecords" },
+        "parameters": {
+          "entityName": "earnint_earningsdiscrepancies",
+          "$filter": "_earnint_caseid_discrepancy_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
+          "$select": "earnint_name,earnint_discrepancyamount,earnint_reportedearnings,earnint_authoritativeearnings,earnint_earningsperiod,earnint_employername,statuscode"
+        }
+      }
+    },
+    "03_List_Evidence_Items": {
+      "order": 3,
+      "type": "OpenApiConnection",
+      "description": "Get all evidence items linked to this case.",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "ListRecords" },
+        "parameters": {
+          "entityName": "earnint_evidenceitems",
+          "$filter": "_earnint_caseid_evidence_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
+          "$select": "earnint_name,earnint_evidencetype,earnint_receiveddate,earnint_status,earnint_notes"
+        }
+      }
+    },
+    "04_List_Investigation_Findings": {
+      "order": 4,
+      "type": "OpenApiConnection",
+      "description": "Get all investigation findings for this case.",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "ListRecords" },
+        "parameters": {
+          "entityName": "earnint_investigationfindings",
+          "$filter": "_earnint_caseid_finding_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
+          "$select": "earnint_name,earnint_findingtype,earnint_severity,earnint_recommendation,statuscode"
+        }
+      }
+    },
+    "05_Compose_Prompt": {
+      "order": 5,
+      "type": "Compose",
+      "description": "Build the structured prompt string to send to AI Builder.",
+      "inputs": "You are an SSA earnings integrity analyst assistant. Analyze the following case data and return a JSON object with exactly three keys: ai_summary, supporting_evidence_summary, and next_best_action.\n\nCASE RECORD:\nTitle: @{outputs('01_Get_Case_Row')?['body/title']}\nTicket: @{outputs('01_Get_Case_Row')?['body/ticketnumber']}\nRisk Rating: @{outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']}\nDiscrepancy Type: @{outputs('01_Get_Case_Row')?['body/earnint_discrepancytype@OData.Community.Display.V1.FormattedValue']}\nDisposition: @{outputs('01_Get_Case_Row')?['body/earnint_casedisposition@OData.Community.Display.V1.FormattedValue']}\nSupervisor Approval: @{outputs('01_Get_Case_Row')?['body/earnint_supervisorapproval']}\n\nDISCREPANCY RECORDS (@{length(outputs('02_List_Discrepancy_Rows')?['body/value'])} items):\n@{outputs('02_List_Discrepancy_Rows')?['body/value']}\n\nEVIDENCE ITEMS (@{length(outputs('03_List_Evidence_Items')?['body/value'])} items):\n@{outputs('03_List_Evidence_Items')?['body/value']}\n\nINVESTIGATION FINDINGS (@{length(outputs('04_List_Investigation_Findings')?['body/value'])} items):\n@{outputs('04_List_Investigation_Findings')?['body/value']}\n\nReturn ONLY a valid JSON object. Do not include markdown fences or explanation. Example format:\n{\n  \"ai_summary\": \"<2-4 sentence case overview>\",\n  \"supporting_evidence_summary\": \"<itemized evidence summary with status>\",\n  \"next_best_action\": \"<clear actionable recommendation for the case worker>\"\n}"
+    },
+    "06_AI_Builder_Text_Generation": {
+      "order": 6,
+      "type": "OpenApiConnection",
+      "description": "Call AI Builder GPT-based text generation with the composed prompt.",
+      "_setup_note": "In the Power Automate designer: Add 'Create text with GPT using a prompt' (AI Builder connector). Set the prompt to the output of step 05_Compose_Prompt.",
+      "inputs": {
+        "host": { "connectionName": "shared_aibuilder", "operationId": "Completion" },
+        "parameters": {
+          "prompt": "@outputs('05_Compose_Prompt')"
+        }
+      }
+    },
+    "07_Compose_Raw_JSON_Payload": {
+      "order": 7,
+      "type": "Compose",
+      "description": "Capture the full AI Builder response as raw JSON for storage.",
+      "inputs": {
+        "model": "gpt-4o",
+        "generated_at": "@utcNow()",
+        "prompt_tokens": "@outputs('06_AI_Builder_Text_Generation')?['body/promptTokens']",
+        "completion_tokens": "@outputs('06_AI_Builder_Text_Generation')?['body/completionTokens']",
+        "source": "AI_BUILDER_FLOW",
+        "case_context": {
+          "incident_id": "@outputs('01_Get_Case_Row')?['body/incidentid']",
+          "title": "@outputs('01_Get_Case_Row')?['body/title']",
+          "risk_rating": "@outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']",
+          "discrepancy_count": "@length(outputs('02_List_Discrepancy_Rows')?['body/value'])",
+          "evidence_count": "@length(outputs('03_List_Evidence_Items')?['body/value'])",
+          "finding_count": "@length(outputs('04_List_Investigation_Findings')?['body/value'])"
+        },
+        "raw_response_text": "@outputs('06_AI_Builder_Text_Generation')?['body/text']"
+      }
+    },
+    "08a_Strip_Markdown_Fences": {
+      "order": 8,
+      "type": "Compose",
+      "description": "Strip markdown code fences that AI Builder sometimes wraps around the JSON output. Run this before Parse JSON.",
+      "inputs": "@{replace(replace(replace(outputs('06_AI_Builder_Text_Generation')?['body/text'], '```json', ''), '```', ''), '\u000a', '\n')}",
+      "_note": "In the designer: Add a Compose action. Expression: replace(replace(body('AI_Builder_text_generation')?['text'], '```json', ''), '```', '')"
+    },
+    "08b_Parse_AI_JSON_Output": {
+      "order": 9,
+      "type": "ParseJson",
+      "description": "Parse the cleaned AI Builder text as JSON to extract the three output fields. Uses output of 08a not 06.",
+      "inputs": {
+        "content": "@outputs('08a_Strip_Markdown_Fences')",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "ai_summary":                   { "type": "string" },
+            "supporting_evidence_summary":  { "type": "string" },
+            "next_best_action":             { "type": "string" }
+          }
+        }
+      }
+    },
+    "09_Update_Case_Row": {
+      "order": 10,
+      "type": "OpenApiConnection",
+      "description": "Write all four AI fields back to the incident record.",
+      "inputs": {
+        "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord" },
+        "parameters": {
+          "entityName": "incidents",
+          "recordId": "@outputs('01_Get_Case_Row')?['body/incidentid']",
+          "item/earnint_aisummary":                   "@body('08b_Parse_AI_JSON_Output')?['ai_summary']",
+          "item/earnint_supportingevidencesummary":   "@body('08b_Parse_AI_JSON_Output')?['supporting_evidence_summary']",
+          "item/earnint_nextbestaction":              "@body('08b_Parse_AI_JSON_Output')?['next_best_action']",
+          "item/earnint_airawjson":                   "@{string(outputs('07_Compose_Raw_JSON_Payload'))}"
+        }
+      }
+    }
+  },
+  "setup_instructions": {
+    "step_1_create_flow": "Go to make.powerautomate.com. Create a new Automated cloud flow. Choose trigger: 'When a row is added, modified or deleted' (Dataverse). Table: Cases (incident). Set scope to Organization.",
+    "step_2_build_three_flows": "BUILD THREE SEPARATE FLOWS (same action steps 01-09 in each): Flow A 'EarnInt AI Summary - Auto' with Dataverse 'When a row is added/modified/deleted' trigger on incident. Flow B 'EarnInt AI Summary - Manual' with Dataverse 'For a selected row' trigger on incident (creates ribbon button in D365). Flow C 'EarnInt AI Summary - HTTP' with 'When an HTTP request is received' trigger (body schema: {incidentId: string}) — used by the web resource Refresh button.",
+    "step_3_add_actions": "Add the 10 actions (01 through 09, including 08a) in sequence. Use Dataverse connector for steps 01-04 and 09. Use AI Builder connector for step 06. Use built-in Compose for 05, 07, 08a. Use built-in Parse JSON for 08b.",
+    "step_4_ai_builder_setup": "For step 06: Add 'Create text with GPT using a prompt' from the AI Builder connector. Paste the dynamic content output of step 05 into the prompt field. Ensure AI Builder credits are provisioned in the Power Platform environment.",
+    "step_5_get_http_trigger_url": "After saving Flow C, expand the 'When an HTTP request is received' trigger step — the URL appears there. Copy it and paste into the FLOW_HTTP_TRIGGER_URL constant in fraud-ai-insights.html, then re-run 70-build-web-resources.ps1.",
+    "step_6_solution_import": "Add all three Flows to the earnint solution: Solutions > earnint > Add existing > Automation > Cloud Flow. Select all three.",
+    "ai_builder_prompt_notes": "Step 08a strips markdown code fences that GPT sometimes adds. If the model still returns invalid JSON, add a Condition before 08b: if first character is '{' skip stripping, else apply replace. The prompt in 05 already instructs the model to return raw JSON only."
+  }
+}

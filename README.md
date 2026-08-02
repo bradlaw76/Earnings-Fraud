@@ -234,6 +234,61 @@ Gate after each script:
 - If `failed > 0`, stop and fix before continuing.
 - All scripts are intended to be idempotent and safe to rerun.
 
+## 5A. Base Solution Inventory and Sync (Required)
+
+Use this pattern for any wizard-generated build, regardless of scenario.
+
+Goal:
+
+- Inventory everything created or updated during the run.
+- Add all required components to the solution selected during wizard setup.
+- Verify solution membership before export.
+
+Minimum inventory categories:
+
+- Tables
+- Columns
+- Relationships
+- Main forms and quick create forms
+- Views
+- Model-driven apps
+- App sitemap updates
+- Web resources
+- Dashboards/charts (if used)
+- Business process flows (if used)
+
+Implementation guidance for wizard updates:
+
+1. During each build script, write created/updated/skipped items into a shared inventory artifact (for example under `_review_tmp` or another build output folder).
+2. Store both logical names and IDs so the same run can add components by ID when available.
+3. After metadata scripts complete, run solution synchronization:
+	- Add missing components to the selected solution.
+	- Re-run add-to-solution safely (idempotent behavior).
+4. After form/view/app updates, run publish.
+5. Re-read component membership and produce a final solution inventory report:
+	- In solution
+	- Missing from solution
+	- Failed to add
+
+Validation checkpoint:
+
+- Every component reported as created/updated is either confirmed in the selected solution or reported with a clear failure reason.
+- No hidden drift between environment state and solution contents.
+
+## 5B. Auto-Create Review App and Confirm Entry Point (Required)
+
+For each wizard-driven build run:
+
+1. Create or update a model-driven app that includes all app-addressable artifacts created in the run.
+2. Ask and confirm the primary entry-point table before finalizing navigation.
+3. Ask and confirm the landing view for that entry point.
+4. Publish and verify that the app opens with the intended entry-point experience.
+
+Why this is required:
+
+- It gives users an immediate, low-friction way to inspect what the wizard built.
+- It prevents navigation ambiguity when multiple OOB/custom tables are present.
+
 ## 6. Validate In Maker Portal
 
 Open [Power Apps Maker](https://make.powerapps.com) and validate:

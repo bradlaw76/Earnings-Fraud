@@ -32,11 +32,47 @@ if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
 }
 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
-    $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
-            "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
     $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
+    $attempt = 0
+    $maxAttempts = 6
+
+    while ($attempt -lt $maxAttempts) {
+        $attempt++
+        try {
+            $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
+                    "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
+            if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
+            return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
+        } catch {
+            $status = $null
+            if ($_.Exception.Response -and $_.Exception.Response.StatusCode) {
+                $status = [int]$_.Exception.Response.StatusCode
+            } elseif ($_.Exception.Message -match "\b(401|429)\b") {
+                $status = [int]$matches[1]
+            }
+
+            if ($status -eq 401 -and $attempt -lt $maxAttempts) {
+                try {
+                    $freshToken = (& az account get-access-token --resource $EnvironmentUrl --query accessToken -o tsv 2>$null)
+                    if (-not [string]::IsNullOrWhiteSpace($freshToken)) {
+                        $AccessToken = $freshToken.Trim()
+                        continue
+                    }
+                } catch {
+                    throw
+                }
+            }
+
+            if ($status -eq 429 -and $attempt -lt $maxAttempts) {
+                $waitSeconds = [Math]::Min(16, [Math]::Pow(2, $attempt - 1))
+                Write-Host "(throttled, retrying in $waitSeconds sec)" -ForegroundColor Yellow
+                [System.Threading.Thread]::Sleep([int]($waitSeconds * 1000))
+                continue
+            }
+
+            throw
+        }
+    }
 }
 
 function Test-ColumnExists([string]$Table, [string]$Column) {

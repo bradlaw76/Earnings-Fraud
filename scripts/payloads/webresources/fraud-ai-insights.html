@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud AI Insights</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fa;
+      --panel: #ffffff;
+      --panel-soft: #f8fbff;
+      --text: #102542;
+      --muted: #516173;
+      --accent: #0a5fa8;
+      --accent-soft: #dbeeff;
+      --border: #d9e2ec;
+      --warn: #a04600;
+      --warn-soft: #fff8f1;
+      --success: #0e6624;
+      --success-soft: #ecfaf0;
+      --ai-purple: #5c2d91;
+      --ai-purple-soft: #f3eeff;
+      --nba-teal: #006d5b;
+      --nba-teal-soft: #e6faf6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: radial-gradient(circle at top right, #f7fbff, var(--bg) 40%);
+      color: var(--text);
+      padding: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(16, 37, 66, 0.06);
+    }
+
+    .header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--ai-purple-soft);
+      color: var(--ai-purple);
+      border: 1px solid #c7aaee;
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+
+    .timestamp {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .status-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .status-pill.ready {
+      border-color: #0e6624;
+      color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .status-pill.loading {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .status-pill.demo {
+      border-color: var(--warn);
+      color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+    }
+
+    .btn-primary:hover { background: #094d8a; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .ai-section {
+      margin-bottom: 12px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-label .icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .label-summary { color: var(--ai-purple); }
+    .label-summary .icon { background: var(--ai-purple-soft); }
+
+    .label-evidence { color: var(--accent); }
+    .label-evidence .icon { background: var(--accent-soft); }
+
+    .label-nba { color: var(--nba-teal); }
+    .label-nba .icon { background: var(--nba-teal-soft); }
+
+    .ai-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--panel-soft);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .ai-card.summary { border-left: 4px solid var(--ai-purple); }
+    .ai-card.evidence { border-left: 4px solid var(--accent); }
+    .ai-card.nba {
+      border-left: 4px solid var(--nba-teal);
+      background: var(--nba-teal-soft);
+      font-weight: 600;
+    }
+
+    .ai-card.empty {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: normal;
+      background: #fbfcfd;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--panel-soft);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    summary:hover { color: var(--text); }
+
+    summary::after {
+      content: "▸";
+      font-size: 11px;
+      transition: transform 0.2s;
+    }
+
+    details[open] summary::after { transform: rotate(90deg); }
+
+    .json-block {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 12px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 320px;
+      overflow-y: auto;
+      margin: 0;
+    }
+
+    .json-key { color: #89b4fa; }
+    .json-str { color: #a6e3a1; }
+    .json-num { color: #fab387; }
+    .json-bool { color: #f5c2e7; }
+    .json-null { color: #f38ba8; }
+
+    .flow-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border: 1px dashed #b0c8e0;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      background: #f9fbfe;
+    }
+
+    .flow-note strong { color: var(--accent); }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 720px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .toolbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+
+    <div class="header">
+      <h1>
+        Fraud AI Insights
+        <span class="ai-badge">AI Builder</span>
+      </h1>
+      <div class="timestamp" id="lastUpdated">Last updated: —</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="status-pill" id="statusPill">Initializing…</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn btn-ghost" id="btnRefreshDisplay" onclick="loadCaseData()">↻ Refresh Display</button>
+        <button type="button" class="btn btn-primary" id="btnTriggerAI" onclick="triggerAIAnalysis()">⚡ Run AI Analysis</button>
+      </div>
+    </div>
+
+    <!-- AI Case Summary -->
+    <div class="ai-section">
+      <div class="section-label label-summary">
+        <span class="icon">✦</span> AI Case Summary
+      </div>
+      <div class="ai-card summary" id="cardSummary">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <!-- Supporting Evidence Summary -->
+    <div class="ai-section">
+      <div class="section-label label-evidence">
+        <span class="icon">📎</span> Supporting Evidence Summary
+      </div>
+      <div class="ai-card evidence" id="cardEvidence">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <!-- Next Best Action -->
+    <div class="ai-section">
+      <div class="section-label label-nba">
+        <span class="icon">▶</span> Next Best Action
+      </div>
+      <div class="ai-card nba" id="cardNBA">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Raw JSON Accordion -->
+    <details id="rawJsonDetails">
+      <summary>Raw AI Builder JSON Response</summary>
+      <pre class="json-block" id="jsonBlock">// No data loaded yet</pre>
+    </details>
+
+    <!-- Flow setup note -->
+    <div class="flow-note" id="flowNote" style="display:none;">
+      <strong>⚡ Run AI Analysis:</strong> To activate the Refresh button, paste your Power Automate HTTP trigger URL into the
+      <code>FLOW_HTTP_TRIGGER_URL</code> constant at the top of this web resource's &lt;script&gt; block, then re-upload.
+      The Flow should accept a POST body of <code>{"incidentId":"&lt;guid&gt;"}</code> and write back
+      <code>earnint_aisummary</code>, <code>earnint_supportingevidencesummary</code>, <code>earnint_nextbestaction</code>,
+      and <code>earnint_airawjson</code> on the incident record.
+    </div>
+
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────
+    // CONFIGURATION — paste your Power Automate HTTP trigger URL here after
+    // creating "EarnInt AI Summary - HTTP" flow (see flow-ai-summary-template.json).
+    // ─────────────────────────────────────────────────────────────────────────
+    var FLOW_HTTP_TRIGGER_URL = "";   // e.g. "https://prod-xx.westus.logic.azure.com:443/..."
+    var POLL_INTERVAL_MS      = 4000; // how often to poll Dataverse after triggering Flow
+    var POLL_TIMEOUT_MS       = 90000; // stop polling after this many ms (Flow can take 10-30s)
+
+    // Demo / fallback data (Hargrove case — used when Dataverse API is unavailable)
+    var DEMO_DATA = {
+      title:  "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025",
+      risk:   "High",
+      earnint_aisummary:
+        "Case EIR-2025-0041 involves Robert Hargrove, an SSDI beneficiary who received " +
+        "$24,800 in unreported wages during Q1-Q2 2025. The discrepancy was detected through " +
+        "a cross-match of employer wage records against beneficiary earnings statements. " +
+        "The case exhibits a classic unreported wages pattern with consistent multi-quarter " +
+        "earnings suppression. Risk is classified as High based on discrepancy magnitude, " +
+        "employer corroboration, and beneficiary response history. Three evidence items " +
+        "are on file supporting an overpayment determination.",
+      earnint_supportingevidencesummary:
+        "Three evidence items have been submitted and reviewed:\n" +
+        "  1. W-2 (Primary Employer) — Confirms $24,800 in wages for Q1-Q2 2025. " +
+        "Date received: 2025-07-10. Status: Verified.\n" +
+        "  2. Employer Confirmation Letter — Corroborates employment dates and earnings " +
+        "figures. Date received: 2025-07-12. Status: Verified.\n" +
+        "  3. Beneficiary Statement — Collected on 2025-07-15. Beneficiary acknowledged " +
+        "partial employment but disputed the total amount. Status: Under Review.\n\n" +
+        "Evidence collectively establishes a consistent unreported earnings pattern " +
+        "across two consecutive quarters with corroborating third-party documentation.",
+      earnint_nextbestaction:
+        "Issue an overpayment determination letter to the beneficiary citing SSA regulations " +
+        "§ 404.502. Escalate to the Fraud Referral Unit if no written response is received " +
+        "within 30 calendar days. Supervisor approval is required before finalizing the " +
+        "disposition. If beneficiary responds with additional documentation, reassign to " +
+        "analyst for re-evaluation within 5 business days.",
+      earnint_airawjson: JSON.stringify({
+        model: "gpt-4o",
+        generated_at: new Date().toISOString(),
+        prompt_tokens: 842,
+        completion_tokens: 317,
+        source: "DEMO_FALLBACK",
+        case_context: {
+          incident_id: "demo-hargrove-001",
+          title: "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025",
+          risk_rating: "High",
+          discrepancy_count: 1,
+          evidence_count: 3,
+          finding_count: 1
+        },
+        output: {
+          ai_summary: "See earnint_aisummary field.",
+          supporting_evidence_summary: "See earnint_supportingevidencesummary field.",
+          next_best_action: "See earnint_nextbestaction field."
+        }
+      }, null, 2)
+    };
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function setStatus(text, cls) {
+      var pill = document.getElementById("statusPill");
+      pill.textContent = text;
+      pill.className = "status-pill" + (cls ? " " + cls : "");
+    }
+
+    function setCard(id, text, isEmpty) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = "";
+      el.classList.toggle("empty", !!isEmpty);
+      el.textContent = isEmpty ? "(No AI output yet — click ⚡ Run AI Analysis)" : (text || "");
+    }
+
+    function renderJSON(raw) {
+      var block = document.getElementById("jsonBlock");
+      if (!raw) { block.textContent = "// No raw JSON captured"; return; }
+      try {
+        var parsed = JSON.parse(raw);
+        block.innerHTML = syntaxHighlight(JSON.stringify(parsed, null, 2));
+      } catch (e) {
+        block.textContent = raw;
+      }
+    }
+
+    function syntaxHighlight(json) {
+      return json
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+          var cls = "json-num";
+          if (/^"/.test(match)) {
+            cls = /:$/.test(match) ? "json-key" : "json-str";
+          } else if (/true|false/.test(match)) {
+            cls = "json-bool";
+          } else if (/null/.test(match)) {
+            cls = "json-null";
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    function getRecordId() {
+      // Try Xrm form context (embedded web resource on a Case form)
+      try {
+        if (parent && parent.Xrm && parent.Xrm.Page && parent.Xrm.Page.data) {
+          var id = parent.Xrm.Page.data.entity.getId();
+          if (id) return id.replace(/[{}]/g, "");
+        }
+      } catch (e) { /* not in form context */ }
+
+      // Fallback: URL parameter ?id=...
+      var params = new URLSearchParams(window.location.search);
+      var urlId = params.get("id") || params.get("incidentid");
+      if (urlId) return urlId.replace(/[{}]/g, "");
+
+      return null;
+    }
+
+    function getEnvUrl() {
+      // In a Dataverse web resource the origin is the environment URL
+      return window.location.origin;
+    }
+
+    async function fetchCaseFromAPI(recordId) {
+      var fields = [
+        "earnint_aisummary",
+        "earnint_supportingevidencesummary",
+        "earnint_nextbestaction",
+        "earnint_airawjson",
+        "title",
+        "earnint_riskrating"
+      ].join(",");
+
+      var url = getEnvUrl() + "/api/data/v9.2/incidents(" + recordId + ")?$select=" + fields;
+
+      var resp = await fetch(url, {
+        headers: {
+          "OData-MaxVersion": "4.0",
+          "OData-Version": "4.0",
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      });
+
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      return await resp.json();
+    }
+
+    function renderData(data, source) {
+      var summary  = data.earnint_aisummary;
+      var evidence = data.earnint_supportingevidencesummary;
+      var nba      = data.earnint_nextbestaction;
+      var rawJson  = data.earnint_airawjson;
+
+      setCard("cardSummary",  summary,  !summary);
+      setCard("cardEvidence", evidence, !evidence);
+      setCard("cardNBA",      nba,      !nba);
+      renderJSON(rawJson || null);
+
+      var now = new Date().toLocaleString();
+      document.getElementById("lastUpdated").textContent = "Last updated: " + now;
+
+      if (source === "demo") {
+        setStatus("Demo data (no live record)", "demo");
+      } else if (!summary && !evidence && !nba) {
+        setStatus("Fields empty — run AI Analysis", "");
+      } else {
+        setStatus("Live data loaded", "ready");
+      }
+    }
+
+    async function loadCaseData() {
+      document.getElementById("btnRefreshDisplay").disabled = true;
+      setStatus("Loading…", "loading");
+
+      var recordId = getRecordId();
+      if (!recordId) {
+        renderData(DEMO_DATA, "demo");
+        document.getElementById("btnRefreshDisplay").disabled = false;
+        if (!FLOW_HTTP_TRIGGER_URL) document.getElementById("flowNote").style.display = "block";
+        return;
+      }
+
+      try {
+        var data = await fetchCaseFromAPI(recordId);
+        renderData(data, "live");
+      } catch (e) {
+        console.warn("Dataverse API error, using demo data:", e);
+        renderData(DEMO_DATA, "demo");
+      }
+
+      document.getElementById("btnRefreshDisplay").disabled = false;
+      if (!FLOW_HTTP_TRIGGER_URL) document.getElementById("flowNote").style.display = "block";
+    }
+
+    async function pollForAIData(recordId) {
+      var start = Date.now();
+      var elapsed = 0;
+
+      while (elapsed < POLL_TIMEOUT_MS) {
+        await new Promise(function(r) { setTimeout(r, POLL_INTERVAL_MS); });
+        elapsed = Date.now() - start;
+        var secs = Math.round(elapsed / 1000);
+        setStatus("Waiting for AI response… " + secs + "s", "loading");
+
+        try {
+          var data = await fetchCaseFromAPI(recordId);
+          if (data.earnint_aisummary) {
+            renderData(data, "live");
+            return true;
+          }
+        } catch (e) { /* keep polling */ }
+      }
+
+      // Timed out — show what's on the record now
+      try { renderData(await fetchCaseFromAPI(recordId), "live"); } catch (e) { /* ignore */ }
+      setStatus("Analysis taking longer than expected — try ↻ Refresh Display", "demo");
+      return false;
+    }
+
+    async function triggerAIAnalysis() {
+      var btn = document.getElementById("btnTriggerAI");
+
+      if (!FLOW_HTTP_TRIGGER_URL) {
+        document.getElementById("flowNote").style.display = "block";
+        document.getElementById("rawJsonDetails").open = false;
+        alert(
+          "Flow trigger URL not configured.\n\n" +
+          "1. Create the 'Run AI Analysis' Power Automate Flow (see flow-ai-summary-template.json).\n" +
+          "2. Copy the HTTP trigger URL from the Flow.\n" +
+          "3. Paste it into the FLOW_HTTP_TRIGGER_URL constant in this web resource and re-upload.\n\n" +
+          "Alternatively, use the Dynamics 365 command bar ribbon button\n" +
+          "'Run AI Analysis' to trigger the Flow for a selected row."
+        );
+        return;
+      }
+
+      var recordId = getRecordId();
+      if (!recordId) {
+        alert("Cannot determine the current Case record ID. Open this web resource from a Case form.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "⏳ Analyzing…";
+      setStatus("AI analysis running…", "loading");
+
+      try {
+        // Fire the Flow trigger — use no-cors since Power Automate is a cross-origin endpoint.
+        // We cannot read the response in no-cors mode, so we poll Dataverse for the result.
+        fetch(FLOW_HTTP_TRIGGER_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({ incidentId: recordId })
+        }).catch(function(e) { console.warn("Flow trigger fetch error (may still have been received):", e); });
+
+        // Poll Dataverse until earnint_aisummary is written (or timeout)
+        await pollForAIData(recordId);
+      } catch (e) {
+        console.error("Flow trigger failed:", e);
+        setStatus("Trigger failed — see console", "demo");
+        alert("Flow trigger error: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "⚡ Run AI Analysis";
+      }
+    }
+
+    // Auto-load on page ready
+    loadCaseData();
+  </script>
+</body>
+</html>

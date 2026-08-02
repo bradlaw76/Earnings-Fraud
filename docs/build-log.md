@@ -39,6 +39,25 @@ Notes:
 ## Latest run
 
 ```text
+Date: 2026-08-02
+Runner: brla
+Environment URL: https://healthconnectcenter.crm.dynamics.com
+Build Type (Demo/Prod): Demo
+Scripts Run: 06-demo-script-wizard.ps1 (updated)
+Changes: Added Copilot Studio agent draft section to demo script wizard output
+  - $copilotStudioSection appended to demo-walkthrough.md (agent setup, instructions, test prompts, checklist)
+  - $copilotStudioTalkTrack appended to demo-talk-track.md (presenter transition, talking points, closing bridge)
+  - Agent: SSA Earnings Integrity Advisor — grounded in 20 CFR Title 20 (Parts 404, 416, 498)
+  - Knowledge source: https://www.ssa.gov/OP_Home/cfr20/cfrdoc.htm
+Git Branch: chore/wizard-refinement-starter-port
+Notes:
+- Section is marked [DRAFT] — agent not yet deployed in Copilot Studio
+- Remove draft markers and update setup checklist once agent is published
+```
+
+## Previous run (2026-07-30)
+
+```text
 Date: 2026-07-30
 Runner: brla
 Environment URL: https://healthconnectcenter.crm.dynamics.com

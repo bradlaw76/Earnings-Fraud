@@ -675,6 +675,73 @@ $($closingLines -join [Environment]::NewLine)
 - [ ] End by restating measurable success criteria.
 "@
 
+$copilotStudioSection = @"
+
+---
+
+## [DRAFT] Copilot Studio Agent: SSA Earnings Integrity Advisor
+
+> **Status**: Placeholder — agent not yet deployed. Update this section after the agent is published in Copilot Studio.
+
+### Agent Settings
+| Field | Value |
+|-------|-------|
+| **Name** | SSA Earnings Integrity Advisor |
+| **Short Description** | Assists SSA fraud investigators in researching earnings reporting obligations, overpayment rules, and civil monetary penalties under Title 20 of the Code of Federal Regulations. |
+| **Knowledge Source** | https://www.ssa.gov/OP_Home/cfr20/cfrdoc.htm |
+| **Additional Sources** | Part 404 (OASDI), Part 416 (SSI), Part 498 (Civil Monetary Penalties) |
+
+### Agent Instructions (Copilot Studio)
+You are the SSA Earnings Integrity Advisor, an AI assistant specialized in Social Security Administration earnings fraud investigation and compliance under Title 20 of the Code of Federal Regulations (CFR).
+
+You support fraud investigators, case reviewers, and compliance officers working on SSA earnings integrity cases — including unreported wages, overpayments, benefit fraud, and civil monetary penalty determinations.
+
+Always cite the specific 20 CFR part and section when stating regulatory requirements. Distinguish clearly between OASDI (Part 404) and SSI (Part 416) rules. If a user describes a case scenario, identify the applicable regulatory framework before drawing conclusions. Do not make legal determinations or adjudication decisions. If uncertain, recommend the user consult the official CFR text or SSA Program Operations Manual System (POMS).
+
+### Test Prompts
+1. "What are the earnings reporting requirements for SSDI beneficiaries?"
+2. "What CFR section covers civil monetary penalties for unreported income?"
+3. "What is the substantial gainful activity threshold and where is it defined?"
+4. "What evidence is required to substantiate unreported wages in an earnings fraud case?"
+5. "What are the overpayment waiver criteria under Part 404?"
+
+### Setup Checklist
+- [ ] Copilot Studio agent published and shared with demo account
+- [ ] Knowledge sources indexed (ssa.gov CFR pages crawled successfully)
+- [ ] Test prompts verified against indexed content
+- [ ] Agent accessible from browser or embedded for demo
+"@
+
+$copilotStudioTalkTrack = @"
+
+---
+
+## [DRAFT] Copilot Studio Agent Demo Step
+
+> **Status**: Placeholder — update pacing and transition once agent is deployed and tested.
+
+### Presenter Transition
+"Before we close, I want to show one more capability we are building into this scenario — an AI agent grounded specifically in SSA federal regulations."
+
+### Agent Demo (2-3 min)
+- Open the SSA Earnings Integrity Advisor in Copilot Studio or browser
+- Ask one of these test prompts live:
+  - "What CFR section covers civil monetary penalties for unreported income?"
+  - "What evidence is required to substantiate unreported wages in an earnings fraud case?"
+- Narrate the response: "Notice the agent cites the specific CFR part and section — Part 404 or Part 498 — rather than giving generic AI answers. Investigators need regulation-grounded, defensible guidance."
+
+### Key Talking Points
+- "This agent is powered by Title 20 of the Code of Federal Regulations — the same source your investigators would reference manually."
+- "It does not make adjudication decisions. It provides regulatory reference support to help investigators move faster and with more confidence."
+- "The knowledge source is the SSA's own published CFR at ssa.gov — no third-party content."
+
+### Closing Bridge
+"Combined with the Dynamics 365 case model we just walked through, investigators now have both a structured case workflow and an on-demand regulatory reference — all in one place."
+"@
+
+$demoWalkthroughContent += $copilotStudioSection
+$demoTalkTrackContent += $copilotStudioTalkTrack
+
 Set-Content -Path $demoAnswersPath -Value $demoAnswersContent -Encoding UTF8
 Set-Content -Path $demoWalkthroughPath -Value $demoWalkthroughContent -Encoding UTF8
 Set-Content -Path $demoTalkTrackPath -Value $demoTalkTrackContent -Encoding UTF8

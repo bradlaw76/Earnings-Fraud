@@ -21,6 +21,10 @@ Wizard outcome:
 Mandatory rule:
 - Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
 
+Required context rule:
+- Before proposing updates or generating build changes, read and align with repository guidance in `README.md`, `docs/onboarding.md`, `docs/build-log.md`, and this requirements folder.
+- If generated guidance conflicts with internal docs, update guidance to match internal docs or explicitly call out the conflict.
+
 ### 0A. End-to-end flow this wizard supports
 
 Use this sequence from first clone to final handoff:
@@ -59,6 +63,9 @@ Ask and capture these answers before Step 1:
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+12. Should the wizard always auto-create or update a model-driven app that includes all artifacts built in this run so users can immediately review outcomes?
+13. What should be the primary app entry point (for example Cases, another OOB table, or a custom table)?
+14. Which default landing view should the entry point open to (for example Active records, queue view, triage view)?
 
 Exit criteria:
 - All questions answered.
@@ -190,11 +197,36 @@ Build decisions:
 - View filters for triage behavior.
 - Chart/dashboard baseline KPIs.
 - Report web resource placement for supervisory summaries when needed.
+- Primary entry point decision (explicit): which table and view users land on first.
+- Review app policy: always create or update a model-driven app containing all newly built artifacts for immediate user validation.
 
 Exit criteria:
 - Sitemap draft approved.
 - Forms/views matrix complete.
 - Dashboard metric list signed off.
+- Entry point table and landing view approved.
+- Review app contents verified against build inventory (forms, views, tables, web resources, app nav).
+
+## 4B. Auto-Created Review App Policy
+
+Goal: Ensure every wizard run leaves behind a usable app that lets users immediately inspect what was built.
+
+Default behavior:
+
+1. Create or update one model-driven app for the run.
+2. Add all run-created or run-updated artifacts that are app-addressable:
+	- Tables
+	- Forms
+	- Views
+	- App navigation (sitemap)
+	- Web resources surfaced via forms
+3. Set the user-confirmed entry point table and landing view.
+4. Publish and validate app visibility.
+
+Validation checkpoint:
+
+- User can open the generated app and find all expected artifacts through navigation.
+- Entry point opens to the intended table/view.
 
 Copilot prompt:
 "Draft a model-driven app sitemap and forms/views matrix aligned to task-centric workflows, including accessibility checkpoints."

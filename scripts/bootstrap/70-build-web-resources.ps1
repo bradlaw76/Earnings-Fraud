@@ -12,7 +12,8 @@ param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
-    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX
+    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
+    [string]$PayloadsFolder = ""
 )
 
 $target = Join-Path $PSScriptRoot "65-build-web-resources.ps1"
@@ -27,6 +28,7 @@ $splat = @{
     AccessToken        = $AccessToken
     SolutionUniqueName = $SolutionUniqueName
     PublisherPrefix    = $PublisherPrefix
+    PayloadsFolder     = $PayloadsFolder
 }
 & $target @splat
 
@@ -42,7 +44,11 @@ if (-not (Test-Path $postBuildScript)) {
 }
 
 try {
-    & $postBuildScript -ScenarioSlug $ScenarioSlug
+    if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+        & $postBuildScript -ScenarioSlug $ScenarioSlug
+    } else {
+        & $postBuildScript -ScenarioSlug $ScenarioSlug -PayloadFolder $PayloadsFolder
+    }
     $postBuildExitCode = $LASTEXITCODE
     if ($postBuildExitCode -ne 0) {
         Write-Host "Warning: 80-post-build-analysis.ps1 failed with exit code $postBuildExitCode. Prior build steps completed successfully." -ForegroundColor Yellow

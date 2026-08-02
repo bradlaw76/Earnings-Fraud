@@ -22,6 +22,11 @@ Required process gate:
 - Spec Kit planning is mandatory before implementation.
 - Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
 
+Required context rule:
+
+- Use repository guidance in `README.md`, `docs/onboarding.md`, `docs/build-log.md`, and companion requirements docs as primary context before generating updates.
+- Keep generated instructions consistent with those internal documents.
+
 ### 0A. Beginner first-run flow (clone to demo)
 
 Use this exact sequence for predictable onboarding:
@@ -62,11 +67,29 @@ Answer these before writing or changing metadata:
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+12. Should the wizard always create or update a model-driven review app that includes all artifacts built in this run?
+13. What is the required app entry point table (for example Cases, another OOB table, or a custom table)?
+14. What landing view should open by default for that entry point?
 
 Why this matters:
 
 - These answers become the source for `spec.md`, then `plan.md`, then
   `tasks.md`.
+- They also define app navigation defaults and first-run usability of the generated app.
+
+## 1A. Review App and Entry-Point Standard
+
+Use this standard for every build unless the user opts out explicitly.
+
+1. Create or update a model-driven app that surfaces all run-created/run-updated app-addressable artifacts.
+2. Require an explicit entry-point decision before finalizing sitemap/navigation.
+3. Set a default landing view for the chosen entry point.
+4. Publish and verify that the app can be used as a quick build validation surface.
+
+Validation checkpoint:
+
+- The generated app opens at the intended entry point.
+- Built tables/forms/views are discoverable through app navigation.
 
 ## 1. What You Are Building
 

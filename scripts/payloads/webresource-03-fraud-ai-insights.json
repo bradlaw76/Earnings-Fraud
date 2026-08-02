@@ -1,0 +1,12 @@
+{
+  "WebResources": [
+    {
+      "Name": "{prefix}_/report/fraud-ai-insights.html",
+      "DisplayName": "Fraud AI Insights",
+      "Description": "AI-generated case summary, supporting evidence summary, and next best action panel. Reads earnint AI fields from the incident record and renders them in a structured Fluent-style card layout. Includes raw AI Builder JSON accordion and a configurable Refresh trigger.",
+      "SourcePath": "webresources/fraud-ai-insights.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}
