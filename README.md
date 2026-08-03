@@ -44,13 +44,21 @@ The app supports analysts and supervisors handling unreported wage or excess ear
 4. Record investigation findings and recommended disposition
 5. Review supervisor summary and approve final action
 
+V2 focus update:
+
+- OOB `incident` remains the anchor lifecycle record.
+- Suspicious wage reports are intake signals into a broader earnings-integrity review process.
+- Expanded case taxonomy includes review type, referral source, allegation type, fraud likelihood, confidence level, and final determination fields.
+- AI outputs are triage-assist only and include summary, supporting evidence synthesis, next best action, risk signal breakdown, evidence gaps, confidence rationale, and a human-review note.
+- Final determinations and escalation actions remain analyst/supervisor decisions.
+
 ### Tables and Data Model
 
 The build currently combines standard and custom Dataverse tables.
 
 Standard tables extended:
 
-- [incident](https://learn.microsoft.com/power-apps/developer/data-platform/reference/entities/incident): discrepancy type, risk rating, case disposition, supervisor approval
+- [incident](https://learn.microsoft.com/power-apps/developer/data-platform/reference/entities/incident): discrepancy and review classification, risk/confidence scoring, determination/disposition, queue/triage controls, and AI summary fields
 - [contact](https://learn.microsoft.com/power-apps/developer/data-platform/reference/entities/contact): SSN field extension
 
 Custom tables created by payloads:
@@ -81,6 +89,8 @@ Defined in [scripts/payloads/webresource-01-supervisor-summary.json](scripts/pay
 - Purpose: supervisor-facing case summary panel
 - Displays: case status, risk tier, and recommended next action
 - Added to solution via [scripts/bootstrap/70-build-web-resources.ps1](scripts/bootstrap/70-build-web-resources.ps1)
+
+Additional v2 web resources include analyst, supervisor, executive KPI, and AI insights pages defined under [scripts/payloads/webresources](scripts/payloads/webresources).
 
 ### Demo Talk Track (Suggested)
 
@@ -347,3 +357,4 @@ Bootstrap scripts used by this build:
 - [docs/build-log.md](docs/build-log.md)
 - [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md)
 - [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md)
+
