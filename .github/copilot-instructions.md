@@ -39,3 +39,46 @@ Use and reference these files when relevant:
 Keep repo changes minimal and practical.
 Do not skip beginner explanations.
 Do not recommend running build scripts before planning is complete.
+
+## BPF Authoring Guardrails (General)
+Use these rules for any wizard-generated Business Process Flow, regardless of scenario, table design, or demo style.
+
+### Start from the planning documents
+- Derive BPF stages, branch logic, and required data steps from `spec.md`, `plan.md`, and `tasks.md` before creating the flow.
+- Require explicit definitions for: stage names/order, branch predicates, required human decision points, and completion behavior.
+- Do not begin BPF implementation if branch criteria are still ambiguous.
+
+### Avoid high-risk implementation patterns
+- Do not treat "workflow is active" as completion. Active status alone can still hide broken internals.
+- Do not treat "in solution" as completion. Solution membership does not guarantee usable stage/branch content.
+- Do not clone unrelated BPF payloads and leave source fields/labels in place.
+- Do not patch only one payload surface (`clientdata` only). If editing by API, keep `clientdata`, `uidata`, and `xaml` aligned.
+- Do not do naive string replacements for field names. Replace longest keys first to avoid substring collisions.
+- Do not bind data steps to fields that do not exist on the BPF primary table.
+
+### What works reliably
+- Use a two-phase pattern:
+	1. Create/activate base BPF in designer.
+	2. Run deterministic validation and targeted repair scripts.
+- Add a structural validator that checks at minimum:
+	- active state
+	- solution membership
+	- stage count threshold
+	- condition count threshold
+	- step count sanity
+- Verify field existence from Dataverse metadata before applying step mappings.
+- Keep data-step mappings deterministic and scriptable so they can be replayed for any design.
+- Update stage labels and step labels separately from data bindings; label layers and bindings can drift independently.
+- Publish after updates and then verify app linkage (`appmodulecomponents`) for workflow component type 29.
+
+### Error handling and resilience
+- Handle Dataverse customization locks (`0x80071151`) with retry/backoff instead of failing fast.
+- If designer automation is unstable or partially broken, switch to API/script remediation and re-validate.
+- If patching causes invalid attribute errors, stop and inspect exact offending field names before retrying.
+
+### Required evidence before declaring done
+- Validation script returns PASS with documented thresholds.
+- BPF is active and in the intended solution.
+- BPF is linked to the intended app module.
+- Stage/condition/step summary is captured in the build log.
+- Any threshold decisions (for example 6 vs 7 stages) are explicitly documented in tasks and log entries.

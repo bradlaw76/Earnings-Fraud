@@ -258,6 +258,11 @@ If you used the terminal wizard, review the generated files under `specs/<scenar
 
 Validation checkpoint:
 
+- For SSA Earnings Integrity V2, confirm the planning artifacts explicitly state:
+	- `incident` is the anchor case table.
+	- Suspicious wage reports are intake signals, not final determinations.
+	- AI output is triage assistance only and final outcomes are human-reviewed.
+
 - `spec.md`, `plan.md`, and `tasks.md` are complete and consistent.
 - No build scripts are run before this checkpoint.
 

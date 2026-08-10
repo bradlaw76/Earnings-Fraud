@@ -5,88 +5,89 @@
 - Duration: 15 minutes
 - Style: verbose
 - Story anchor: incident
-- Core workflow: Run the end-to-end SSA Earnings Integrity Case Review V2 story from intake through closure, using incident, contact, earnint_earningsdiscrepancy, earnint_evi...
+- Core workflow: Run suspicious wage report intake through earnings integrity case resolution with analyst and supervisor checkpoints.
 
 ## Opening (30-45 sec)
-"Today I am showing how SSA Earnings Integrity Case Review V2 helps Fraud analysts and supervisors solve this problem: Detect and resolve unreported SSA earnings discrepancies with auditable case workflows." "The success signal is: End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment." "I will anchor the walkthrough on incident and show how the scenario flows from intake to outcome."
+"Today I am showing how SSA Earnings Integrity Case Review V2 handles suspicious wage reports as intake signals into a broader earnings integrity process." "The system provides explainable triage support, but all findings and final outcomes remain with SSA analysts and supervisors." "I will anchor the walkthrough on the Case record and follow the case from intake to disposition."
 
 ## Talk Track Steps
 ### Step 1: Open with the business problem (3 min)
 **Narrative**
-Explain why this scenario exists, who it helps, and what outcome the audience should watch for. Show the primary workflow, supporting artifacts, and one exception path.
+Explain how suspicious wage reports, wage matches, and employer mismatches are routed into one standardized case lifecycle.
 
 **Actions**
-- State the workflow being demoed: Run the end-to-end SSA Earnings Integrity Case Review V2 story from intake through closure, using incident, contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding and proving 'End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment'.
-- Anchor the audience on the hero record: incident
-- Call out the target audience: Fraud analysts and supervisors
+- Open Active Cases and pick the suspicious wage intake scenario (Hargrove).
+- Show case taxonomy fields: Review Type, Referral Source, Allegation Type, and Review Period.
+- Confirm case anchor and linked beneficiary profile.
 
 **Key Points**
-- Business value: End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment
-- Primary assets in scope: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
-- Special emphasis: defaults plus benefits of how this tool can be used for a variey of use cases and can be configured to support future scopes
+- Suspicious wage report is an intake signal, not a final determination.
+- One case record unifies triage, evidence, findings, and supervisor decision.
+- The same structure handles high, medium, and low-risk scenarios.
 
 ### Step 2: Start from the hero record (3 min)
 **Narrative**
-Show how a user begins work with incident and why that record matters to the scenario.
+Show how the case captures risk and confidence context before any disposition.
 
 **Actions**
-- Navigate to the app area or page where incident is managed
-- Open the relevant form, view, or page for incident
-- Explain which fields or data points matter most
+- On the case form, review Fraud Risk Score, Fraud Likelihood, Confidence Score, Confidence Level, and Risk Explanation.
+- Show Supervisor Review Required and Human Review Required flags.
+- Open AI Insights web resource and explain summary, risk drivers, evidence gaps, and human-review note.
 
 **Key Points**
-- Hero record drives the rest of the workflow
-- The design should reduce friction for Fraud analysts and supervisors
+- AI supports triage prioritization only.
+- Human review remains mandatory for final outcomes.
 
 ### Step 3: Walk through the core workflow (3 min)
 **Narrative**
-Demonstrate the main business use case from start to finish using incident and contact.
+Demonstrate discrepancy and evidence review, then show recommended outcome progression.
 
 **Actions**
-- Create or update the record needed for the workflow
-- Show how related data or artifacts support the process
-- Narrate the expected business outcome at each point
+- Open discrepancy records and show source type, discrepancy type, and variance metrics.
+- Open evidence records and show status, supports-finding category, and verification.
+- Show analyst finding with recommendation and supervisor approval status.
 
 **Key Points**
-- Workflow outcome: Run the end-to-end SSA Earnings Integrity Case Review V2 story from intake through closure, using incident, contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding and proving 'End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment'.
-- Show evidence that the process is controlled and repeatable
+- Case state is explainable: discrepancy + evidence + finding + supervisor checkpoint.
+- Recommended outcomes are structured and auditable.
 
 ### Step 4: Show supporting experience (3 min)
 **Narrative**
-Use the scenario artifacts to prove that the workflow is operational, visible, and useful to the business.
+Use dashboard and summary artifacts to prove queue-level visibility and oversight.
 
 **Actions**
-- Show the most important artifact from: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
-- Explain how users monitor or act on the workflow
-- Call out any automation, views, dashboards, or copilots involved
+- Show Supervisor Case Summary and Executive dashboard web resources.
+- Show queue assignment values and stage-oriented views.
+- Reference the flow template and prompt structure used for AI analysis refresh.
 
 **Key Points**
-- Audience should see how the app supports day-to-day work
-- Use the artifacts to reinforce the business problem being solved
+- Supervisors see risk concentration and pending approvals quickly.
+- Analysts can identify missing evidence before escalation.
 
 ### Step 5: Close with success and next step (3 min)
 **Narrative**
-Tie the workflow back to the business problem and tell the audience what to review next.
+Close by contrasting high-risk and low-risk demo scenarios and confirming human-reviewed outcomes.
 
 **Actions**
-- Restate the measurable success outcome
-- Summarize what changed for the user
-- Ask the reviewer to confirm edits or additional demo goals
+- Compare Hargrove (medium-high risk) and Nguyen (late-reporting low risk) dispositions.
+- Restate that final determination is analyst/supervisor owned.
+- Capture follow-up asks for additional automation or data scenarios.
 
 **Key Points**
-- Review request: confirm that the demo flow and talking points match the intended story
-- Data approach during demo: Use prepared sample data where helpful, but show at least one live change.
+- Review request: confirm expanded case taxonomy and suspicious wage story framing.
+- Data approach: prepared sample data plus one live field update.
 
 
 ## Key Phrases To Use
-- "defaults plus benefits of how this tool can be used for a variey of use cases and can be configured to support future scopes"
+- "Suspicious wage reports are intake signals into a broader earnings integrity lifecycle."
+- "AI provides a likelihood indicator and confidence score, not a final determination."
 - "We can trace this outcome directly to the scenario requirements and mapping."
 - "What you are seeing aligns to the defined success measure."
 - "The implementation stays aligned to the scenario files and explicit mapping."
 
 
 ## Closing (20-30 sec)
-"To recap, we demonstrated Run the end-to-end SSA Earnings Integrity Case Review V2 story from intake through closure, using incident, contact, earnint_earningsdiscrepancy, earnint_evi... and confirmed the expected outcome: End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment." "Next, we can review edits for pacing, audience emphasis, or depth."
+"To recap, we demonstrated suspicious wage intake through structured, explainable, and human-reviewed earnings integrity resolution." "Dynamics 365 Customer Service provides auditability and repeatability while SSA staff retain decision authority." "Next, we can tune queue routing, expand prompt outputs, or add new demo scenarios."
 
 ## Presenter Checklist
 - [ ] Keep language outcome-first, not implementation-heavy.

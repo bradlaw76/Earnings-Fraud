@@ -5,7 +5,7 @@
 - Duration: 15 minutes
 - Style: verbose
 - Story anchor: incident (OOB Case)
-- Core workflow: Run the end-to-end SSA Earnings Integrity Case Review V2 story from intake through closure using OOB incident and contact with fraud-specific forms.
+- Core workflow: Run suspicious wage report intake through earnings integrity resolution using OOB incident and contact with fraud-specific forms.
 
 ## Form Names To Use
 - incident (OOB): Fraud Case Form (primary for demo)
@@ -35,7 +35,7 @@
 **Hero case for demo:** EIR-2025-0041 (Hargrove) — has all evidence collected and a finding pending supervisor approval. Best for showing the full lifecycle.
 
 ## Opening (30-45 sec)
-"Today I am showing how SSA Earnings Integrity Case Review V2 helps Fraud analysts and supervisors solve a real operational problem: detecting and resolving unreported earnings discrepancies with a consistent, auditable review process." "I will walk through the Hargrove case — a live record in this environment — showing intake, evidence review, analyst finding, and the supervisor approval path."
+"Today I am showing how SSA Earnings Integrity Case Review V2 uses suspicious wage reports as intake signals into a consistent, auditable review process." "I will walk through the Hargrove case — a live record in this environment — showing triage, evidence review, analyst finding, and supervisor approval." "AI supports prioritization, but final decisions remain with SSA staff."
 
 ## Talk Track Steps
 ### Step 1: Open with the business problem (3 min)
@@ -52,6 +52,7 @@ Set the stage: SSA receives thousands of earnings reports and wage-feed records 
 - Explain: "Every case is a structured work item with an audit trail from the moment it's created."
 - Note the case description already references the wage feed source and discrepancy amount ($24,800)
 - The queue shows cases at different stages — Hargrove is the most advanced and will anchor the walkthrough
+- Emphasize that suspicious wage report is an intake path, not an automatic fraud determination
 
 ### Step 2: Case workspace and earnings discrepancies (3 min)
 **Narrative**
@@ -67,6 +68,7 @@ Show the Hargrove case as a complete workspace — description, linked beneficia
 - "The discrepancy records are created automatically from wage-feed comparison — the analyst doesn't have to calculate the gap."
 - Two records covering two quarters = $24,800 total exposure
 - Every record links back to the parent case, so closing the case cascades
+- Review Type, Referral Source, and Allegation Type keep scenario classification consistent
 
 ### Step 3: Evidence review (3 min)
 **Narrative**
@@ -83,6 +85,7 @@ Show the evidence package assembled for the Hargrove case. This is what the anal
 - "Three evidence types are already in the system — the analyst didn't have to chase documents manually."
 - The beneficiary statement and employer confirmation tell opposite stories — this is exactly the conflict that triggers supervisor review.
 - Evidence is attached to the case and visible in the case timeline
+- Missing or contradictory evidence is surfaced in AI Evidence Gaps output for analyst follow-up
 
 ### Step 4: Analyst finding and supervisor approval (3 min)
 **Narrative**
@@ -99,7 +102,7 @@ Show the finding the analyst wrote for Hargrove, then show what the supervisor s
 **Key Points**
 - Finding Type and Recommended Disposition are controlled vocabularies — no free-text decisions
 - The supervisor sees: what was found, who found it, what action is recommended, and the evidence behind it
-- "Copilot could generate the Finding Details summary automatically — this was hand-authored for demo clarity"
+- "Copilot provides fraud likelihood and confidence rationale for triage; analysts and supervisors make final determinations."
 
 ### Step 5: Close with the resolved case and the queue (3 min)
 **Narrative**
@@ -116,6 +119,7 @@ End with the Nguyen case as the resolved example, then zoom out to show the full
 - The queue gives supervisors full visibility into workload and stage
 - Resolution paths are explicit: Close, RFI, Overpayment Review, Fraud Escalation
 - Every case produces the same artifact structure — consistency is the product
+- Final determination remains human-reviewed and auditable
 
 
 ## Key Phrases To Use
@@ -126,7 +130,7 @@ End with the Nguyen case as the resolved example, then zoom out to show the full
 
 
 ## Closing (20-30 sec)
-"We just walked four live cases — from a fresh referral in the queue to a resolved overpayment review — using structured Dataverse records, an auditable evidence package, and a controlled analyst-to-supervisor approval path. Dynamics 365 Customer Service structures the work. SSA staff retain control of every finding, approval, and outcome." "Next, we can review pacing, expand the Copilot analysis scene, or tailor the talk track for a specific audience."
+"We just walked four live cases — from suspicious wage intake to final disposition — using structured Dataverse records, explainable AI-assisted triage, and a controlled analyst-to-supervisor approval path." "Dynamics 365 Customer Service structures the work while SSA staff retain control of every finding, approval, and outcome." "Next, we can review pacing, expand AI insight visuals, or tailor the talk track for a specific audience."
 
 ## Presenter Checklist
 - [ ] Keep language outcome-first, not implementation-heavy.

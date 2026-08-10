@@ -10,13 +10,80 @@
       },
       "OptionSet": {
         "Options": [
-          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Tax Return" }] } },
-          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "W-2 Form" }] } },
-          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "1099 Form" }] } },
-          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Wage Statement" }] } },
-          { "Value": 100000004, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Beneficiary Statement" }] } },
-          { "Value": 100000005, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Employer Confirmation" }] } },
-          { "Value": 100000006, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Other" }] } }
+          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Wage Report" }] } },
+          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Suspicious Wage Report" }] } },
+          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Employer Wage Confirmation" }] } },
+          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Pay Stub" }] } },
+          { "Value": 100000004, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "W-2 / Tax Wage Document" }] } },
+          { "Value": 100000005, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Beneficiary Statement" }] } },
+          { "Value": 100000006, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Representative Payee Statement" }] } },
+          { "Value": 100000007, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Prior Notice" }] } },
+          { "Value": 100000008, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Payment History" }] } },
+          { "Value": 100000009, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Call Note" }] } },
+          { "Value": 100000010, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Portal Submission" }] } },
+          { "Value": 100000011, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Uploaded Document" }] } },
+          { "Value": 100000012, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Employer Letter" }] } },
+          { "Value": 100000013, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Internal Analyst Note" }] } },
+          { "Value": 100000014, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Prior Case Evidence" }] } },
+          { "Value": 100000015, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Identity Verification Document" }] } },
+          { "Value": 100000016, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Data Match Record" }] } },
+          { "Value": 100000017, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Other" }] } }
+        ],
+        "IsGlobal": false,
+        "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
+      },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "earnInt_receiveddate",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Received Date" }]
+      },
+      "Format": "DateOnly",
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+      "SchemaName": "earnInt_status",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Evidence Status" }]
+      },
+      "OptionSet": {
+        "Options": [
+          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Requested" }] } },
+          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Received" }] } },
+          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Under Review" }] } },
+          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Verified" }] } },
+          { "Value": 100000004, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Rejected" }] } },
+          { "Value": 100000005, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Missing" }] } }
+        ],
+        "IsGlobal": false,
+        "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
+      },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+      "SchemaName": "earnInt_supportsfinding",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Evidence Supports Finding" }]
+      },
+      "OptionSet": {
+        "Options": [
+          { "Value": 100000000, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Discrepancy" }] } },
+          { "Value": 100000001, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Beneficiary Explanation" }] } },
+          { "Value": 100000002, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Employer Record" }] } },
+          { "Value": 100000003, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Administrative Error" }] } },
+          { "Value": 100000004, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Overpayment Review" }] } },
+          { "Value": 100000005, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Supports Fraud Escalation" }] } },
+          { "Value": 100000006, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Neutral" }] } },
+          { "Value": 100000007, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Inconclusive" }] } },
+          { "Value": 100000008, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Contradictory" }] } },
+          { "Value": 100000009, "Label": { "@odata.type": "Microsoft.Dynamics.CRM.Label", "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Requires Follow-Up" }] } }
         ],
         "IsGlobal": false,
         "@odata.type": "Microsoft.Dynamics.CRM.OptionSetMetadata"
@@ -53,6 +120,16 @@
       },
       "MaxLength": 200,
       "FormatName": { "Value": "Text" },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnInt_notes",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "LanguageCode": 1033, "Label": "Notes" }]
+      },
+      "MaxLength": 4000,
       "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "None" }
     }
   ]

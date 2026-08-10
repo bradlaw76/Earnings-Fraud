@@ -1,14 +1,18 @@
 # tasks.md
 
 ## Ordered Tasks
-- [ ] Review nswers.md with stakeholder
-- [ ] Finalize spec.md
-- [ ] Finalize plan.md
+
+- [x] Review answers.md with stakeholder
+- [x] Finalize spec.md
+- [x] Finalize plan.md
 - [ ] Approve build environment and permissions
-- [ ] Define Dataverse tables and columns for: incident, contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
-- [ ] Define required app artifacts for: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
-- [ ] Build report mapping matrix for tables: earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
-- [ ] Confirm report types/placement: web resource, dashboard KPI, queue/view summary
+- [x] Define Dataverse tables and columns for: incident (anchor), contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
+- [x] Expand case taxonomy fields: review type, referral source, allegation type, fraud likelihood, confidence level, final determination
+- [x] Expand discrepancy/evidence/finding schemas for suspicious wage report scenarios
+- [x] Align AI flow payload, prompts, and case AI output fields
+- [x] Define required app artifacts for: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
+- [x] Build report mapping matrix for tables: earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
+- [x] Confirm report types/placement: web resource, dashboard KPI, queue/view summary
 - [x] Decide demo data approach: Yes
 - [x] Run pwsh ./scripts/bootstrap/00-prereq-check.ps1
 - [x] Run pwsh ./scripts/bootstrap/10-auth-connect.ps1
@@ -19,9 +23,21 @@
 - [x] Build starter forms/views with 60-build-forms-views.ps1
 - [x] Build report/web resources with 70-build-web-resources.ps1 (when applicable)
 - [x] Seed demo data with 97-seed-demo-data.ps1 (2026-07-30)
+- [x] Apply semantic colors to every custom choice option and validate the choice-visual mapping.
+- [x] Approve Earnings Fraud Case Review BPF design: Case anchor, conditional supervisor route, human decision guardrails, and manual completion behavior
+- [x] Update BPF scope in spec.md, plan.md, and tasks.md
+- [x] Create the Earnings Fraud Case Review BPF on `incident` in the `FederalEarningsFraud` solution
+- [ ] Configure Intake, Risk Triage, Evidence Validation, Earnings Analysis, conditional Supervisor Review, Disposition, and Complete Review stages
+- [ ] Configure branch predicate: `earnint_supervisorreviewrequired = Yes` includes Supervisor Review; No continues to Disposition
+- [x] Activate and publish the BPF
+- [ ] Enable the BPF in Earnings Integrity V2 Demo App and publish the app
+- [x] Run 100-install-earnings-fraud-case-bpf.ps1 to verify active workflow and solution component type 29 membership
+- [x] Run 101-validate-earnings-fraud-case-bpf.ps1 and 102-repair-bpf-control-step.ps1; remediate BPF internals to a persisted multi-stage baseline (6 stages, 1 condition)
+- [ ] Smoke test the high-risk Yes branch and low-risk No branch; verify BPF Finish does not resolve the Case
+- [x] Fix malformed starter ControlStep (empty `dataFieldName`) that blocked activation
 - [ ] Manually resolve Nguyen case (EIR-2025-0033) in Maker portal
 - [ ] Export and unpack solution
+- [ ] Verify unpacked solution contains BPF workflow and process-stage artifacts
 - [x] Commit changes to git
 - [ ] Pack and import solution
 - [x] Update docs/build-log.md
-

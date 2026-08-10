@@ -3,7 +3,7 @@
   "Columns": [
     {
       "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
-      "SchemaName": "earnint_aisummary",
+      "SchemaName": "earnfrau_aisummary",
       "DisplayName": {
         "@odata.type": "Microsoft.Dynamics.CRM.Label",
         "LocalizedLabels": [
@@ -23,7 +23,7 @@
     },
     {
       "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
-      "SchemaName": "earnint_supportingevidencesummary",
+      "SchemaName": "earnfrau_supportingevidencesummary",
       "DisplayName": {
         "@odata.type": "Microsoft.Dynamics.CRM.Label",
         "LocalizedLabels": [
@@ -43,7 +43,7 @@
     },
     {
       "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
-      "SchemaName": "earnint_nextbestaction",
+      "SchemaName": "earnfrau_nextbestaction",
       "DisplayName": {
         "@odata.type": "Microsoft.Dynamics.CRM.Label",
         "LocalizedLabels": [
@@ -63,7 +63,7 @@
     },
     {
       "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
-      "SchemaName": "earnint_airawjson",
+      "SchemaName": "earnfrau_airawjson",
       "DisplayName": {
         "@odata.type": "Microsoft.Dynamics.CRM.Label",
         "LocalizedLabels": [
@@ -75,6 +75,86 @@
         ]
       },
       "MaxLength": 1048576,
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnfrau_risksignalbreakdown",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "AI Risk Signal Breakdown"
+          }
+        ]
+      },
+      "MaxLength": 4000,
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnfrau_evidencegaps",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "AI Evidence Gaps"
+          }
+        ]
+      },
+      "MaxLength": 4000,
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnfrau_confidencerationale",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "AI Confidence Rationale"
+          }
+        ]
+      },
+      "MaxLength": 4000,
+      "RequiredLevel": {
+        "CanBeChanged": true,
+        "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",
+        "Value": "None"
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MemoAttributeMetadata",
+      "SchemaName": "earnfrau_humanreviewnote",
+      "DisplayName": {
+        "@odata.type": "Microsoft.Dynamics.CRM.Label",
+        "LocalizedLabels": [
+          {
+            "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel",
+            "LanguageCode": 1033,
+            "Label": "AI Human Review Note"
+          }
+        ]
+      },
+      "MaxLength": 2000,
       "RequiredLevel": {
         "CanBeChanged": true,
         "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings",

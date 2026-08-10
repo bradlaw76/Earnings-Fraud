@@ -15,7 +15,8 @@ param(
     [string]$EnvironmentUrl  = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken     = $env:DV_TOKEN,
   [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
-  [string]$PayloadsFolder  = ""
+  [string]$PayloadsFolder  = "",
+  [int]$DataCustomerApplicationValue = 581180001
 )
 
 Set-StrictMode -Version Latest
@@ -95,6 +96,7 @@ function Get-FormFieldMap([string]$Folder, [string]$PrefixLower) {
         [void]$fieldMap[$tableLogical].Add([pscustomobject]@{
           LogicalName = $logical
           Label = $displayLabel
+          ODataType = "$($col.'@odata.type')"
         })
       }
     }
@@ -174,29 +176,152 @@ $($rows.ToString())
 "@
 }
 
-function New-StarterViewFetchXml([string]$TableLogical, [string]$PrimaryField) {
+function Add-UniqueViewField([System.Collections.Generic.List[string]]$Fields, [string]$LogicalName) {
+  if ([string]::IsNullOrWhiteSpace($LogicalName)) { return }
+  $logical = $LogicalName.ToLower()
+  if (-not $Fields.Contains($logical)) {
+    [void]$Fields.Add($logical)
+  }
+}
+
+function Select-StarterViewFields([string]$TableLogical, [string]$PrimaryField, [object[]]$PayloadFields) {
+  $fields = New-Object System.Collections.Generic.List[string]
+  Add-UniqueViewField $fields $PrimaryField
+
+  $viewPriority = @{
+    "incident" = @(
+      "ticketnumber", "title", "earnint_reviewtype", "earnint_referralsource", "earnint_riskrating",
+      "earnint_fraudriskscore", "earnint_fraudlikelihood", "earnint_potentialoverpayment",
+      "earnint_evidencestatus", "earnint_humanreviewrequired", "earnint_supervisorreviewrequired"
+    )
+    "contact" = @("fullname", "earnint_ssn", "emailaddress1", "telephone1")
+    "earnint_earningsdiscrepancy" = @(
+      "earnint_discrepancytype", "earnint_earningsourcetype", "earnint_earningsperiod", "earnint_employername",
+      "earnint_reportedearnings", "earnint_authoritativeearnings", "earnint_discrepancyamount",
+      "earnint_discrepancypercent", "earnint_requiresmanualreview"
+    )
+    "earnint_evidenceitem" = @(
+      "earnint_evidencetype", "earnint_status", "earnint_receiveddate", "earnint_supportsfinding",
+      "earnint_documentname", "earnint_verifiedby"
+    )
+    "earnint_investigationfinding" = @(
+      "earnint_findingtype", "earnint_severity", "earnint_recddisposition", "earnint_supervisorapprovalstatus",
+      "earnint_analystname"
+    )
+  }
+
+  $payloadLookup = @{}
+  foreach ($field in $PayloadFields) {
+    $logical = "$($field.LogicalName)".ToLower()
+    if (-not [string]::IsNullOrWhiteSpace($logical)) {
+      $payloadLookup[$logical] = $field
+    }
+  }
+
+  $tableKey = $TableLogical.ToLower()
+  if ($viewPriority.ContainsKey($tableKey)) {
+    foreach ($logical in $viewPriority[$tableKey]) {
+      if ($logical -eq $PrimaryField.ToLower() -or $payloadLookup.ContainsKey($logical) -or $logical -in @("ticketnumber", "title", "fullname", "emailaddress1", "telephone1")) {
+        Add-UniqueViewField $fields $logical
+      }
+    }
+  } else {
+    foreach ($field in $PayloadFields) {
+      $type = "$($field.ODataType)"
+      if ($type -eq "Microsoft.Dynamics.CRM.MemoAttributeMetadata") { continue }
+      Add-UniqueViewField $fields "$($field.LogicalName)"
+      if ($fields.Count -ge 8) { break }
+    }
+  }
+
+  Add-UniqueViewField $fields "createdon"
+  Add-UniqueViewField $fields "modifiedon"
+  return @($fields | ForEach-Object { $_ })
+}
+
+function New-StarterViewFetchXml([string]$TableLogical, [string]$PrimaryField, [string[]]$ViewFields, [int]$DataCustomerApplicationValue) {
+    $attributes = New-Object System.Text.StringBuilder
+    foreach ($field in $ViewFields) {
+      [void]$attributes.AppendLine("    <attribute name=`"$field`" />")
+    }
+
+    $tableKey = $TableLogical.ToLower()
+    $distinct = "false"
+    $extraRootFilter = ""
+    $linkEntityXml = ""
+
+    switch ($tableKey) {
+      "incident" {
+        $extraRootFilter = "`n      <condition attribute=`"demo_datacustomerapplication`" operator=`"eq`" value=`"$DataCustomerApplicationValue`" />"
+      }
+      "contact" {
+        $distinct = "true"
+        $linkEntityXml = @"
+    <link-entity name="incident" from="customerid" to="contactid" alias="casefilter" link-type="inner">
+      <filter type="and">
+        <condition attribute="demo_datacustomerapplication" operator="eq" value="$DataCustomerApplicationValue" />
+      </filter>
+    </link-entity>
+"@
+      }
+      "earnint_earningsdiscrepancy" {
+        $linkEntityXml = @"
+    <link-entity name="incident" from="incidentid" to="earnint_caseid_discrepancy" alias="casefilter" link-type="inner">
+      <filter type="and">
+        <condition attribute="demo_datacustomerapplication" operator="eq" value="$DataCustomerApplicationValue" />
+      </filter>
+    </link-entity>
+"@
+      }
+      "earnint_evidenceitem" {
+        $linkEntityXml = @"
+    <link-entity name="incident" from="incidentid" to="earnint_caseid_evidence" alias="casefilter" link-type="inner">
+      <filter type="and">
+        <condition attribute="demo_datacustomerapplication" operator="eq" value="$DataCustomerApplicationValue" />
+      </filter>
+    </link-entity>
+"@
+      }
+      "earnint_investigationfinding" {
+        $linkEntityXml = @"
+    <link-entity name="incident" from="incidentid" to="earnint_caseid_finding" alias="casefilter" link-type="inner">
+      <filter type="and">
+        <condition attribute="demo_datacustomerapplication" operator="eq" value="$DataCustomerApplicationValue" />
+      </filter>
+    </link-entity>
+"@
+      }
+    }
+
     return @"
-<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="$distinct">
   <entity name="$TableLogical">
-    <attribute name="$PrimaryField" />
-    <attribute name="createdon" />
-    <attribute name="modifiedon" />
+$($attributes.ToString().TrimEnd())
     <order attribute="$PrimaryField" descending="false" />
     <filter type="and">
       <condition attribute="statecode" operator="eq" value="0" />
+      $extraRootFilter
     </filter>
+$(if ([string]::IsNullOrWhiteSpace($linkEntityXml)) { "" } else { $linkEntityXml.TrimEnd() })
   </entity>
 </fetch>
 "@
 }
 
-function New-StarterViewLayoutXml([string]$PrimaryField) {
+function New-StarterViewLayoutXml([string]$PrimaryIdField, [string]$PrimaryField, [string[]]$ViewFields) {
+    $cells = New-Object System.Text.StringBuilder
+    foreach ($field in $ViewFields) {
+      $width = 150
+      if ($field -eq $PrimaryField.ToLower()) { $width = 300 }
+      elseif ($field -like "*amount" -or $field -like "*earnings" -or $field -like "*score" -or $field -like "*percent" -or $field -like "*overpayment") { $width = 130 }
+      elseif ($field -like "*type" -or $field -like "*status" -or $field -like "*rating" -or $field -like "*likelihood") { $width = 180 }
+      [void]$cells.AppendLine("    <cell name=`"$field`" width=`"$width`" />")
+    }
+
     return @"
 <grid name="resultset" object="1" jump="$PrimaryField" select="1" icon="1" preview="1">
-  <row name="result" id="$($PrimaryField)id">
-    <cell name="$PrimaryField" width="300" />
-    <cell name="createdon" width="150" />
-    <cell name="modifiedon" width="150" />
+  <row name="result" id="$PrimaryIdField">
+$($cells.ToString().TrimEnd())
   </row>
 </grid>
 "@
@@ -211,17 +336,18 @@ Write-Host ""
 
 $publisherLogicalPrefix = $PublisherPrefix.ToLower()
 $tableFieldMap = Get-FormFieldMap -Folder $PayloadsFolder -PrefixLower $publisherLogicalPrefix
-$tables = @((Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,PrimaryNameAttribute,MetadataId&`$filter=IsCustomEntity eq true").value |
-  Where-Object { $_.LogicalName -like "$($publisherLogicalPrefix)_*" })
+$tables = @((Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,PrimaryNameAttribute,PrimaryIdAttribute,MetadataId&`$filter=IsCustomEntity eq true or LogicalName eq 'incident' or LogicalName eq 'contact'").value |
+  Where-Object { $_.LogicalName -like "$($publisherLogicalPrefix)_*" -or $_.LogicalName -in @("incident", "contact") })
 
 Write-Host "  Custom tables found: $($tables.Count)"
 Write-Host ""
 
-$formsCreated = 0; $formsUpdated = 0; $viewsCreated = 0; $failed = 0
+$formsCreated = 0; $formsUpdated = 0; $viewsCreated = 0; $viewsUpdated = 0; $failed = 0
 
 foreach ($t in $tables) {
     $logical  = $t.LogicalName
     $primary  = $t.PrimaryNameAttribute
+    $primaryId = $t.PrimaryIdAttribute
     Write-Host "  $logical" -ForegroundColor Cyan
 
     # ── Form ──────────────────────────────────────────────────────────────
@@ -267,23 +393,48 @@ foreach ($t in $tables) {
     }
 
     # ── View ──────────────────────────────────────────────────────────────
-    $existingViews = @((Invoke-Dv "Get" "savedqueries?`$select=name&`$filter=returnedtypecode eq '$logical' and querytype eq 0").value)
-    $hasActive = $existingViews | Where-Object { $_.name -like "Active*" }
-    if ($hasActive) {
-        Write-Host "    View  (exists — skipped)" -ForegroundColor DarkGray
+    $existingViews = @((Invoke-Dv "Get" "savedqueries?`$select=savedqueryid,name&`$filter=returnedtypecode eq '$logical' and querytype eq 0").value)
+    $targetViewName = ""
+    $activeViews = @()
+    if ($logical -eq "incident") {
+      $targetViewName = "Earnings Integrity - Active Cases"
+      $activeViews = @($existingViews | Where-Object { $_.name -eq $targetViewName })
+    } elseif ($logical -eq "contact") {
+      $targetViewName = "Earnings Integrity - Active Contacts"
+      $activeViews = @($existingViews | Where-Object { $_.name -eq $targetViewName })
+    } else {
+      $activeViews = @($existingViews | Where-Object { $_.name -like "Active*" })
+    }
+    $viewFields = Select-StarterViewFields $logical $primary $fieldList
+    $fetchXml  = New-StarterViewFetchXml $logical $primary $viewFields $DataCustomerApplicationValue
+    $layoutXml = New-StarterViewLayoutXml $primaryId $primary $viewFields
+    if ($activeViews.Count -gt 0) {
+      foreach ($activeView in $activeViews) {
+        try {
+          $patchBody = @{
+            "fetchxml"  = $fetchXml
+            "layoutxml" = $layoutXml
+          } | ConvertTo-Json -Compress -Depth 10
+          Invoke-Dv "Patch" "savedqueries($($activeView.savedqueryid))" $patchBody | Out-Null
+          Write-Host "    View  ($($activeView.name) updated with payload fields)" -ForegroundColor Green
+          $viewsUpdated++
+        } catch {
+          Write-Host "    View  ($($activeView.name) FAILED update: $($_.Exception.Message))" -ForegroundColor Red
+          $failed++
+        }
+      }
     } else {
         try {
-            $fetchXml  = New-StarterViewFetchXml $logical $primary
-            $layoutXml = New-StarterViewLayoutXml $primary
+            $viewName = if ([string]::IsNullOrWhiteSpace($targetViewName)) { "Active Records" } else { $targetViewName }
             $viewBody = @{
-                "name"               = "Active Records"
+              "name"               = $viewName
                 "returnedtypecode"   = $logical
                 "querytype"          = 0
                 "fetchxml"           = $fetchXml
                 "layoutxml"          = $layoutXml
             } | ConvertTo-Json -Compress -Depth 10
             Invoke-Dv "Post" "savedqueries" $viewBody | Out-Null
-            Write-Host "    View  (created)" -ForegroundColor Green
+            Write-Host "    View  ($viewName created)" -ForegroundColor Green
             $viewsCreated++
         } catch {
             Write-Host "    View  (FAILED: $($_.Exception.Message))" -ForegroundColor Red
@@ -303,7 +454,7 @@ try {
 }
 
 Write-Host ""
-Write-Host "Forms created: $formsCreated  Forms updated: $formsUpdated  Views created: $viewsCreated  Failures: $failed"
+Write-Host "Forms created: $formsCreated  Forms updated: $formsUpdated  Views created: $viewsCreated  Views updated: $viewsUpdated  Failures: $failed"
 if ($failed -gt 0) { exit 1 }
 Write-Host ""
 Write-Host "Build complete. Verify in Power Apps Maker at:"

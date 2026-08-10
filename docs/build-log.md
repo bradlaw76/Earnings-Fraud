@@ -39,6 +39,106 @@ Notes:
 ## Latest run
 
 ```text
+Date: 2026-08-06
+Runner: GitHub Copilot
+Environment URL: https://healthconnectcenter.crm.dynamics.com
+Build Type (Demo/Prod): Demo
+Build Activity: Earnings Fraud Case Review BPF structural remediation and validation
+Changes:
+  - Added structural validator script 101-validate-earnings-fraud-case-bpf.ps1 to assert active state, solution membership, and minimum process shape
+  - Added repair script 102-repair-bpf-control-step.ps1 to normalize malformed starter ControlStep payload
+  - Added expansion script 103-expand-earnings-fraud-case-bpf.ps1 to enforce stage-chain/condition expectations in clientdata
+  - Repaired process internals by cloning a known-good incident BPF payload with GUID remapping into Earnings Fraud Case Review
+  - Retargeted cloned payload to workflow aa834710-ec90-f111-8077-000d3a189124 and renamed stage labels to fraud-review terminology
+Status:
+  - BPF remains active and in FederalEarningsFraud solution (component type 29)
+  - Structural validation now reports StageCount=6, ConditionCount=1, StepCount=14, IsActive=True, InSolution=True
+  - Unified Process Designer now renders a full multi-stage flow with a visible condition node (no longer single-stage minimal payload)
+  - Current validator default threshold expects 7 stages, so default run remains FAIL until threshold or stage target is adjusted
+Known Issues:
+  - Unified designer page intermittently fails to load unifiedprocessdesignereventhandler.js (404/MIME mismatch), causing unstable toolbar interactions
+Next Steps:
+  - Decide whether the target baseline is 6 stages (current persisted shape) or 7 stages, then align validator threshold and design spec
+  - If 7 stages are required, add the seventh stage through a stable designer session and re-run 101 validation
+  - Enable the BPF in Earnings Integrity V2 Demo App and publish the app
+  - Smoke test Yes/No branch behavior and manual completion behavior on demo cases
+```
+
+## Previous run (2026-08-05)
+
+```text
+Date: 2026-08-05
+Runner: GitHub Copilot
+Environment URL: https://healthconnectcenter.crm.dynamics.com
+Build Type (Demo/Prod): Demo
+Build Activity: Earnings Fraud Case Review BPF implementation planning and installer preparation
+Changes:
+  - Approved a Case (`incident`) Business Process Flow named Earnings Fraud Case Review for the FederalEarningsFraud unmanaged solution
+  - Defined Intake, Risk Triage, Evidence Validation, Earnings Analysis, conditional Supervisor Review, Disposition, and Complete Review stages
+  - Defined the single conditional route: earnint_supervisorreviewrequired = Yes requires Supervisor Review; No continues to Disposition
+  - Preserved human-decision guardrails: AI outputs are informational only, final disposition/determination are human-owned, and BPF Finish does not resolve a Case
+  - Added 100-install-earnings-fraud-case-bpf.ps1 to validate an activated designer-authored BPF and add it idempotently to the target solution as workflow component type 29
+Status:
+  - PowerShell syntax validation passed for 100-install-earnings-fraud-case-bpf.ps1
+  - Target metadata validation passed for all 17 planned Case fields
+  - BPF exists: workflow aa834710-ec90-f111-8077-000d3a189124 on incident
+  - Activation initially failed with platform validation error: "Attribute - datafieldname of ControlStep cannot be null or empty"
+  - Repaired malformed starter definition by removing the invalid empty ControlStep payload and activating the workflow
+  - Activation succeeded: statecode=1, statuscode=2
+  - Installer succeeded: added workflow component type 29 to FederalEarningsFraud and published
+  - Verified solution membership via solutioncomponents query: componenttype=29 count=1 for workflow aa834710-ec90-f111-8077-000d3a189124
+  - App exposure pending: AddAppComponents did not create an appmodulecomponent link for workflow; process must be enabled from model-driven app designer
+  - Full stage/branch enrichment pending: current active BPF is minimal-valid and does not yet contain the full seven-stage conditional design
+Next Steps:
+  - Open the BPF designer and configure the approved seven-stage path and conditional supervisor branch
+  - Enable the BPF in Earnings Integrity V2 Demo App and publish the app
+  - Test Yes/No supervisor branch behavior and manual completion behavior on demo cases
+  - Export/unpack the solution to version the generated BPF workflow and process-stage artifacts
+```
+
+```text
+Date: 2026-08-04
+Runner: GitHub Copilot
+Environment URL: https://healthconnectcenter.crm.dynamics.com
+Build Type (Demo/Prod): Demo
+Scripts Run: 85-apply-choice-visuals.ps1
+Changes:
+  - Identified 22 custom Picklist choice columns across incident, earnint_earningsdiscrepancy, earnint_evidenceitem, and earnint_investigationfinding
+  - Applied semantic Dataverse colors to every deployed payload choice option
+  - Prefixed choice labels with visible Unicode glyph icons, for example ✓, ▲, ⚠, ◷, ℹ, and ◆
+  - Replaced the original dark semantic colors with pastel green (#B7E4C7), yellow (#FFF3B0), peach (#FFD6A5), blush (#FFC2C7), powder blue (#BDE0FE), and lavender (#D8C4F1)
+  - Inserted 40 missing payload option values that were not added by the original column build skip logic
+  - Published metadata for incident, earnint_earningsdiscrepancy, earnint_evidenceitem, and earnint_investigationfinding
+Validation:
+  - 85-apply-choice-visuals.ps1 -ApplyIconLabels -VerifyOnly confirmed 207 choice options verified, 0 missing colors, 0 mismatched labels, 0 failed columns
+Notes:
+  - Dataverse choice metadata supports option colors natively.
+  - Dataverse does not expose a native per-option icon property, so visible icons are stored in the choice label text.
+```
+
+## Previous run (2026-08-03)
+
+```text
+Date: 2026-08-03
+Runner: brla
+Environment URL: https://healthconnectcenter.crm.dynamics.com
+Build Type (Demo/Prod): Demo
+Scripts Run: payload/schema/docs alignment updates (no bootstrap execution)
+Changes:
+  - Expanded case/discrepancy/evidence/finding/AI payload fields for suspicious wage intake and human-reviewed disposition model
+  - Updated flow-ai-summary-template.json to align selects, prompt guardrails, parse schema, and case writeback fields
+  - Updated fraud AI insights web resource to render risk breakdown, evidence gaps, confidence rationale, and human review note
+  - Updated form layout and demo seed script to use expanded taxonomy and triage fields
+  - Updated V2 spec/plan/tasks/demo docs and onboarding notes to reflect case-anchor + AI guardrails
+Git Branch: current working branch (ahead, local changes pending commit)
+Notes:
+  - Git fetch completed; no pull/rebase due dirty working tree
+  - Validation scripts not yet re-run after this alignment pass
+```
+
+## Previous run (2026-08-02)
+
+```text
 Date: 2026-08-02
 Runner: brla
 Environment URL: https://healthconnectcenter.crm.dynamics.com
@@ -82,7 +182,7 @@ Notes:
 - Script 97-seed-demo-data.ps1 is idempotent — safe to rerun
 ```
 
-## Previous run
+## Previous run (2026-07-23)
 
 ```text
 Date: 2026-07-23

@@ -137,10 +137,14 @@ Write-Host "--- Step 2: Cases (Incidents) ---" -ForegroundColor Yellow
 # statuscode: 1=In Progress, 2=On Hold, 4=Researching, 5=Problem Solved
 # statecode:  0=Active, 1=Resolved
 # prioritycode: 1=High, 2=Normal, 3=Low
-# earnint_discrepancytype:   100000000=Unreported Wages, 100000001=Excess Earnings, 100000002=Employer Mismatch
+# earnint_reviewtype:        100000001=Suspicious Wage Report Review, 100000002=Unreported Earnings Review, 100000004=Late Wage Reporting Review
+# earnint_discrepancytype:   100000001=Unreported Earnings, 100000003=Underreported Earnings, 100000005=Employer Mismatch
 # earnint_riskrating:        100000000=Low, 100000001=Medium, 100000002=High, 100000003=Critical
-# earnint_casedisposition:   100000000=Close Case, 100000001=RFI, 100000002=Overpayment Review, 100000003=Escalate Fraud
+# earnint_fraudlikelihood:   100000000=Low, 100000002=Medium, 100000003=Medium-High
+# earnint_confidencelevel:   100000000=Low, 100000001=Moderate, 100000002=High
+# earnint_casedisposition:   100000001=Request More Information, 100000002=Create Overpayment Review, 100000006=Contact Employer
 # earnint_supervisorapproval: boolean
+# demo_datacustomerapplication: 581180001=EarningsFraud (global choice)
 $cases = @(
     @{
         title          = "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025"
@@ -149,9 +153,28 @@ $cases = @(
         statuscode     = 1
         statecode      = 0
         contactName    = "Robert Hargrove"
-        discrepancytype    = 100000000  # Unreported Wages
+        reviewtype         = 100000001  # Suspicious Wage Report Review
+        referralsource     = 100000000  # Wage Match
+        allegationtype     = 100000000  # Unreported Earnings
+        discrepancytype    = 100000001  # Unreported Earnings
         riskrating         = 100000002  # High
+        fraudlikelihood    = 100000003  # Medium-High
+        confidencelevel    = 100000002  # High Confidence
+        fraudriskscore     = 75
+        confidencescore    = 78
+        reviewperiodstart  = "2025-01-01"
+        reviewperiodend    = "2025-06-30"
+        potentialoverpayment = 12400.00
+        impactedmonths       = 6
+        largestvariance      = 6200.00
+        evidencestatus       = 100000002  # Complete
+        beneficiaryresponse  = 100000004  # No Response
+        identitystatus       = 100000002  # Validated
+        queueassignment      = 100000003  # High-Risk Fraud Review Queue
         casedisposition    = 100000002  # Create Overpayment Review
+        finaldetermination = 100000005  # Overpayment Review Required
+        supervisorreviewrequired = $true
+        humanreviewrequired = $true
         supervisorapproval = $false
     }
     @{
@@ -161,9 +184,28 @@ $cases = @(
         statuscode     = 4
         statecode      = 0
         contactName    = "Maria Castillo"
-        discrepancytype    = 100000000  # Unreported Wages
+        reviewtype         = 100000002  # Unreported Earnings Review
+        referralsource     = 100000002  # Employer Report
+        allegationtype     = 100000008  # Multiple Employer Discrepancy
+        discrepancytype    = 100000001  # Unreported Earnings
         riskrating         = 100000002  # High
+        fraudlikelihood    = 100000002  # Medium
+        confidencelevel    = 100000001  # Moderate Confidence
+        fraudriskscore     = 52
+        confidencescore    = 55
+        reviewperiodstart  = "2024-01-01"
+        reviewperiodend    = "2024-12-31"
+        potentialoverpayment = 9800.00
+        impactedmonths       = 12
+        largestvariance      = 4600.00
+        evidencestatus       = 100000001  # In Progress
+        beneficiaryresponse  = 100000001  # Requested
+        identitystatus       = 100000003  # Validation Incomplete
+        queueassignment      = 100000004  # Evidence Needed Queue
         casedisposition    = 100000001  # Request More Information
+        finaldetermination = 100000007  # Insufficient Evidence
+        supervisorreviewrequired = $false
+        humanreviewrequired = $true
         supervisorapproval = $false
     }
     @{
@@ -173,9 +215,28 @@ $cases = @(
         statuscode     = 2
         statecode      = 0
         contactName    = "James Whitfield"
-        discrepancytype    = 100000002  # Employer Mismatch
+        reviewtype         = 100000005  # Employer Wage Mismatch Review
+        referralsource     = 100000009  # Internal Review
+        allegationtype     = 100000005  # Employer Wage Mismatch
+        discrepancytype    = 100000005  # Employer Mismatch
         riskrating         = 100000001  # Medium
-        casedisposition    = 100000001  # Request More Information
+        fraudlikelihood    = 100000002  # Medium
+        confidencelevel    = 100000001  # Moderate Confidence
+        fraudriskscore     = 48
+        confidencescore    = 60
+        reviewperiodstart  = "2025-07-01"
+        reviewperiodend    = "2025-09-30"
+        potentialoverpayment = 4300.00
+        impactedmonths       = 3
+        largestvariance      = 2916.67
+        evidencestatus       = 100000001  # In Progress
+        beneficiaryresponse  = 100000001  # Requested
+        identitystatus       = 100000003  # Validation Incomplete
+        queueassignment      = 100000005  # Employer Verification Queue
+        casedisposition    = 100000006  # Contact Employer
+        finaldetermination = 100000010  # Referred for Further Review
+        supervisorreviewrequired = $false
+        humanreviewrequired = $true
         supervisorapproval = $false
     }
     @{
@@ -185,9 +246,28 @@ $cases = @(
         statuscode     = 5
         statecode      = 1
         contactName    = "Patricia Nguyen"
-        discrepancytype    = 100000000  # Unreported Wages
+        reviewtype         = 100000004  # Late Wage Reporting Review
+        referralsource     = 100000006  # Field Office
+        allegationtype     = 100000002  # Late-Reported Earnings
+        discrepancytype    = 100000004  # Late-Reported Earnings
         riskrating         = 100000003  # Critical
+        fraudlikelihood    = 100000000  # Low
+        confidencelevel    = 100000002  # High Confidence
+        fraudriskscore     = 22
+        confidencescore    = 82
+        reviewperiodstart  = "2024-01-01"
+        reviewperiodend    = "2024-12-31"
+        potentialoverpayment = 1800.00
+        impactedmonths       = 2
+        largestvariance      = 900.00
+        evidencestatus       = 100000002  # Complete
+        beneficiaryresponse  = 100000002  # Received
+        identitystatus       = 100000002  # Validated
+        queueassignment      = 100000010  # Closed / Monitoring Queue
         casedisposition    = 100000002  # Create Overpayment Review
+        finaldetermination = 100000003  # Late Reporting Confirmed
+        supervisorreviewrequired = $false
+        humanreviewrequired = $true
         supervisorapproval = $true
     }
 )
@@ -209,9 +289,29 @@ foreach ($c in $cases) {
             prioritycode = $c.prioritycode
             statuscode   = $createStatusCode
             casetypecode = 2   # Problem
+            demo_datacustomerapplication = 581180001
+            earnint_reviewtype       = $c.reviewtype
+            earnint_referralsource   = $c.referralsource
+            earnint_allegationtype   = $c.allegationtype
             earnint_discrepancytype    = $c.discrepancytype
             earnint_riskrating         = $c.riskrating
+            earnint_fraudriskscore     = $c.fraudriskscore
+            earnint_fraudlikelihood    = $c.fraudlikelihood
+            earnint_confidencescore    = $c.confidencescore
+            earnint_confidencelevel    = $c.confidencelevel
+            earnint_reviewperiodstart  = $c.reviewperiodstart
+            earnint_reviewperiodend    = $c.reviewperiodend
+            earnint_potentialoverpayment = $c.potentialoverpayment
+            earnint_impactedmonthcount   = $c.impactedmonths
+            earnint_largestmonthlyvariance = $c.largestvariance
+            earnint_evidencestatus      = $c.evidencestatus
+            earnint_beneficiaryresponsestatus = $c.beneficiaryresponse
+            earnint_identityvalidationstatus = $c.identitystatus
+            earnint_queueassignment     = $c.queueassignment
             earnint_casedisposition    = $c.casedisposition
+            earnint_finaldetermination = $c.finaldetermination
+            earnint_supervisorreviewrequired = $c.supervisorreviewrequired
+            earnint_humanreviewrequired      = $c.humanreviewrequired
             earnint_supervisorapproval = $c.supervisorapproval
         }
         if ($contactIds.ContainsKey($c.contactName)) {
@@ -279,23 +379,23 @@ foreach ($d in $discrepancies) {
 
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 4 — EVIDENCE ITEMS
-# earnint_evidencetype values: 100000000=Tax Return, 100000001=W-2, 100000002=1099,
-#                              100000003=Wage Statement, 100000004=Beneficiary Statement,
-#                              100000005=Employer Confirmation, 100000006=Other
+# earnint_evidencetype values: 100000000=Wage Report, 100000001=Suspicious Wage Report,
+#                              100000002=Employer Wage Confirmation, 100000004=W-2/Tax Wage,
+#                              100000005=Beneficiary Statement, 100000016=Data Match Record
 # ══════════════════════════════════════════════════════════════════════════════
 Write-Host ""
 Write-Host "--- Step 4: Evidence Items ---" -ForegroundColor Yellow
 
 $evidenceItems = @(
-    @{ contactName="Robert Hargrove";  name="Hargrove — IRS W-2 2025 Q1-Q2";        type=100000001; doc="W2_Hargrove_Apex_2025.pdf";            verifiedby="J. Reyes, Analyst"; desc="IRS W-2 wage record from Apex Logistics Inc. Shows `$24,800 in wages for Jan-Jun 2025. Conflicts with zero-income SSA report." }
-    @{ contactName="Robert Hargrove";  name="Hargrove — Beneficiary Statement";       type=100000004; doc="BeneStatement_Hargrove_Jul2025.pdf";   verifiedby="";                  desc="Written statement submitted by beneficiary claiming wages belonged to a family member. Under review for credibility." }
-    @{ contactName="Robert Hargrove";  name="Hargrove — Employer Confirmation";       type=100000005; doc="EmployerConf_Apex_Hargrove.pdf";        verifiedby="J. Reyes, Analyst"; desc="Apex Logistics Inc confirmed Robert Hargrove as active employee Jan–Jun 2025. Confirms W-2 wage amounts." }
-    @{ contactName="Maria Castillo";   name="Castillo — Wage Statement Sunrise";      type=100000003; doc="WageStmt_Castillo_Sunrise_2024.pdf";    verifiedby="T. Morales, Analyst"; desc="Employer-provided wage statement from Sunrise Cleaning Services. Covers all four quarters 2024. Total: `$9,200." }
-    @{ contactName="Maria Castillo";   name="Castillo — Wage Statement Metro";        type=100000003; doc="WageStmt_Castillo_Metro_2024.pdf";      verifiedby="T. Morales, Analyst"; desc="Employer-provided wage statement from Metro Catering LLC. Covers Q2-Q4 2024. Total: `$9,200." }
-    @{ contactName="Maria Castillo";   name="Castillo — Tax Return 2024 (1040)";      type=100000000; doc="TaxReturn_Castillo_2024_1040.pdf";      verifiedby="";                  desc="IRS 1040 return for 2024 obtained via third-party data match. Wage income line confirms `$18,400 from dual employment." }
-    @{ contactName="James Whitfield";  name="Whitfield — IRS W-2 Q3 2025";           type=100000001; doc="W2_Whitfield_GreenPath_Q3_2025.pdf";    verifiedby="";                  desc="IRS wage feed shows `$8,750 paid by GreenPath Construction Q3 2025. Employer verification letter sent 2025-07-10. Response pending." }
-    @{ contactName="Patricia Nguyen";  name="Nguyen — IRS 1099-NEC 2024";            type=100000002; doc="1099NEC_Nguyen_2024.pdf";               verifiedby="S. Kim, Supervisor"; desc="IRS 1099-NEC shows `$11,600 in nonemployee compensation for 2024. Source: field services contractor." }
-    @{ contactName="Patricia Nguyen";  name="Nguyen — Beneficiary Written Statement"; type=100000004; doc="BeneStatement_Nguyen_Jun2025.pdf";      verifiedby="S. Kim, Supervisor"; desc="Beneficiary claims 1099 income was a personal loan repayment, not earned wages. Statement not credible per supervisor review." }
+    @{ contactName="Robert Hargrove";  name="Hargrove — Wage Match Intake";           type=100000001; status=100000003; support=100000005; received="2025-07-09"; doc="WageMatch_Hargrove_2025Q2.xml";             verifiedby="J. Reyes, Analyst"; desc="Suspicious wage report received from automated wage match feed showing unreported wages."; notes="Primary intake artifact for suspicious wage signal." }
+    @{ contactName="Robert Hargrove";  name="Hargrove — IRS W-2 2025 Q1-Q2";          type=100000004; status=100000003; support=100000000; received="2025-07-10"; doc="W2_Hargrove_Apex_2025.pdf";                  verifiedby="J. Reyes, Analyst"; desc="IRS W-2 wage record from Apex Logistics Inc. Shows `$24,800 in wages for Jan-Jun 2025."; notes="Supports discrepancy finding." }
+    @{ contactName="Robert Hargrove";  name="Hargrove — Employer Confirmation";       type=100000002; status=100000003; support=100000002; received="2025-07-12"; doc="EmployerConf_Apex_Hargrove.pdf";              verifiedby="J. Reyes, Analyst"; desc="Apex Logistics Inc confirmed Robert Hargrove as active employee Jan-Jun 2025."; notes="Corroborates employer wage record." }
+    @{ contactName="Robert Hargrove";  name="Hargrove — Beneficiary Statement";       type=100000005; status=100000002; support=100000008; received="2025-07-15"; doc="BeneStatement_Hargrove_Jul2025.pdf";         verifiedby="";                  desc="Beneficiary claims wages belonged to a family member. Under review for credibility."; notes="Contradictory statement, follow-up needed." }
+    @{ contactName="Maria Castillo";   name="Castillo — Wage Statement Sunrise";      type=100000000; status=100000003; support=100000000; received="2025-06-10"; doc="WageStmt_Castillo_Sunrise_2024.pdf";          verifiedby="T. Morales, Analyst"; desc="Employer-provided wage statement from Sunrise Cleaning Services. Total: `$9,200."; notes="Verified against employer records." }
+    @{ contactName="Maria Castillo";   name="Castillo — Wage Statement Metro";        type=100000000; status=100000003; support=100000000; received="2025-06-11"; doc="WageStmt_Castillo_Metro_2024.pdf";            verifiedby="T. Morales, Analyst"; desc="Employer-provided wage statement from Metro Catering LLC. Total: `$9,200."; notes="Verified against payroll letter." }
+    @{ contactName="Maria Castillo";   name="Castillo — Data Match Record 2024";      type=100000016; status=100000001; support=100000009; received="2025-06-12"; doc="DataMatch_Castillo_2024.json";                verifiedby="";                  desc="Third-party data match output confirms dual-employer wages for 2024."; notes="Requires additional beneficiary response." }
+    @{ contactName="James Whitfield";  name="Whitfield — IRS W-2 Q3 2025";            type=100000004; status=100000001; support=100000009; received="2025-07-10"; doc="W2_Whitfield_GreenPath_Q3_2025.pdf";          verifiedby="";                  desc="IRS wage feed shows `$8,750 paid by GreenPath Construction Q3 2025."; notes="Waiting on employer confirmation response." }
+    @{ contactName="Patricia Nguyen";  name="Nguyen — Corrected Wage Report";         type=100000000; status=100000003; support=100000003; received="2025-06-21"; doc="CorrectedWage_Nguyen_2024.pdf";               verifiedby="S. Kim, Supervisor"; desc="Corrected wage report confirms late-reported income that now matches employer data."; notes="Supports administrative correction path." }
 )
 
 foreach ($e in $evidenceItems) {
@@ -310,8 +410,12 @@ foreach ($e in $evidenceItems) {
         $body = @{
             earnint_evidenceitem_name                  = $e.name
             earnint_evidencetype               = $e.type
+            earnint_status                     = $e.status
+            earnint_supportsfinding            = $e.support
+            earnint_receiveddate               = $e.received
             earnint_documentname               = $e.doc
             earnint_evidencedesc               = $e.desc
+            earnint_notes                      = $e.notes
             "earnint_caseid_evidence@odata.bind" = "/incidents($caseId)"
         }
         if ($e.verifiedby) { $body["earnint_verifiedby"] = $e.verifiedby }
@@ -322,10 +426,9 @@ foreach ($e in $evidenceItems) {
 
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 5 — INVESTIGATION FINDINGS
-# earnint_findingtype:   100000000=Discrepancy Confirmed, 100000001=Resolved,
-#                        100000002=Unresolved, 100000003=Possible Fraud, 100000004=No Issue
-# earnint_recddisposition: 100000000=Close, 100000001=RFI, 100000002=Overpayment Review,
-#                          100000003=Escalate Fraud
+# earnint_findingtype:   100000005=Late Reporting, 100000006=Potential Overpayment,
+#                        100000007=Potential Fraud, 100000010=Insufficient Evidence
+# earnint_supervisorapprovalstatus: 100000000=Pending, 100000001=Approved
 # ══════════════════════════════════════════════════════════════════════════════
 Write-Host ""
 Write-Host "--- Step 5: Investigation Findings ---" -ForegroundColor Yellow
@@ -334,26 +437,38 @@ $findings = @(
     @{
         contactName   = "Robert Hargrove"
         name          = "Hargrove — Finding: Discrepancy Confirmed — Pending Supervisor"
-        findingtype   = 100000000
+        findingtype   = 100000007
         disposition   = 100000002
+        severity      = 100000002
+        approvalstatus = 100000000
         analyst       = "J. Reyes"
+        recommendation = "Request beneficiary wage clarification, keep overpayment packet ready, and route to supervisor approval queue."
+        supervisorcomments = "Pending supervisor review package."
         details       = "Earnings discrepancy of `$24,800 confirmed across Q1 and Q2 2025. Beneficiary statement not credible. Employer confirmation received and verified. Recommended action: initiate overpayment review for SSDI benefit adjustment. Case ready for supervisor approval."
     }
     @{
         contactName   = "Maria Castillo"
         name          = "Castillo — Finding: Dual Employer Wages — In Progress"
-        findingtype   = 100000000
+        findingtype   = 100000010
         disposition   = 100000001
+        severity      = 100000001
+        approvalstatus = 100000000
         analyst       = "T. Morales"
+        recommendation = "Collect beneficiary written response and verify identity linkage before final determination."
+        supervisorcomments = "Not ready for approval; evidence package still incomplete."
         details       = "Both employer wage statements received and verified. Total unreported earnings for 2024: `$18,400. Tax return confirms dual employment. Analyst is completing evidence package before submitting for supervisor review. RFI may be issued to beneficiary to explain non-reporting."
     }
     @{
         contactName   = "Patricia Nguyen"
-        name          = "Nguyen — Finding: Fraud Indicator — Supervisor Approved"
-        findingtype   = 100000003
+        name          = "Nguyen — Finding: Late Reporting Confirmed — Supervisor Approved"
+        findingtype   = 100000005
         disposition   = 100000002
+        severity      = 100000000
+        approvalstatus = 100000001
         analyst       = "S. Kim"
-        details       = "Beneficiary claim that 1099 income was a loan repayment is not substantiated. IRS 1099-NEC confirmed as valid income. Pattern consistent with prior SSI underreporting. Supervisor approved overpayment review. Case resolved and overpayment review initiated. Benefit adjustment pending."
+        recommendation = "Close as late-reporting correction with monitoring; overpayment review remains documented for audit history."
+        supervisorcomments = "Approved for closure and monitoring queue placement."
+        details       = "Earnings were reported late but now match employer data and corrected records. No intentional misrepresentation pattern found. Case resolved with documented review trail."
     }
 )
 
@@ -369,7 +484,11 @@ foreach ($f in $findings) {
         $body = @{
             earnint_investigationfinding_name         = $f.name
             earnint_findingtype               = $f.findingtype
+            earnint_severity                  = $f.severity
             earnint_recddisposition           = $f.disposition
+            earnint_recommendation            = $f.recommendation
+            earnint_supervisorapprovalstatus  = $f.approvalstatus
+            earnint_supervisorcomments        = $f.supervisorcomments
             earnint_analystname               = $f.analyst
             earnint_findingdetails            = $f.details
             "earnint_caseid_finding@odata.bind" = "/incidents($caseId)"

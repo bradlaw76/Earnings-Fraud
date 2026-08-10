@@ -338,6 +338,42 @@
       </div>
     </div>
 
+    <div class="ai-section">
+      <div class="section-label label-evidence">
+        <span class="icon">∑</span> Risk Signal Breakdown
+      </div>
+      <div class="ai-card evidence" id="cardRiskBreakdown">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <div class="ai-section">
+      <div class="section-label label-evidence">
+        <span class="icon">⚠</span> Evidence Gaps
+      </div>
+      <div class="ai-card evidence" id="cardEvidenceGaps">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <div class="ai-section">
+      <div class="section-label label-summary">
+        <span class="icon">◎</span> Confidence Rationale
+      </div>
+      <div class="ai-card summary" id="cardConfidenceRationale">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
+    <div class="ai-section">
+      <div class="section-label label-summary">
+        <span class="icon">👥</span> Human Review Note
+      </div>
+      <div class="ai-card summary" id="cardHumanReviewNote">
+        <span class="spinner"></span> Loading…
+      </div>
+    </div>
+
     <hr class="divider">
 
     <!-- Raw JSON Accordion -->
@@ -351,8 +387,9 @@
       <strong>⚡ Run AI Analysis:</strong> To activate the Refresh button, paste your Power Automate HTTP trigger URL into the
       <code>FLOW_HTTP_TRIGGER_URL</code> constant at the top of this web resource's &lt;script&gt; block, then re-upload.
       The Flow should accept a POST body of <code>{"incidentId":"&lt;guid&gt;"}</code> and write back
-      <code>earnint_aisummary</code>, <code>earnint_supportingevidencesummary</code>, <code>earnint_nextbestaction</code>,
-      and <code>earnint_airawjson</code> on the incident record.
+      <code>earnfrau_aisummary</code>, <code>earnfrau_supportingevidencesummary</code>, <code>earnfrau_nextbestaction</code>,
+      <code>earnfrau_risksignalbreakdown</code>, <code>earnfrau_evidencegaps</code>, <code>earnfrau_confidencerationale</code>,
+      <code>earnfrau_humanreviewnote</code>, and <code>earnfrau_airawjson</code> on the incident record.
     </div>
 
   </div>
@@ -360,9 +397,9 @@
   <script>
     // ─────────────────────────────────────────────────────────────────────────
     // CONFIGURATION — paste your Power Automate HTTP trigger URL here after
-    // creating "EarnInt AI Summary - HTTP" flow (see flow-ai-summary-template.json).
+    // creating "EarnInt AI Summary - HTTP Trigger" flow (see flow-ai-summary-template.json).
     // ─────────────────────────────────────────────────────────────────────────
-    var FLOW_HTTP_TRIGGER_URL = "";   // e.g. "https://prod-xx.westus.logic.azure.com:443/..."
+    var FLOW_HTTP_TRIGGER_URL = "https://3516f9621f69e81b8df15b52add15d.0d.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/24/workflows/6cecf331b53c47cf86f2645ecdbd5afc/triggers/manual/paths/invoke?api-version=1";
     var POLL_INTERVAL_MS      = 4000; // how often to poll Dataverse after triggering Flow
     var POLL_TIMEOUT_MS       = 90000; // stop polling after this many ms (Flow can take 10-30s)
 
@@ -370,7 +407,7 @@
     var DEMO_DATA = {
       title:  "EIR-2025-0041 — Hargrove, Robert — Unreported SSDI Wages Q1-Q2 2025",
       risk:   "High",
-      earnint_aisummary:
+      earnfrau_aisummary:
         "Case EIR-2025-0041 involves Robert Hargrove, an SSDI beneficiary who received " +
         "$24,800 in unreported wages during Q1-Q2 2025. The discrepancy was detected through " +
         "a cross-match of employer wage records against beneficiary earnings statements. " +
@@ -378,7 +415,7 @@
         "earnings suppression. Risk is classified as High based on discrepancy magnitude, " +
         "employer corroboration, and beneficiary response history. Three evidence items " +
         "are on file supporting an overpayment determination.",
-      earnint_supportingevidencesummary:
+      earnfrau_supportingevidencesummary:
         "Three evidence items have been submitted and reviewed:\n" +
         "  1. W-2 (Primary Employer) — Confirms $24,800 in wages for Q1-Q2 2025. " +
         "Date received: 2025-07-10. Status: Verified.\n" +
@@ -388,13 +425,27 @@
         "partial employment but disputed the total amount. Status: Under Review.\n\n" +
         "Evidence collectively establishes a consistent unreported earnings pattern " +
         "across two consecutive quarters with corroborating third-party documentation.",
-      earnint_nextbestaction:
+      earnfrau_nextbestaction:
         "Issue an overpayment determination letter to the beneficiary citing SSA regulations " +
         "§ 404.502. Escalate to the Fraud Referral Unit if no written response is received " +
         "within 30 calendar days. Supervisor approval is required before finalizing the " +
         "disposition. If beneficiary responds with additional documentation, reassign to " +
         "analyst for re-evaluation within 5 business days.",
-      earnint_airawjson: JSON.stringify({
+      earnfrau_risksignalbreakdown:
+        "Large Wage Variance (+20): Two quarters of zero self-reported wages vs verified W-2 wages.\n" +
+        "Multiple Months Impacted (+20): Six-month sustained discrepancy pattern.\n" +
+        "Suspicious Wage Report Indicator (+10): Intake originated from wage-match signal.\n" +
+        "Conflicting Beneficiary Statement (+10): Statement conflicts with employer-confirmed records.",
+      earnfrau_evidencegaps:
+        "1. Beneficiary response packet not received within expected timeline.\n" +
+        "2. No independent payment-history record attached yet.\n" +
+        "3. Identity re-validation should be refreshed before final determination.",
+      earnfrau_confidencerationale:
+        "Confidence is Moderate-High because employer and tax wage records corroborate each other. " +
+        "Confidence is reduced by unresolved beneficiary response and one contradictory statement.",
+      earnfrau_humanreviewnote:
+        "AI output is triage support only. Final determination and any escalation must be made by SSA analysts and supervisors.",
+      earnfrau_airawjson: JSON.stringify({
         model: "gpt-4o",
         generated_at: new Date().toISOString(),
         prompt_tokens: 842,
@@ -409,9 +460,9 @@
           finding_count: 1
         },
         output: {
-          ai_summary: "See earnint_aisummary field.",
-          supporting_evidence_summary: "See earnint_supportingevidencesummary field.",
-          next_best_action: "See earnint_nextbestaction field."
+          ai_summary: "See earnfrau_aisummary field.",
+          supporting_evidence_summary: "See earnfrau_supportingevidencesummary field.",
+          next_best_action: "See earnfrau_nextbestaction field."
         }
       }, null, 2)
     };
@@ -483,10 +534,14 @@
 
     async function fetchCaseFromAPI(recordId) {
       var fields = [
-        "earnint_aisummary",
-        "earnint_supportingevidencesummary",
-        "earnint_nextbestaction",
-        "earnint_airawjson",
+        "earnfrau_aisummary",
+        "earnfrau_supportingevidencesummary",
+        "earnfrau_nextbestaction",
+        "earnfrau_risksignalbreakdown",
+        "earnfrau_evidencegaps",
+        "earnfrau_confidencerationale",
+        "earnfrau_humanreviewnote",
+        "earnfrau_airawjson",
         "title",
         "earnint_riskrating"
       ].join(",");
@@ -508,14 +563,22 @@
     }
 
     function renderData(data, source) {
-      var summary  = data.earnint_aisummary;
-      var evidence = data.earnint_supportingevidencesummary;
-      var nba      = data.earnint_nextbestaction;
-      var rawJson  = data.earnint_airawjson;
+      var summary  = data.earnfrau_aisummary;
+      var evidence = data.earnfrau_supportingevidencesummary;
+      var nba      = data.earnfrau_nextbestaction;
+      var riskBreakdown = data.earnfrau_risksignalbreakdown;
+      var evidenceGaps = data.earnfrau_evidencegaps;
+      var confidenceRationale = data.earnfrau_confidencerationale;
+      var humanReviewNote = data.earnfrau_humanreviewnote;
+      var rawJson  = data.earnfrau_airawjson;
 
       setCard("cardSummary",  summary,  !summary);
       setCard("cardEvidence", evidence, !evidence);
       setCard("cardNBA",      nba,      !nba);
+      setCard("cardRiskBreakdown", riskBreakdown, !riskBreakdown);
+      setCard("cardEvidenceGaps", evidenceGaps, !evidenceGaps);
+      setCard("cardConfidenceRationale", confidenceRationale, !confidenceRationale);
+      setCard("cardHumanReviewNote", humanReviewNote, !humanReviewNote);
       renderJSON(rawJson || null);
 
       var now = new Date().toLocaleString();
@@ -523,7 +586,7 @@
 
       if (source === "demo") {
         setStatus("Demo data (no live record)", "demo");
-      } else if (!summary && !evidence && !nba) {
+      } else if (!summary && !evidence && !nba && !riskBreakdown && !evidenceGaps && !confidenceRationale && !humanReviewNote) {
         setStatus("Fields empty — run AI Analysis", "");
       } else {
         setStatus("Live data loaded", "ready");
@@ -566,7 +629,7 @@
 
         try {
           var data = await fetchCaseFromAPI(recordId);
-          if (data.earnint_aisummary) {
+          if (data.earnfrau_aisummary) {
             renderData(data, "live");
             return true;
           }
@@ -615,7 +678,7 @@
           body: JSON.stringify({ incidentId: recordId })
         }).catch(function(e) { console.warn("Flow trigger fetch error (may still have been received):", e); });
 
-        // Poll Dataverse until earnint_aisummary is written (or timeout)
+        // Poll Dataverse until earnfrau_aisummary is written (or timeout)
         await pollForAIData(recordId);
       } catch (e) {
         console.error("Flow trigger failed:", e);

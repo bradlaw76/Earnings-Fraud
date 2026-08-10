@@ -43,10 +43,10 @@ tr:last-child td{border-bottom:none}
 <script>
 const RISK_LABELS={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
 const RISK_CLASS={100000000:"risk-low",100000001:"risk-medium",100000002:"risk-high",100000003:"risk-critical"};
-const DISP_LABELS={100000000:"Close Case",100000001:"RFI",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
+const DISP_LABELS={100000000:"Close - No Issue",100000001:"Request More Information",100000002:"Create Overpayment Review",100000003:"Refer to OIG-Style Review",100000004:"Close - Corrected Data",100000005:"Close - Insufficient Evidence",100000006:"Contact Employer",100000007:"Contact Beneficiary",100000008:"Send for Supervisor Review",100000009:"Create Fraud Escalation Package",100000010:"Return for Additional Evidence"};
 const STATUS_LABELS={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
 const STATUS_CLASS={1:"sp-active",2:"sp-hold",4:"sp-research",5:"sp-resolved"};
-const DTYPE_LABELS={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+const DTYPE_LABELS={100000000:"No Discrepancy",100000001:"Unreported Earnings",100000002:"Employer Mismatch",100000003:"Underreported Earnings",100000004:"Late-Reported Earnings",100000005:"Overreported Earnings",100000006:"Duplicate Wage Record",100000007:"Identity Mismatch",100000008:"Multiple Employer Mismatch",100000009:"Reporting Period Mismatch",100000010:"Corrected Record Received",100000011:"Data Match Error",100000012:"Requires Manual Review"};
 
 const SAMPLE_CASES=[
   {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,earnint_discrepancytype:100000000,totalGap:24800},

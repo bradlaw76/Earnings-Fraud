@@ -11,10 +11,10 @@ This walkthrough is for the engineer/operator running the demo. It is derived fr
 - Environment: https://healthconnectcenter.crm.dynamics.com
 
 ## Scenario Requirements Snapshot
-- Business problem: Detect and resolve unreported SSA earnings discrepancies with auditable case workflows
-- Success criteria: End-to-end case intake through supervisor disposition with auditability, executive report mode, and repeatable scripted deployment
+- Business problem: Detect, triage, and resolve suspicious wage and earnings discrepancy scenarios with auditable human-reviewed workflows
+- Success criteria: End-to-end suspicious wage intake through supervisor disposition with explainable triage and repeatable scripted deployment
 - Required entities: incident, contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
-- Required artifacts: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
+- Required artifacts: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, AI insights web resource, executive mode report
 
 ### Explicit Entity Mapping
 No explicit entity mapping block found.
@@ -44,7 +44,9 @@ No explicit entity mapping block found.
 - [x] Finalize spec.md
 - [x] Finalize plan.md
 - [x] Approve build environment and permissions
-- [x] Define Dataverse tables and columns for: incident, contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
+- [x] Define Dataverse tables and columns for: incident (anchor), contact, earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
+- [x] Expand case metadata fields (review type, referral source, allegation type, risk/confidence, final determination)
+- [x] Expand discrepancy/evidence/finding option sets and workflow-support fields
 - [x] Define required app artifacts for: Case form updates, discrepancy/evidence/finding forms, active views, supervisor summary web resource, executive mode report
 - [x] Build report mapping matrix for tables: earnint_earningsdiscrepancy, earnint_evidenceitem, earnint_investigationfinding
 - [x] Confirm report types/placement: web resource, dashboard KPI, queue/view summary
@@ -58,9 +60,11 @@ No explicit entity mapping block found.
 ### What To Show (Implementation-Oriented)
 - Open **Active Cases - DATA** view to show the 4-case queue at different stages.
 - Hero record: **EIR-2025-0041 — Hargrove, Robert** (In Progress, pending supervisor).
+- On the hero case, show Review Type, Referral Source, Allegation Type, Fraud Risk Score, Fraud Likelihood, Confidence Score, and Human Review Required.
 - Show **Active Earnings Discrepancies**: 2 Hargrove records, Q1+Q2 2025, $12,400 each, source=IRS Wage Feed W-2.
-- Show **Active Evidence Items**: W-2 (verified), Beneficiary Statement (unverified), Employer Confirmation (verified).
-- Show **Active Investigation Findings**: Hargrove finding with recommended disposition = Create Overpayment Review.
+- Show **Active Evidence Items**: suspicious wage intake record + employer confirmation + beneficiary statement, including status and supports-finding tags.
+- Show **Active Investigation Findings**: recommendation text, supervisor approval status, and structured recommended outcome.
+- Show **Fraud AI Insights** web resource: summary, risk signal breakdown, evidence gaps, confidence rationale, and human-review note.
 - Close with **EIR-2025-0033 — Nguyen** as the resolved/approved example.
 
 ### Risk Mitigation During Demo

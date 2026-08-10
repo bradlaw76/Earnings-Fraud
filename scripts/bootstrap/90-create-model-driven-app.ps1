@@ -213,8 +213,8 @@ $components = New-Object System.Collections.Generic.List[object]
 $seen = New-Object System.Collections.Generic.HashSet[string]
 
 $preferredViews = @{
-    "incident" = @("Active Cases", "My Active Cases", "Inactive Cases")
-    "contact" = @("Active Contacts", "My Active Contacts", "Inactive Contacts")
+    "incident" = @("Earnings Integrity - Active Cases", "Active Cases", "My Active Cases", "Inactive Cases")
+    "contact" = @("Earnings Integrity - Active Contacts", "Active Contacts", "My Active Contacts", "Inactive Contacts")
 }
 
 foreach ($entity in $targetEntities) {

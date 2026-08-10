@@ -50,11 +50,11 @@ tr:last-child td{border-bottom:none}
 <script>
 const RISK_LABELS={100000000:"Low",100000001:"Medium",100000002:"High",100000003:"Critical"};
 const RISK_CLASS={100000000:"risk-low",100000001:"risk-medium",100000002:"risk-high",100000003:"risk-critical"};
-const DISP_LABELS={100000000:"Close Case",100000001:"Request More Information",100000002:"Create Overpayment Review",100000003:"Escalate as Fraud Referral"};
+const DISP_LABELS={100000000:"Close - No Issue",100000001:"Request More Information",100000002:"Create Overpayment Review",100000003:"Refer to OIG-Style Review",100000004:"Close - Corrected Data",100000005:"Close - Insufficient Evidence",100000006:"Contact Employer",100000007:"Contact Beneficiary",100000008:"Send for Supervisor Review",100000009:"Create Fraud Escalation Package",100000010:"Return for Additional Evidence"};
 const DISP_CLASS={100000000:"disp-close",100000001:"disp-rfi",100000002:"disp-op",100000003:"disp-fraud"};
-const DTYPE_LABELS={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy",100000004:"Other"};
+const DTYPE_LABELS={100000000:"No Discrepancy",100000001:"Unreported Earnings",100000002:"Employer Mismatch",100000003:"Underreported Earnings",100000004:"Late-Reported Earnings",100000005:"Overreported Earnings",100000006:"Duplicate Wage Record",100000007:"Identity Mismatch",100000008:"Multiple Employer Mismatch",100000009:"Reporting Period Mismatch",100000010:"Corrected Record Received",100000011:"Data Match Error",100000012:"Requires Manual Review"};
 const STATUS_LABELS={1:"In Progress",2:"On Hold",4:"Researching",5:"Problem Solved"};
-const ETYPE_LABELS={100000000:"Tax Return",100000001:"W-2 Form",100000002:"1099 Form",100000003:"Wage Statement",100000004:"Beneficiary Statement",100000005:"Employer Confirmation",100000006:"Other"};
+const ETYPE_LABELS={100000000:"Wage Report",100000001:"Suspicious Wage Report",100000002:"Employer Wage Confirmation",100000003:"Pay Stub",100000004:"W-2 / Tax Wage Document",100000005:"Beneficiary Statement",100000006:"Representative Payee Statement",100000007:"Prior Notice",100000008:"Payment History",100000009:"Call Note",100000010:"Portal Submission",100000011:"Uploaded Document",100000012:"Employer Letter",100000013:"Internal Analyst Note",100000014:"Prior Case Evidence",100000015:"Identity Verification Document",100000016:"Data Match Record",100000017:"Other"};
 const FTYPE_LABELS={100000000:"Discrepancy Confirmed",100000001:"Discrepancy Resolved",100000002:"Discrepancy Unresolved",100000003:"Possible Fraud Indicator",100000004:"No Issue Found"};
 
 // Sample fallback data (Hargrove hero case)

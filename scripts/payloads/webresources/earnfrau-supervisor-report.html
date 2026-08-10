@@ -50,7 +50,7 @@ const RC={100000000:"r-low",100000001:"r-medium",100000002:"r-high",100000003:"r
 const DL={100000000:"Close Case",100000001:"Request More Info",100000002:"Overpayment Review",100000003:"Fraud Escalation"};
 const SL={1:"In Progress",2:"On Hold",4:"Researching",5:"Resolved"};
 const SC={1:"s-inprog",2:"s-hold",4:"s-research",5:"s-resolved"};
-const DTL={100000000:"Unreported Wages",100000001:"Excess Earnings",100000002:"Employer Mismatch",100000003:"Date Discrepancy"};
+const DTL={100000000:"No Discrepancy",100000001:"Unreported Earnings",100000002:"Employer Mismatch",100000003:"Underreported Earnings",100000004:"Late-Reported Earnings",100000005:"Overreported Earnings",100000006:"Duplicate Wage Record",100000007:"Identity Mismatch",100000008:"Multiple Employer Mismatch",100000009:"Reporting Period Mismatch",100000010:"Corrected Record Received",100000011:"Data Match Error",100000012:"Requires Manual Review"};
 const SAMPLE=[
   {incidentid:"a1",title:"EIR-2025-0041",customer:"Robert Hargrove",earnint_riskrating:100000002,earnint_casedisposition:100000002,earnint_supervisorapproval:false,statuscode:1,earnint_discrepancytype:100000000,gap:24800,hasFinding:true,analyst:"J. Reyes"},
   {incidentid:"a2",title:"EIR-2025-0052",customer:"Maria Castillo",earnint_riskrating:100000002,earnint_casedisposition:100000001,earnint_supervisorapproval:false,statuscode:4,earnint_discrepancytype:100000000,gap:18400,hasFinding:false,analyst:"T. Morales"},

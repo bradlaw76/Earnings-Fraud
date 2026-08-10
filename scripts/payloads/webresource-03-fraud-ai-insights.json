@@ -1,9 +1,17 @@
 {
   "WebResources": [
     {
-      "Name": "{prefix}_/report/fraud-ai-insights.html",
+      "Name": "earnfrau_reports/fraud-ai-insights.html",
       "DisplayName": "Fraud AI Insights",
-      "Description": "AI-generated case summary, supporting evidence summary, and next best action panel. Reads earnint AI fields from the incident record and renders them in a structured Fluent-style card layout. Includes raw AI Builder JSON accordion and a configurable Refresh trigger.",
+      "Description": "AI-generated case summary, evidence summary, next best action, risk signal breakdown, evidence gaps, confidence rationale, and human-review note panel. Reads AI fields from the incident record and renders them in a structured Fluent-style card layout. Includes raw AI Builder JSON accordion and a configurable Refresh trigger.",
+      "SourcePath": "webresources/fraud-ai-insights.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    },
+    {
+      "Name": "earnint_/report/fraud-ai-insights.html",
+      "DisplayName": "Fraud AI Insights (Legacy Path)",
+      "Description": "Legacy path kept in sync with the canonical Fraud AI Insights web resource to avoid stale form bindings during migration.",
       "SourcePath": "webresources/fraud-ai-insights.html",
       "WebResourceType": 1,
       "AddToSolution": true

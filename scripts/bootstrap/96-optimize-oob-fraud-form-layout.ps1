@@ -218,9 +218,29 @@ Write-Host "  Environment: $EnvironmentUrl"
 Write-Host ""
 
 $caseOrder = @(
+    "earnint_reviewtype",
+    "earnint_referralsource",
+    "earnint_allegationtype",
+    "earnint_reviewperiodstart",
+    "earnint_reviewperiodend",
     "earnint_discrepancytype",
     "earnint_riskrating",
+    "earnint_fraudriskscore",
+    "earnint_fraudlikelihood",
+    "earnint_confidencescore",
+    "earnint_confidencelevel",
+    "earnint_riskexplanation",
+    "earnint_supervisorreviewrequired",
+    "earnint_humanreviewrequired",
+    "earnint_potentialoverpayment",
+    "earnint_impactedmonthcount",
+    "earnint_largestmonthlyvariance",
+    "earnint_evidencestatus",
+    "earnint_beneficiaryresponsestatus",
+    "earnint_identityvalidationstatus",
+    "earnint_queueassignment",
     "earnint_casedisposition",
+    "earnint_finaldetermination",
     "earnint_supervisorapproval"
 )
 $contactOrder = @("earnint_ssn")

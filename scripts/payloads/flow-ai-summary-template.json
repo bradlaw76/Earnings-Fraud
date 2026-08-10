@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic",
-  "description": "AI Builder Summary Flow — Federal Earnings Fraud (V1 earnint solution). Reads case + related records from Dataverse, builds a structured prompt, calls AI Builder Text Generation, parses the JSON response, and writes back to earnint_ fields on the incident record. Import this blueprint into Power Automate manually.",
+  "description": "AI Builder Summary Flow — Federal Earnings Fraud (case anchor). Reads case + related records from Dataverse, builds a structured prompt, calls AI Builder Text Generation, parses the JSON response, and writes back to earnfrau_ and earnInt_ analysis fields on the incident record. Import this blueprint into Power Automate manually.",
   "name": "EarnInt AI Case Summary",
-  "_architecture_note": "Power Automate does not support multiple trigger types in a single flow. Build TWO separate flows using the same action steps (01-09): (1) EarnInt AI Summary - Auto: trigger = 'When a row is added, modified or deleted' on incident. (2) EarnInt AI Summary - Manual: trigger = 'For a selected row' on incident, which creates the ribbon button. Optionally add a third flow with an HTTP Request trigger to support the web resource Refresh button.",
+  "_architecture_note": "Power Automate does not support multiple trigger types in a single flow. Build THREE separate flows using the same action steps (01-09): (1) EarnInt AI Summary - Auto: trigger = 'When a row is added, modified or deleted' on incident. (2) EarnInt AI Summary - Manual: trigger = 'For a selected row' on incident, which creates the ribbon button. (3) EarnInt AI Summary - HTTP: trigger = 'When an HTTP request is received' for the web resource Refresh button.",
   "triggers": {
     "When_a_row_is_added_or_modified": {
       "type": "OpenApiConnection",
@@ -12,7 +12,7 @@
           "subscriptionRequest/message": 3,
           "subscriptionRequest/entityname": "incident",
           "subscriptionRequest/scope": 4,
-          "subscriptionRequest/filteringattributes": "earnint_discrepancytype,earnint_riskrating"
+          "subscriptionRequest/filteringattributes": "earnint_reviewtype,earnint_referralsource,earnint_allegationtype,earnint_discrepancytype,earnint_riskrating,earnint_fraudlikelihood,earnint_confidencelevel,earnint_evidencestatus,earnint_beneficiaryresponsestatus"
         }
       },
       "recurrence": { "frequency": "Minute", "interval": 1 }
@@ -24,6 +24,20 @@
         "parameters": { "entityName": "incident" }
       },
       "_note": "This trigger appears as 'Run AI Analysis' in the Case record ribbon after the Flow is saved."
+    },
+    "When_an_HTTP_request_is_received": {
+      "type": "Request",
+      "kind": "Http",
+      "inputs": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "incidentId": { "type": "string" }
+          },
+          "required": ["incidentId"]
+        }
+      },
+      "_note": "Use this trigger for the web resource Run AI Analysis button; body should be {\"incidentId\":\"<guid>\"}."
     }
   },
   "actions": {
@@ -35,8 +49,8 @@
         "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "GetItem" },
         "parameters": {
           "entityName": "incidents",
-          "recordId": "@triggerOutputs()?['body/incidentid']",
-          "$select": "title,earnint_discrepancytype,earnint_riskrating,earnint_casedisposition,earnint_supervisorapproval,statuscode,ticketnumber"
+          "recordId": "@coalesce(triggerOutputs()?['body/incidentid'], triggerOutputs()?['body/recordId'], triggerBody()?['incidentId'])",
+          "$select": "title,earnint_reviewtype,earnint_referralsource,earnint_allegationtype,earnint_discrepancytype,earnint_riskrating,earnint_fraudriskscore,earnint_fraudlikelihood,earnint_confidencescore,earnint_confidencelevel,earnint_potentialoverpayment,earnint_impactedmonthcount,earnint_largestmonthlyvariance,earnint_evidencestatus,earnint_beneficiaryresponsestatus,earnint_identityvalidationstatus,earnint_supervisorreviewrequired,earnint_humanreviewrequired,earnint_casedisposition,earnint_finaldetermination,earnint_supervisorapproval,statuscode,ticketnumber"
         }
       }
     },
@@ -49,7 +63,7 @@
         "parameters": {
           "entityName": "earnint_earningsdiscrepancies",
           "$filter": "_earnint_caseid_discrepancy_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
-          "$select": "earnint_name,earnint_discrepancyamount,earnint_reportedearnings,earnint_authoritativeearnings,earnint_earningsperiod,earnint_employername,statuscode"
+          "$select": "earnint_name,earnint_discrepancytype,earnint_earningsourcetype,earnint_discrepancyamount,earnint_discrepancypercent,earnint_reportedearnings,earnint_authoritativeearnings,earnint_earningsperiod,earnint_employername,earnint_requiresmanualreview,statuscode"
         }
       }
     },
@@ -62,7 +76,7 @@
         "parameters": {
           "entityName": "earnint_evidenceitems",
           "$filter": "_earnint_caseid_evidence_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
-          "$select": "earnint_name,earnint_evidencetype,earnint_receiveddate,earnint_status,earnint_notes"
+          "$select": "earnint_name,earnint_evidencetype,earnint_receiveddate,earnint_status,earnint_supportsfinding,earnint_notes"
         }
       }
     },
@@ -75,7 +89,7 @@
         "parameters": {
           "entityName": "earnint_investigationfindings",
           "$filter": "_earnint_caseid_finding_value eq '@{outputs('01_Get_Case_Row')?['body/incidentid']}'",
-          "$select": "earnint_name,earnint_findingtype,earnint_severity,earnint_recommendation,statuscode"
+          "$select": "earnint_name,earnint_findingtype,earnint_severity,earnint_recddisposition,earnint_recommendation,earnint_supervisorapprovalstatus,earnint_supervisorcomments,statuscode"
         }
       }
     },
@@ -83,7 +97,7 @@
       "order": 5,
       "type": "Compose",
       "description": "Build the structured prompt string to send to AI Builder.",
-      "inputs": "You are an SSA earnings integrity analyst assistant. Analyze the following case data and return a JSON object with exactly three keys: ai_summary, supporting_evidence_summary, and next_best_action.\n\nCASE RECORD:\nTitle: @{outputs('01_Get_Case_Row')?['body/title']}\nTicket: @{outputs('01_Get_Case_Row')?['body/ticketnumber']}\nRisk Rating: @{outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']}\nDiscrepancy Type: @{outputs('01_Get_Case_Row')?['body/earnint_discrepancytype@OData.Community.Display.V1.FormattedValue']}\nDisposition: @{outputs('01_Get_Case_Row')?['body/earnint_casedisposition@OData.Community.Display.V1.FormattedValue']}\nSupervisor Approval: @{outputs('01_Get_Case_Row')?['body/earnint_supervisorapproval']}\n\nDISCREPANCY RECORDS (@{length(outputs('02_List_Discrepancy_Rows')?['body/value'])} items):\n@{outputs('02_List_Discrepancy_Rows')?['body/value']}\n\nEVIDENCE ITEMS (@{length(outputs('03_List_Evidence_Items')?['body/value'])} items):\n@{outputs('03_List_Evidence_Items')?['body/value']}\n\nINVESTIGATION FINDINGS (@{length(outputs('04_List_Investigation_Findings')?['body/value'])} items):\n@{outputs('04_List_Investigation_Findings')?['body/value']}\n\nReturn ONLY a valid JSON object. Do not include markdown fences or explanation. Example format:\n{\n  \"ai_summary\": \"<2-4 sentence case overview>\",\n  \"supporting_evidence_summary\": \"<itemized evidence summary with status>\",\n  \"next_best_action\": \"<clear actionable recommendation for the case worker>\"\n}"
+      "inputs": "You are an SSA earnings integrity analyst assistant. Suspicious wage reports are an intake signal, not a final fraud determination. Analyze the case data and return a JSON object with exactly seven keys: ai_summary, supporting_evidence_summary, next_best_action, risk_signal_breakdown, evidence_gaps, confidence_rationale, human_review_note.\n\nUse language such as fraud likelihood, confidence score, recommended next action, requires human review. Never state that AI determines fraud or adjudicates eligibility.\n\nCASE RECORD:\nTitle: @{outputs('01_Get_Case_Row')?['body/title']}\nTicket: @{outputs('01_Get_Case_Row')?['body/ticketnumber']}\nReview Type: @{outputs('01_Get_Case_Row')?['body/earnint_reviewtype@OData.Community.Display.V1.FormattedValue']}\nReferral Source: @{outputs('01_Get_Case_Row')?['body/earnint_referralsource@OData.Community.Display.V1.FormattedValue']}\nAllegation Type: @{outputs('01_Get_Case_Row')?['body/earnint_allegationtype@OData.Community.Display.V1.FormattedValue']}\nRisk Level: @{outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']}\nFraud Risk Score: @{outputs('01_Get_Case_Row')?['body/earnint_fraudriskscore']}\nFraud Likelihood: @{outputs('01_Get_Case_Row')?['body/earnint_fraudlikelihood@OData.Community.Display.V1.FormattedValue']}\nConfidence Score: @{outputs('01_Get_Case_Row')?['body/earnint_confidencescore']}\nConfidence Level: @{outputs('01_Get_Case_Row')?['body/earnint_confidencelevel@OData.Community.Display.V1.FormattedValue']}\nPotential Overpayment: @{outputs('01_Get_Case_Row')?['body/earnint_potentialoverpayment']}\nSupervisor Review Required: @{outputs('01_Get_Case_Row')?['body/earnint_supervisorreviewrequired']}\nHuman Review Required: @{outputs('01_Get_Case_Row')?['body/earnint_humanreviewrequired']}\nRecommended Outcome: @{outputs('01_Get_Case_Row')?['body/earnint_casedisposition@OData.Community.Display.V1.FormattedValue']}\n\nDISCREPANCY RECORDS (@{length(outputs('02_List_Discrepancy_Rows')?['body/value'])} items):\n@{outputs('02_List_Discrepancy_Rows')?['body/value']}\n\nEVIDENCE ITEMS (@{length(outputs('03_List_Evidence_Items')?['body/value'])} items):\n@{outputs('03_List_Evidence_Items')?['body/value']}\n\nINVESTIGATION FINDINGS (@{length(outputs('04_List_Investigation_Findings')?['body/value'])} items):\n@{outputs('04_List_Investigation_Findings')?['body/value']}\n\nReturn ONLY a valid JSON object. Do not include markdown fences or explanation. Example format:\n{\n  \"ai_summary\": \"<2-4 sentence case overview>\",\n  \"supporting_evidence_summary\": \"<itemized evidence summary with status>\",\n  \"next_best_action\": \"<clear actionable recommendation for the case worker>\",\n  \"risk_signal_breakdown\": \"<signal-by-signal rationale and score drivers>\",\n  \"evidence_gaps\": \"<missing or contradictory evidence list>\",\n  \"confidence_rationale\": \"<why confidence is high/medium/low>\",\n  \"human_review_note\": \"<explicit reminder that final decision remains with SSA staff>\"\n}"
     },
     "06_AI_Builder_Text_Generation": {
       "order": 6,
@@ -110,7 +124,10 @@
         "case_context": {
           "incident_id": "@outputs('01_Get_Case_Row')?['body/incidentid']",
           "title": "@outputs('01_Get_Case_Row')?['body/title']",
-          "risk_rating": "@outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']",
+            "risk_rating": "@outputs('01_Get_Case_Row')?['body/earnint_riskrating@OData.Community.Display.V1.FormattedValue']",
+            "review_type": "@outputs('01_Get_Case_Row')?['body/earnint_reviewtype@OData.Community.Display.V1.FormattedValue']",
+            "fraud_likelihood": "@outputs('01_Get_Case_Row')?['body/earnint_fraudlikelihood@OData.Community.Display.V1.FormattedValue']",
+            "confidence_level": "@outputs('01_Get_Case_Row')?['body/earnint_confidencelevel@OData.Community.Display.V1.FormattedValue']",
           "discrepancy_count": "@length(outputs('02_List_Discrepancy_Rows')?['body/value'])",
           "evidence_count": "@length(outputs('03_List_Evidence_Items')?['body/value'])",
           "finding_count": "@length(outputs('04_List_Investigation_Findings')?['body/value'])"
@@ -128,7 +145,7 @@
     "08b_Parse_AI_JSON_Output": {
       "order": 9,
       "type": "ParseJson",
-      "description": "Parse the cleaned AI Builder text as JSON to extract the three output fields. Uses output of 08a not 06.",
+      "description": "Parse the cleaned AI Builder text as JSON to extract the required output fields. Uses output of 08a not 06.",
       "inputs": {
         "content": "@outputs('08a_Strip_Markdown_Fences')",
         "schema": {
@@ -136,7 +153,11 @@
           "properties": {
             "ai_summary":                   { "type": "string" },
             "supporting_evidence_summary":  { "type": "string" },
-            "next_best_action":             { "type": "string" }
+            "next_best_action":             { "type": "string" },
+            "risk_signal_breakdown":        { "type": "string" },
+            "evidence_gaps":                { "type": "string" },
+            "confidence_rationale":         { "type": "string" },
+            "human_review_note":            { "type": "string" }
           }
         }
       }
@@ -144,16 +165,21 @@
     "09_Update_Case_Row": {
       "order": 10,
       "type": "OpenApiConnection",
-      "description": "Write all four AI fields back to the incident record.",
+      "description": "Write AI output fields back to the incident record.",
       "inputs": {
         "host": { "connectionName": "shared_commondataserviceforapps", "operationId": "UpdateRecord" },
         "parameters": {
           "entityName": "incidents",
           "recordId": "@outputs('01_Get_Case_Row')?['body/incidentid']",
-          "item/earnint_aisummary":                   "@body('08b_Parse_AI_JSON_Output')?['ai_summary']",
-          "item/earnint_supportingevidencesummary":   "@body('08b_Parse_AI_JSON_Output')?['supporting_evidence_summary']",
-          "item/earnint_nextbestaction":              "@body('08b_Parse_AI_JSON_Output')?['next_best_action']",
-          "item/earnint_airawjson":                   "@{string(outputs('07_Compose_Raw_JSON_Payload'))}"
+          "item/earnfrau_aisummary":                   "@body('08b_Parse_AI_JSON_Output')?['ai_summary']",
+          "item/earnfrau_supportingevidencesummary":   "@body('08b_Parse_AI_JSON_Output')?['supporting_evidence_summary']",
+          "item/earnfrau_nextbestaction":              "@body('08b_Parse_AI_JSON_Output')?['next_best_action']",
+          "item/earnfrau_risksignalbreakdown":         "@body('08b_Parse_AI_JSON_Output')?['risk_signal_breakdown']",
+          "item/earnfrau_evidencegaps":                "@body('08b_Parse_AI_JSON_Output')?['evidence_gaps']",
+          "item/earnfrau_confidencerationale":         "@body('08b_Parse_AI_JSON_Output')?['confidence_rationale']",
+          "item/earnfrau_humanreviewnote":             "@body('08b_Parse_AI_JSON_Output')?['human_review_note']",
+          "item/earnint_riskexplanation":              "@body('08b_Parse_AI_JSON_Output')?['risk_signal_breakdown']",
+          "item/earnfrau_airawjson":                   "@{string(outputs('07_Compose_Raw_JSON_Payload'))}"
         }
       }
     }
@@ -161,10 +187,10 @@
   "setup_instructions": {
     "step_1_create_flow": "Go to make.powerautomate.com. Create a new Automated cloud flow. Choose trigger: 'When a row is added, modified or deleted' (Dataverse). Table: Cases (incident). Set scope to Organization.",
     "step_2_build_three_flows": "BUILD THREE SEPARATE FLOWS (same action steps 01-09 in each): Flow A 'EarnInt AI Summary - Auto' with Dataverse 'When a row is added/modified/deleted' trigger on incident. Flow B 'EarnInt AI Summary - Manual' with Dataverse 'For a selected row' trigger on incident (creates ribbon button in D365). Flow C 'EarnInt AI Summary - HTTP' with 'When an HTTP request is received' trigger (body schema: {incidentId: string}) — used by the web resource Refresh button.",
-    "step_3_add_actions": "Add the 10 actions (01 through 09, including 08a) in sequence. Use Dataverse connector for steps 01-04 and 09. Use AI Builder connector for step 06. Use built-in Compose for 05, 07, 08a. Use built-in Parse JSON for 08b.",
+    "step_3_add_actions": "Add the 10 actions (01 through 09, including 08a) in sequence. Use Dataverse connector for steps 01-04 and 09. Use AI Builder connector for step 06. Use built-in Compose for 05, 07, 08a. Use built-in Parse JSON for 08b. In step 01, set Record ID to coalesce(triggerOutputs()?['body/incidentid'], triggerOutputs()?['body/recordId'], triggerBody()?['incidentId']) so all three trigger variants work.",
     "step_4_ai_builder_setup": "For step 06: Add 'Create text with GPT using a prompt' from the AI Builder connector. Paste the dynamic content output of step 05 into the prompt field. Ensure AI Builder credits are provisioned in the Power Platform environment.",
     "step_5_get_http_trigger_url": "After saving Flow C, expand the 'When an HTTP request is received' trigger step — the URL appears there. Copy it and paste into the FLOW_HTTP_TRIGGER_URL constant in fraud-ai-insights.html, then re-run 70-build-web-resources.ps1.",
     "step_6_solution_import": "Add all three Flows to the earnint solution: Solutions > earnint > Add existing > Automation > Cloud Flow. Select all three.",
-    "ai_builder_prompt_notes": "Step 08a strips markdown code fences that GPT sometimes adds. If the model still returns invalid JSON, add a Condition before 08b: if first character is '{' skip stripping, else apply replace. The prompt in 05 already instructs the model to return raw JSON only."
+    "ai_builder_prompt_notes": "Step 08a strips markdown code fences that GPT sometimes adds. If the model still returns invalid JSON, add a Condition before 08b: if first character is '{' skip stripping, else apply replace. The prompt in 05 enforces non-adjudicative language and requires a human-review note in every response."
   }
 }
