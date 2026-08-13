@@ -1,0 +1,12 @@
+{
+  "WebResources": [
+    {
+      "Name": "earnint_/report/earnings-integrity-agent-dashboard.html",
+      "DisplayName": "Earnings Integrity Analyst Dashboard",
+      "Description": "Analyst operational dashboard for earnings-integrity investigations, discrepancies, evidence review, findings, supervisor decisions, open tasks, and recent case activity. Reads live Dataverse data and preserves human-review guardrails.",
+      "SourcePath": "webresources/earnings-integrity-agent-dashboard.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}

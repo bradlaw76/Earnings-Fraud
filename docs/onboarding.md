@@ -303,6 +303,20 @@ pwsh ./scripts/bootstrap/80-post-build-analysis.ps1
 Use script 70 when your scenario includes HTML/report web resources on forms.
 Use script 80 to generate end-of-build analysis, preview README updates, and optionally commit/push the generated summary section.
 
+For the Earnings Fraud Process Map extension, run the dedicated scripts after the base build and completed Spec Kit approval:
+
+```powershell
+pwsh ./scripts/bootstrap/112-build-process-mining-demo.ps1 -WhatIf
+pwsh ./scripts/bootstrap/112-build-process-mining-demo.ps1
+pwsh ./scripts/bootstrap/113-configure-process-event-main-form.ps1
+pwsh ./scripts/bootstrap/114-configure-process-event-views.ps1
+pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -SolutionUniqueName FederalEarningsFraud -PublisherPrefix earnint
+pwsh ./scripts/bootstrap/116-add-process-map-to-app.ps1
+pwsh ./scripts/bootstrap/111-export-process-mining-event-log.ps1
+```
+
+The report cohort is controlled by the Dataverse global choice `DATA-Customer-Application = EarningsFraud (581180001)`. Validate this choice filter, Process Event coverage, and the synthetic-event indicator before presenting metrics.
+
 All scripts are idempotent and safe to rerun.
 
 Validation checkpoint after each script:
@@ -327,6 +341,7 @@ Open [Power Apps Maker](https://make.powerapps.com), select your environment, an
 - Forms and views appear on each table.
 - Tables appear inside the target solution.
 - Report web resources appear under the solution components when script 70 is in scope.
+- The Process Map loads from the app or configured form, shows aggregate transitions and independent metrics, and reports Cases without event history as a coverage gap.
 
 Validation checkpoint:
 

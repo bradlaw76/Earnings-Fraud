@@ -1,0 +1,12 @@
+{
+  "WebResources": [
+    {
+      "Name": "earnint_/report/earnings-fraud-process-map.html",
+      "DisplayName": "Earnings Fraud Process Map",
+      "Description": "Read-only aggregate process map for all Dynamics Cases where DATA-Customer-Application is EarningsFraud. Uses stored Process Events for transition counts, variants, completion coverage, and Case path drill-down.",
+      "SourcePath": "webresources/earnings-fraud-process-map.html",
+      "WebResourceType": 1,
+      "AddToSolution": true
+    }
+  ]
+}

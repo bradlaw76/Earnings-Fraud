@@ -16,7 +16,7 @@ Expected top-level path should end with `Federal Earnings Fraud` for this build 
 
 The implementation uses:
 
-- Spec-driven planning in [specs/ssa-earnings-integrity-case-review/spec.md](specs/ssa-earnings-integrity-case-review/spec.md), [specs/ssa-earnings-integrity-case-review/plan.md](specs/ssa-earnings-integrity-case-review/plan.md), and [specs/ssa-earnings-integrity-case-review/tasks.md](specs/ssa-earnings-integrity-case-review/tasks.md)
+- Spec-driven planning in [specs/ssa-earnings-integrity-case-review-v2/spec.md](specs/ssa-earnings-integrity-case-review-v2/spec.md), [specs/ssa-earnings-integrity-case-review-v2/plan.md](specs/ssa-earnings-integrity-case-review-v2/plan.md), and [specs/ssa-earnings-integrity-case-review-v2/tasks.md](specs/ssa-earnings-integrity-case-review-v2/tasks.md)
 - Dataverse Web API bootstrap scripts under [scripts/bootstrap](scripts/bootstrap)
 - JSON payload-driven metadata under [scripts/payloads](scripts/payloads)
 
@@ -28,7 +28,9 @@ The build creates a repeatable, source-controlled baseline for:
 - Columns and relationships defined in payload files
 - Solution assembly in the target Dataverse solution
 - Starter forms and active views on custom tables
-- A supervisor report HTML web resource packaged into the solution
+- Analyst, supervisor, executive, AI insights, and Process Map HTML web resources packaged into the solution
+- Additive Process Event instrumentation and process-mining exports for operational analysis
+- A Case-anchored Business Process Flow and a 40-minute offline demonstration companion
 
 ## Application Built Summary
 
@@ -92,6 +94,29 @@ Defined in [scripts/payloads/webresource-01-supervisor-summary.json](scripts/pay
 
 Additional v2 web resources include analyst, supervisor, executive KPI, and AI insights pages defined under [scripts/payloads/webresources](scripts/payloads/webresources).
 
+### Process Events and All-Case Process Map
+
+The Process Mining extension adds the `earnint_processevent` table, a required Case relationship, 21 event-contract columns, a complete Information form, and Active, Inactive, and Associated views. The table and relationship payloads live under [scripts/payloads-process-mining](scripts/payloads-process-mining).
+
+The [Earnings Fraud Process Map](scripts/payloads/webresources/earnings-fraud-process-map.html) is a read-only Dynamics web resource that:
+
+- Filters Cases by `demo_datacustomerapplication = 581180001`, the global **DATA-Customer-Application = EarningsFraud** choice shown in Maker
+- Displays shared Case paths, transition counts and percentages, path variants, and a timestamped Case drill-down
+- Provides risk, status, variant, event-source, and Case-search filters
+- Calculates independent median cycle time, completion rate, straight-through rate, automated-event share, handoffs, and event coverage
+- Ranks observed bottlenecks by median activity-to-next-event wait, with affected Cases, observations, and maximum wait
+- Keeps Cases without stored Process Events in coverage metrics without inventing a path
+- Clearly distinguishes synthetic Process Events from production audit history
+
+Live validation on August 13, 2026 reconciled 58 filtered Cases, 13 Cases with Process Events, and 145 Process Events. All 145 current Process Events are synthetic demonstration instrumentation; 17 carry rework markers and 4 carry reassignment markers.
+
+Deploy and add the report to the app with:
+
+```powershell
+pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -SolutionUniqueName FederalEarningsFraud -PublisherPrefix earnint
+pwsh ./scripts/bootstrap/116-add-process-map-to-app.ps1
+```
+
 ### Demo Talk Track (Suggested)
 
 Use this sequence for a 7-10 minute walkthrough:
@@ -105,12 +130,11 @@ Use this sequence for a 7-10 minute walkthrough:
 7. Toggle Supervisor Approval and finalize disposition (close, request info, overpayment review, fraud referral)
 8. Conclude with auditability and replayability: all artifacts are payload/script driven and source controlled
 
-### What To Add Next
+### Current Follow-Up Work
 
-- Bind the supervisor summary web resource directly to live case fields or automation outputs
-- Add queue-driven triage views for analyst workload management
-- Add Power Automate orchestration for intake routing and escalation
-- Add seeded demo records for repeatable stakeholder demos
+- Finish and smoke-test the documented conditional BPF branches
+- Export and unpack the unmanaged solution, then pack/import it for portability validation
+- Replace synthetic Process Events with authoritative transaction/audit capture before any production use
 
 ## Generated Build Summary Section
 
@@ -119,11 +143,15 @@ This section is updated by [scripts/bootstrap/80-post-build-analysis.ps1](script
 <!-- BEGIN GENERATED BUILD SUMMARY -->
 ### Generated Build Summary
 
-No generated summary yet. Run:
+Current v2 environment outcome:
 
-```powershell
-pwsh ./scripts/bootstrap/80-post-build-analysis.ps1
-```
+- Solution: `FederalEarningsFraud` (unmanaged)
+- Model-driven app: `Earnings Integrity V2 Demo App`
+- Case cohort filter: `DATA-Customer-Application = EarningsFraud (581180001)`
+- Live cohort: 58 Cases; 13 with Process Events; 145 Process Events
+- Process Map: deployed, solution-added, published, and available from the app/form
+- App navigation validation: 9 of 9 original subareas preserved; exactly 1 Process Map entry
+- Process-mining CSV outputs: event log, source assessment, event rules, and data quality
 <!-- END GENERATED BUILD SUMMARY -->
 
 ## Full Build Sequence
@@ -188,9 +216,9 @@ pwsh ./scripts/bootstrap/10-auth-connect.ps1 -ServicePrincipal
 
 Before build scripts, confirm planning artifacts are complete and reviewed:
 
-- [specs/ssa-earnings-integrity-case-review/spec.md](specs/ssa-earnings-integrity-case-review/spec.md)
-- [specs/ssa-earnings-integrity-case-review/plan.md](specs/ssa-earnings-integrity-case-review/plan.md)
-- [specs/ssa-earnings-integrity-case-review/tasks.md](specs/ssa-earnings-integrity-case-review/tasks.md)
+- [specs/ssa-earnings-integrity-case-review-v2/spec.md](specs/ssa-earnings-integrity-case-review-v2/spec.md)
+- [specs/ssa-earnings-integrity-case-review-v2/plan.md](specs/ssa-earnings-integrity-case-review-v2/plan.md)
+- [specs/ssa-earnings-integrity-case-review-v2/tasks.md](specs/ssa-earnings-integrity-case-review-v2/tasks.md)
 
 If you need to regenerate starter planning files:
 
@@ -224,6 +252,10 @@ Web resources:
 
 - [scripts/payloads/webresource-01-supervisor-summary.json](scripts/payloads/webresource-01-supervisor-summary.json)
 - [scripts/payloads/webresources/supervisor-case-summary.html](scripts/payloads/webresources/supervisor-case-summary.html)
+- [scripts/payloads/webresource-04-earnings-integrity-agent-dashboard.json](scripts/payloads/webresource-04-earnings-integrity-agent-dashboard.json)
+- [scripts/payloads/webresource-05-earnings-fraud-process-map.json](scripts/payloads/webresource-05-earnings-fraud-process-map.json)
+- [scripts/payloads/webresources/earnings-integrity-agent-dashboard.html](scripts/payloads/webresources/earnings-integrity-agent-dashboard.html)
+- [scripts/payloads/webresources/earnings-fraud-process-map.html](scripts/payloads/webresources/earnings-fraud-process-map.html)
 
 ## 5. Execute Build Scripts
 
@@ -350,6 +382,16 @@ Bootstrap scripts used by this build:
 - [scripts/bootstrap/60-build-forms-views.ps1](scripts/bootstrap/60-build-forms-views.ps1)
 - [scripts/bootstrap/70-build-web-resources.ps1](scripts/bootstrap/70-build-web-resources.ps1)
 - [scripts/bootstrap/80-post-build-analysis.ps1](scripts/bootstrap/80-post-build-analysis.ps1)
+- [scripts/bootstrap/107-seed-bulk-demo-data.ps1](scripts/bootstrap/107-seed-bulk-demo-data.ps1)
+- [scripts/bootstrap/108-remediate-case-activities.ps1](scripts/bootstrap/108-remediate-case-activities.ps1)
+- [scripts/bootstrap/109-seed-recent-case-tasks.ps1](scripts/bootstrap/109-seed-recent-case-tasks.ps1)
+- [scripts/bootstrap/110-enrich-bulk-case-ai-fields.ps1](scripts/bootstrap/110-enrich-bulk-case-ai-fields.ps1)
+- [scripts/bootstrap/111-export-process-mining-event-log.ps1](scripts/bootstrap/111-export-process-mining-event-log.ps1)
+- [scripts/bootstrap/112-build-process-mining-demo.ps1](scripts/bootstrap/112-build-process-mining-demo.ps1)
+- [scripts/bootstrap/113-configure-process-event-main-form.ps1](scripts/bootstrap/113-configure-process-event-main-form.ps1)
+- [scripts/bootstrap/114-configure-process-event-views.ps1](scripts/bootstrap/114-configure-process-event-views.ps1)
+- [scripts/bootstrap/115-complete-hargrove-case.ps1](scripts/bootstrap/115-complete-hargrove-case.ps1)
+- [scripts/bootstrap/116-add-process-map-to-app.ps1](scripts/bootstrap/116-add-process-map-to-app.ps1)
 
 ## Supporting Documentation
 

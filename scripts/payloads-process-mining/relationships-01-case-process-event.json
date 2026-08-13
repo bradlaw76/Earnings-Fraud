@@ -1,0 +1,17 @@
+[
+  {
+    "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+    "SchemaName": "earnint_case_processevent",
+    "ReferencedEntity": "incident",
+    "ReferencedAttribute": "incidentid",
+    "ReferencingEntity": "earnint_processevent",
+    "Lookup": {
+      "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+      "SchemaName": "earnint_caseid_processevent",
+      "DisplayName": { "LocalizedLabels": [{ "LanguageCode": 1033, "Label": "Case" }] },
+      "RequiredLevel": { "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings", "Value": "ApplicationRequired" }
+    },
+    "AssociatedMenuConfiguration": { "Behavior": "UseCollectionName", "Group": "Details", "Order": 10000, "Label": { "LocalizedLabels": [] } },
+    "CascadeConfiguration": { "Assign": "NoCascade", "Delete": "Cascade", "Merge": "NoCascade", "Reparent": "NoCascade", "Share": "NoCascade", "Unshare": "NoCascade" }
+  }
+]

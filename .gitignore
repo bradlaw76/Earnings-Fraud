@@ -7,3 +7,13 @@
 
 # Build output
 *.log
+
+# Node dependencies are restored from package-lock.json.
+node_modules/
+
+# Temporary BPF payload captures used for local inspection.
+_review_tmp/bpf-workflow-debug.json
+_review_tmp/current-bpf-*.json
+_review_tmp/current-bpf-*.xml
+_review_tmp/template-*.json
+_review_tmp/template-*.xml

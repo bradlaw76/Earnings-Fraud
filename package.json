@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@microsoft/power-apps": "^1.2.12",
+    "docx": "^9.7.1"
+  }
+}

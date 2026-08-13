@@ -23,6 +23,53 @@
 - [x] Build starter forms/views with 60-build-forms-views.ps1
 - [x] Build report/web resources with 70-build-web-resources.ps1 (when applicable)
 - [x] Seed demo data with 97-seed-demo-data.ps1 (2026-07-30)
+- [x] Approve bulk demo data scope: 50 Cases, with all three custom child records on the final 25 Cases, reusing existing Contacts
+- [x] Approve correction of the Patricia Nguyen EIR Case application choice to `581180001`
+- [x] Implement an idempotent bulk demo data seed script with a no-write preview mode
+- [x] Create the approved bulk demo data in Dataverse (2026-08-10)
+- [x] Validate 50 new Cases, 25 discrepancies, 25 evidence items, 25 findings, existing-Contact reuse, relationship coverage, and application choice values
+- [x] Approve remediation of the three unrelated activities linked to the Patricia Nguyen EIR Case
+- [x] Implement an idempotent, content-only activity-remediation script with a no-write preview mode
+- [x] Rewrite and reschedule the two Tasks and one Appointment for the earnings-integrity scenario without deleting records or changing participants
+- [x] Validate activity content, dates, open states, Case linkage, participant preservation, and removal of foreign tactical terminology from activity content
+- [x] Approve three Task types for each of the 20 most recent Earnings Fraud Cases
+- [x] Implement an idempotent recent-Case Task seed script with a no-write preview mode
+- [x] Create 60 open Tasks across the 20 target Cases (2026-08-10)
+- [x] Validate exactly three Tasks per target Case, due dates, open states, unique subjects, and regarding links
+- [x] Diagnose blank AI form fields and the endlessly polling Run AI Analysis button
+- [x] Implement and run idempotent AI display-data enrichment for all 50 bulk Cases
+- [x] Update and deploy fail-fast HTTP trigger handling in the AI insights web resource
+- [x] Validate populated AI fields, seeded-demo source labeling, and rejected-trigger behavior
+- [x] Inspect live Dataverse Case, discrepancy, evidence, finding, activity, queue, audit, resolution, and BPF-instance evidence for Process Mining
+- [x] Export the existing-only Process Mining event log, source assessment, event rules, and data-quality CSVs
+- [x] Approve additive Process Mining enrichment: one explicit event table and a 12-Case representative cohort
+- [x] Document the Process Mining event contract, cohort safeguards, and validation thresholds in spec.md and plan.md
+- [x] Implement an idempotent Process Mining table/cohort seed script with `-WhatIf` support
+- [x] Preview the complete Process Mining build and verify that no existing records will be modified
+- [x] Create `earnint_processevent`, its Case relationship, and solution membership
+- [x] Seed explicit events for eight existing Cases without modifying those Cases
+- [x] Create and resolve four isolated `EIR-PM-*` Cases with complete event histories
+- [x] Validate event counts, deterministic keys, risk balance, variants, handoffs, reassignments, rework, escalation, and automated activity
+- [x] Update the exporter to consume explicit process events without duplicating evidence-derived cohort events
+- [x] Regenerate and validate all four Process Mining CSV outputs
+- [x] Approve the all-Case Process Map scope and `DATA-Customer-Application = EarningsFraud (581180001)` cohort filter
+- [x] Build the live Dynamics Process Map web resource with aggregate transitions, KPIs, filters, variants, and Case drill-down
+- [x] Add independent performance metrics and timestamp-based bottleneck ranking to the Process Map
+- [x] Register and publish the Process Map web resource in `FederalEarningsFraud`
+- [x] Add the Process Map navigation entry to Earnings Integrity V2 Demo App without removing existing sitemap entries
+- [x] Validate filtered Case/event reconciliation, completion rules, path variants, empty/error states, and responsive rendering
+- [x] Approve the Process Event main-form field scope and section layout
+- [x] Implement an idempotent Process Event Information main-form update
+- [x] Publish and validate all intended controls against existing Process Event records
+- [x] Approve primary Process Event view columns for active and inactive records
+- [x] Implement an idempotent Process Event system-view update with `-WhatIf` support
+- [x] Publish and validate exact view columns and active/inactive filters
+- [x] Approve the same primary field layout for the Process Event Associated View
+- [x] Extend the view updater to preserve and patch the query type 2 associated view
+- [x] Publish and validate the associated view ID, query type, columns, and active filter
+- [x] Approve completion of the Hargrove hero Case and its explicit Process Event history
+- [x] Implement an idempotent Hargrove completion script with `-WhatIf` support
+- [x] Populate and validate all 32 visible custom Case fields, approve the linked finding, create 17 complete Process Events, and resolve the Case
 - [x] Apply semantic colors to every custom choice option and validate the choice-visual mapping.
 - [x] Approve Earnings Fraud Case Review BPF design: Case anchor, conditional supervisor route, human decision guardrails, and manual completion behavior
 - [x] Update BPF scope in spec.md, plan.md, and tasks.md
@@ -41,3 +88,20 @@
 - [x] Commit changes to git
 - [ ] Pack and import solution
 - [x] Update docs/build-log.md
+- [x] Approve a self-contained React presenter console based on the 40-minute SSA talk track
+- [x] Build the presenter console with persistent section/action checkboxes, timing, navigation, and reset controls
+- [x] Bundle the presenter console into one directly openable HTML file
+- [x] Validate direct-file loading, content coverage, persistence, browser errors, and responsive screenshots
+- [x] Approve Agent Support placement after AI Insights with a three-minute allocation and a 40-minute timing rebalance
+- [x] Add Specialized Agent and Frontline Support to the full Markdown and Word talk tracks
+- [x] Add the Agent Support section to the React presenter console and renumber subsequent sections
+- [x] Rebuild and validate the offline HTML, cumulative timing, section order, persistence, and responsive layout
+- [x] Synthesize website grounding, linked-agent roles, and the purpose-built SSA Agent Fraud Support page into the three-minute section
+- [x] Replace Step 02 with the Earnings Integrity - Analyst Dashboard web resource narrative and update related references
+- [x] Regenerate and validate the Markdown, Word, and offline HTML talk-track deliverables at 40 minutes
+- [x] Replace Step 01 narration-like On Screen items with actual dashboard-state and transition cues
+- [x] Clarify that Step 04 opens Hargrove only after the Active/My Cases workload explanation
+- [x] Expand Step 05 to introduce the generated Summary, command bar, form navigation, and Business Process Flow
+- [x] Rebalance Step 05 and AI Insights to preserve the 40-minute total
+- [x] Align Hargrove supervisor-review language with the intended open hero-case state
+- [x] Reframe Hargrove as open and describe resolved/read-only behavior conditionally

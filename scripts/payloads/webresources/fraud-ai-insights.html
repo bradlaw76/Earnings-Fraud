@@ -670,20 +670,30 @@
       setStatus("AI analysis running…", "loading");
 
       try {
-        // Fire the Flow trigger — use no-cors since Power Automate is a cross-origin endpoint.
-        // We cannot read the response in no-cors mode, so we poll Dataverse for the result.
-        fetch(FLOW_HTTP_TRIGGER_URL, {
+        // Only poll Dataverse after Power Automate accepts the trigger request.
+        // A rejected or CORS-blocked request must not look like a running analysis.
+        var triggerResponse = await fetch(FLOW_HTTP_TRIGGER_URL, {
           method: "POST",
-          mode: "no-cors",
+          mode: "cors",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ incidentId: recordId })
-        }).catch(function(e) { console.warn("Flow trigger fetch error (may still have been received):", e); });
+        });
+
+        if (!triggerResponse.ok) {
+          throw new Error("Power Automate trigger returned HTTP " + triggerResponse.status);
+        }
 
         // Poll Dataverse until earnfrau_aisummary is written (or timeout)
         await pollForAIData(recordId);
       } catch (e) {
         console.error("Flow trigger failed:", e);
-        setStatus("Trigger failed — see console", "demo");
-        alert("Flow trigger error: " + e.message);
+        setStatus("AI trigger unavailable — authentication or CORS configuration required", "demo");
+        alert(
+          "AI analysis did not start.\n\n" +
+          "The Power Automate HTTP trigger rejected or blocked the request. " +
+          "Verify the trigger authentication policy and allowed browser origin, then try again.\n\n" +
+          "Technical detail: " + e.message
+        );
       } finally {
         btn.disabled = false;
         btn.textContent = "⚡ Run AI Analysis";

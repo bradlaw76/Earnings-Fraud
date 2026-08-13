@@ -41,8 +41,12 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
 
 function Test-RelationshipExists([string]$SchemaName) {
     try {
-        Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName" | Out-Null
-        return $true
+        foreach ($type in @("OneToManyRelationshipMetadata", "ManyToManyRelationshipMetadata")) {
+            $path = "RelationshipDefinitions/Microsoft.Dynamics.CRM.${type}?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName"
+            $response = Invoke-Dv "Get" $path
+            if (@($response.value).Count -gt 0) { return $true }
+        }
+        return $false
     } catch { return $false }
 }
 

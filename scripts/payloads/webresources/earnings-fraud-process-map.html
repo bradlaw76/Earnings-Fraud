@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Earnings Fraud Process Map</title>
+  <style>
+    :root {
+      --canvas: #eef3f7;
+      --surface: #ffffff;
+      --surface-strong: #f8fafc;
+      --ink: #17212b;
+      --muted: #5f6b76;
+      --line: #d5dde5;
+      --navy: #12304a;
+      --teal: #007f78;
+      --teal-soft: #dff5f1;
+      --gold: #b36a00;
+      --gold-soft: #fff2d8;
+      --red: #b42318;
+      --red-soft: #fee4e2;
+      --green: #127044;
+      --green-soft: #dcfae6;
+      --focus: #0969da;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font-family: "Aptos", "Segoe UI", sans-serif; font-size: 14px; }
+    button, input, select { font: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(9,105,218,.28); outline-offset: 1px; }
+    .shell { min-height: 100vh; }
+    .masthead { background: var(--navy); color: #fff; padding: 18px 24px 16px; border-bottom: 4px solid var(--teal); }
+    .masthead-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    h1 { margin: 0; font-size: 24px; line-height: 1.15; letter-spacing: 0; }
+    .subtitle { margin-top: 5px; color: #cbd9e5; font-size: 13px; }
+    .refresh { border: 1px solid rgba(255,255,255,.55); background: transparent; color: #fff; padding: 7px 12px; cursor: pointer; border-radius: 4px; }
+    .refresh:hover { background: rgba(255,255,255,.1); }
+    main { padding: 16px 20px 24px; max-width: 1680px; margin: 0 auto; }
+    .scope { display: flex; align-items: center; gap: 8px; color: var(--muted); margin-bottom: 12px; font-size: 12px; }
+    .scope-mark { width: 9px; height: 9px; background: var(--teal); display: inline-block; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 15px; letter-spacing: 0; }
+    .panel-body { padding: 14px; }
+    .filters { display: grid; grid-template-columns: minmax(220px,1.7fr) repeat(4,minmax(130px,1fr)); gap: 10px; }
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    input, select { width: 100%; min-height: 36px; border: 1px solid #aeb9c4; border-radius: 4px; background: #fff; color: var(--ink); padding: 6px 9px; }
+    .kpis { display: grid; grid-template-columns: repeat(7,minmax(110px,1fr)); gap: 10px; margin-bottom: 12px; }
+    .kpi { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--teal); min-height: 84px; padding: 11px 12px; border-radius: 4px; }
+    .kpi.warn { border-top-color: var(--gold); }
+    .kpi.alert { border-top-color: var(--red); }
+    .kpi-value { display: block; font-size: 25px; line-height: 1; font-weight: 750; color: var(--navy); }
+    .kpi-label { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.2; }
+    .map-wrap { overflow: auto; min-height: 390px; background-color: var(--surface-strong); background-image: linear-gradient(#e8edf2 1px,transparent 1px),linear-gradient(90deg,#e8edf2 1px,transparent 1px); background-size: 24px 24px; }
+    #processMap { position: relative; min-width: 960px; min-height: 390px; }
+    #edgeLayer { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+    .edge { fill: none; stroke: #8293a3; stroke-width: 2; marker-end: url(#arrow); }
+    .edge.rework { stroke: var(--gold); stroke-dasharray: 6 4; }
+    .edge-label { fill: var(--navy); font-size: 11px; font-weight: 700; paint-order: stroke; stroke: #f8fafc; stroke-width: 4px; stroke-linejoin: round; }
+    .node { position: absolute; width: 172px; min-height: 76px; transform: translate(-50%,-50%); border: 1px solid #8fa0af; border-left: 5px solid var(--teal); background: #fff; padding: 9px 10px; box-shadow: 0 2px 6px rgba(18,48,74,.12); border-radius: 4px; }
+    .node.terminal { border-left-color: var(--green); }
+    .node.rework { border-left-color: var(--gold); }
+    .node-name { display: block; font-weight: 700; font-size: 12px; line-height: 1.25; }
+    .node-meta { display: flex; justify-content: space-between; gap: 6px; color: var(--muted); font-size: 10px; margin-top: 8px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 11px; }
+    .legend span::before { content: ""; width: 14px; height: 3px; background: #8293a3; display: inline-block; margin-right: 5px; vertical-align: middle; }
+    .legend .loop::before { background: repeating-linear-gradient(90deg,var(--gold) 0 6px,transparent 6px 10px); }
+    .signals { display: grid; grid-template-columns: minmax(500px,1.25fr) minmax(440px,1fr); gap: 12px; margin-bottom: 12px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3,minmax(130px,1fr)); gap: 9px; }
+    .metric { border: 1px solid var(--line); background: var(--surface-strong); padding: 10px; min-height: 78px; border-radius: 4px; }
+    .metric-value { display: block; color: var(--navy); font-size: 20px; font-weight: 750; line-height: 1.1; }
+    .metric-label { display: block; color: var(--muted); font-size: 10px; margin-top: 6px; }
+    .metric-context { display: block; color: var(--muted); font-size: 9px; margin-top: 3px; }
+    .signal-note { margin-top: 10px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .split { display: grid; grid-template-columns: minmax(300px,.8fr) minmax(520px,1.7fr); gap: 12px; }
+    .table-scroll { overflow: auto; max-height: 430px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { position: sticky; top: 0; z-index: 1; background: #edf2f6; color: #475467; text-align: left; padding: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+    td { padding: 8px; border-bottom: 1px solid #e5eaf0; vertical-align: top; }
+    tr[data-case-id] { cursor: pointer; }
+    tr[data-case-id]:hover, tr.selected { background: #e8f5f3; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .badge.good { color: var(--green); background: var(--green-soft); }
+    .badge.warn { color: #8a4b00; background: var(--gold-soft); }
+    .badge.alert { color: var(--red); background: var(--red-soft); }
+    .badge.neutral { color: #475467; background: #e9eef3; }
+    .case-title { font-weight: 700; color: var(--navy); }
+    .empty, .loading, .error { padding: 42px 20px; text-align: center; color: var(--muted); }
+    .error { margin-bottom: 12px; padding: 14px; text-align: left; color: var(--red); background: var(--red-soft); border: 1px solid #f2aaa5; border-radius: 4px; }
+    .muted { color: var(--muted); }
+    .coverage-note { color: var(--muted); font-size: 11px; }
+    @media (max-width: 1100px) {
+      .filters { grid-template-columns: repeat(2,minmax(160px,1fr)); }
+      .filters > div:first-child { grid-column: 1 / -1; }
+      .kpis { grid-template-columns: repeat(4,minmax(110px,1fr)); }
+      .signals { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .masthead { padding: 14px 16px; }
+      h1 { font-size: 20px; }
+      main { padding: 12px; }
+      .filters { grid-template-columns: 1fr; }
+      .filters > div:first-child { grid-column: auto; }
+      .kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="masthead-row">
+        <div>
+          <h1>Earnings Fraud Process Map</h1>
+          <div class="subtitle">Case paths from stored Process Events, aggregated across the EarningsFraud application cohort</div>
+        </div>
+        <button id="refreshButton" class="refresh" type="button" aria-label="Refresh report data">Refresh</button>
+      </div>
+    </header>
+    <main>
+      <div class="scope"><span class="scope-mark"></span><strong>Scope:</strong> DATA-Customer-Application = EarningsFraud (581180001) <span id="asOf"></span></div>
+      <div id="message" role="alert"></div>
+      <section class="panel" aria-labelledby="filterHeading">
+        <div class="panel-head"><h2 id="filterHeading">Report filters</h2><span class="coverage-note">Filters update every view below</span></div>
+        <div class="panel-body filters">
+          <div><label for="caseSearch">Case search</label><input id="caseSearch" type="search" placeholder="Case ID or title"></div>
+          <div><label for="riskFilter">Risk</label><select id="riskFilter"><option value="">All risk levels</option></select></div>
+          <div><label for="statusFilter">Case status</label><select id="statusFilter"><option value="">All statuses</option></select></div>
+          <div><label for="variantFilter">Path variant</label><select id="variantFilter"><option value="">All variants</option></select></div>
+          <div><label for="sourceFilter">Event source</label><select id="sourceFilter"><option value="">All events</option><option value="synthetic">Synthetic included</option><option value="nonsynthetic">Non-synthetic only</option><option value="noevents">Cases without events</option></select></div>
+        </div>
+      </section>
+      <div id="content"><div class="panel loading">Loading live Dataverse Cases and Process Events...</div></div>
+    </main>
+  </div>
+  <script>
+    "use strict";
+    const APPLICATION_CHOICE_VALUE = 581180001;
+    const TERMINAL_PATTERN = /(complete|completed|closed|closure|resolved|resolution|final disposition|case disposition|review finished)/i;
+    const ESCALATION_PATTERN = /(escalat|oig|fraud package)/i;
+    const state = { cases: [], events: [], models: [], filtered: [], selectedCaseId: "" };
+    const formatted = (row, field) => row[`${field}@OData.Community.Display.V1.FormattedValue`] || "";
+    const escapeHtml = value => String(value == null ? "" : value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const toTime = value => value ? new Date(value).getTime() : Number.MAX_SAFE_INTEGER;
+
+    function getClientUrl() {
+      try {
+        const xrm = window.parent && window.parent.Xrm ? window.parent.Xrm : window.Xrm;
+        if (xrm && xrm.Utility) return xrm.Utility.getGlobalContext().getClientUrl();
+      } catch (_) { /* Cross-frame access may be unavailable outside Dynamics. */ }
+      const orgUrl = new URLSearchParams(window.location.search).get("orgUrl");
+      if (orgUrl) return orgUrl.replace(/\/$/, "");
+      throw new Error("Dynamics organization context is unavailable. Open this report from the model-driven app.");
+    }
+
+    async function getAll(url) {
+      const rows = [];
+      let next = url;
+      const headers = { Accept: "application/json", "OData-Version": "4.0", Prefer: 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"' };
+      while (next) {
+        const response = await fetch(next, { credentials: "same-origin", headers });
+        if (!response.ok) throw new Error(`Dataverse request failed (${response.status} ${response.statusText}).`);
+        const payload = await response.json();
+        rows.push(...(payload.value || []));
+        next = payload["@odata.nextLink"] || "";
+      }
+      return rows;
+    }
+
+    function chunks(items, size) {
+      const result = [];
+      for (let index = 0; index < items.length; index += size) result.push(items.slice(index, index + size));
+      return result;
+    }
+
+    async function loadData() {
+      setMessage("");
+      document.getElementById("content").innerHTML = '<div class="panel loading">Loading live Dataverse Cases and Process Events...</div>';
+      const base = `${getClientUrl()}/api/data/v9.2`;
+      const caseQuery = "$select=incidentid,ticketnumber,title,statecode,statuscode,earnint_riskrating,earnint_finaldetermination,modifiedon" +
+        `&$filter=demo_datacustomerapplication eq ${APPLICATION_CHOICE_VALUE}&$orderby=createdon asc`;
+      const cases = await getAll(`${base}/incidents?${caseQuery}`);
+      const eventSelect = "$select=earnint_processeventid,earnint_processevent_name,earnint_activityname,earnint_starttimestamp,earnint_endtimestamp,earnint_resource,earnint_resourcetype,earnint_queueorteam,earnint_previousstatus,earnint_newstatus,earnint_reassignmentindicator,earnint_reworkindicator,earnint_finaldisposition,earnint_sourcesystem,earnint_issyntheticdemoevent,_earnint_caseid_processevent_value";
+      const events = [];
+      for (const batch of chunks(cases.map(row => row.incidentid), 15)) {
+        const filter = batch.map(id => `_earnint_caseid_processevent_value eq ${id}`).join(" or ");
+        events.push(...await getAll(`${base}/earnint_processevents?${eventSelect}&$filter=${encodeURIComponent(filter)}`));
+      }
+      state.cases = cases;
+      state.events = events;
+      state.models = buildModels(cases, events);
+      state.selectedCaseId = state.models.find(model => model.events.length)?.id || state.models[0]?.id || "";
+      populateFilters();
+      applyFilters();
+      document.getElementById("asOf").textContent = ` | Refreshed ${new Date().toLocaleString()}`;
+    }
+
+    function buildModels(cases, events) {
+      const byCase = new Map();
+      for (const event of events) {
+        const id = String(event._earnint_caseid_processevent_value || "").toLowerCase();
+        if (!byCase.has(id)) byCase.set(id, []);
+        byCase.get(id).push(event);
+      }
+      return cases.map(caseRow => {
+        const caseEvents = (byCase.get(String(caseRow.incidentid).toLowerCase()) || []).sort((left, right) =>
+          toTime(left.earnint_starttimestamp) - toTime(right.earnint_starttimestamp) || String(left.earnint_processevent_name).localeCompare(String(right.earnint_processevent_name)));
+        const activities = [];
+        for (const event of caseEvents) {
+          const activity = String(event.earnint_activityname || "Unnamed event").trim();
+          if (activities[activities.length - 1] !== activity) activities.push(activity);
+        }
+        const finalEvent = caseEvents[caseEvents.length - 1];
+        const completed = Boolean(finalEvent && (TERMINAL_PATTERN.test(finalEvent.earnint_activityname || "") || finalEvent.earnint_finaldisposition));
+        const reassigned = caseEvents.some(event => event.earnint_reassignmentindicator === true);
+        const rework = caseEvents.some(event => event.earnint_reworkindicator === true);
+        const escalated = caseEvents.some(event => ESCALATION_PATTERN.test([event.earnint_activityname,event.earnint_queueorteam,event.earnint_finaldisposition].join(" ")));
+        return {
+          id: caseRow.incidentid,
+          label: caseRow.ticketnumber || caseRow.title || caseRow.incidentid,
+          title: caseRow.title || "Untitled Case",
+          risk: formatted(caseRow,"earnint_riskrating") || "Not set",
+          status: formatted(caseRow,"statuscode") || formatted(caseRow,"statecode") || "Unknown",
+          events: caseEvents,
+          activities,
+          variant: activities.length ? activities.join(" > ") : "No Process Events",
+          completed,
+          reassigned,
+          rework,
+          escalated,
+          hasSynthetic: caseEvents.some(event => event.earnint_issyntheticdemoevent === true),
+          hasNonSynthetic: caseEvents.some(event => event.earnint_issyntheticdemoevent !== true)
+        };
+      });
+    }
+
+    function populateSelect(id, values, labeler = value => value) {
+      const select = document.getElementById(id);
+      const first = select.options[0];
+      select.replaceChildren(first);
+      values.forEach(value => select.add(new Option(labeler(value), value)));
+    }
+
+    function populateFilters() {
+      populateSelect("riskFilter", [...new Set(state.models.map(model => model.risk))].sort());
+      populateSelect("statusFilter", [...new Set(state.models.map(model => model.status))].sort());
+      const variants = [...new Set(state.models.map(model => model.variant))].sort();
+      const variantNumber = new Map(variants.map((variant, index) => [variant, `Variant ${index + 1}`]));
+      state.models.forEach(model => { model.variantLabel = variantNumber.get(model.variant); });
+      populateSelect("variantFilter", variants, value => `${variantNumber.get(value)} (${state.models.filter(model => model.variant === value).length} cases)`);
+    }
+
+    function applyFilters() {
+      const query = document.getElementById("caseSearch").value.trim().toLowerCase();
+      const risk = document.getElementById("riskFilter").value;
+      const status = document.getElementById("statusFilter").value;
+      const variant = document.getElementById("variantFilter").value;
+      const source = document.getElementById("sourceFilter").value;
+      state.filtered = state.models.filter(model => {
+        const sourceMatch = !source || (source === "synthetic" && model.hasSynthetic) || (source === "nonsynthetic" && model.hasNonSynthetic) || (source === "noevents" && !model.events.length);
+        return (!query || `${model.label} ${model.title}`.toLowerCase().includes(query)) && (!risk || model.risk === risk) && (!status || model.status === status) && (!variant || model.variant === variant) && sourceMatch;
+      });
+      if (!state.filtered.some(model => model.id === state.selectedCaseId)) state.selectedCaseId = state.filtered.find(model => model.events.length)?.id || state.filtered[0]?.id || "";
+      render();
+    }
+
+    function aggregate(models) {
+      const nodeMap = new Map();
+      const edgeMap = new Map();
+      const mapped = models.filter(model => model.activities.length);
+      for (const model of mapped) {
+        model.activities.forEach((activity, index) => {
+          if (!nodeMap.has(activity)) nodeMap.set(activity, { name: activity, cases: new Set(), positions: [], terminal: false, rework: false });
+          const node = nodeMap.get(activity);
+          node.cases.add(model.id);
+          node.positions.push(index);
+          node.terminal ||= model.completed && index === model.activities.length - 1;
+          node.rework ||= model.rework;
+          if (index === model.activities.length - 1) return;
+          const next = model.activities[index + 1];
+          const key = `${activity}\u0000${next}`;
+          if (!edgeMap.has(key)) edgeMap.set(key, { from: activity, to: next, cases: new Set(), rework: false });
+          const edge = edgeMap.get(key);
+          edge.cases.add(model.id);
+          edge.rework ||= model.rework && model.events.some(event => event.earnint_reworkindicator === true && event.earnint_activityname === next);
+        });
+      }
+      const nodes = [...nodeMap.values()].map(node => ({...node, count: node.cases.size, rank: node.positions.reduce((sum,value) => sum + value,0) / node.positions.length})).sort((a,b) => a.rank - b.rank || a.name.localeCompare(b.name));
+      const edges = [...edgeMap.values()].map(edge => ({...edge, count: edge.cases.size}));
+      return { nodes, edges, mappedCount: mapped.length };
+    }
+
+    function median(values) {
+      if (!values.length) return null;
+      const sorted = [...values].sort((left,right) => left-right);
+      const middle = Math.floor(sorted.length/2);
+      return sorted.length%2 ? sorted[middle] : (sorted[middle-1]+sorted[middle])/2;
+    }
+
+    function formatDuration(milliseconds) {
+      if (milliseconds == null || !Number.isFinite(milliseconds)) return "Insufficient data";
+      const hours = milliseconds/3600000;
+      if (hours < 1) return `${Math.round(hours*60)} min`;
+      if (hours < 48) return `${hours.toFixed(hours<10?1:0)} hr`;
+      return `${(hours/24).toFixed(hours<240?1:0)} days`;
+    }
+
+    function operationalMetrics(models) {
+      const mapped = models.filter(model => model.events.length);
+      const completed = mapped.filter(model => model.completed);
+      const allEvents = mapped.flatMap(model => model.events);
+      const cycleTimes = completed.map(model => {
+        const timestamps = model.events.map(event => toTime(event.earnint_starttimestamp)).filter(value => value !== Number.MAX_SAFE_INTEGER);
+        if (timestamps.length < 2) return null;
+        const duration = timestamps[timestamps.length-1]-timestamps[0];
+        return duration > 0 ? duration : null;
+      }).filter(value => value != null);
+      const straightThrough = completed.filter(model => !model.rework && !model.reassigned).length;
+      const automatedEvents = allEvents.filter(event => /automated workflow|ai agent/i.test(event.earnint_resourcetype || "")).length;
+      let handoffCount = 0;
+      const handoffCases = new Set();
+      const bottleneckGroups = new Map();
+      for (const model of mapped) {
+        for (let index=0; index<model.events.length-1; index++) {
+          const current=model.events[index], next=model.events[index+1];
+          const pairs=[[current.earnint_resource,next.earnint_resource],[current.earnint_resourcetype,next.earnint_resourcetype],[current.earnint_queueorteam,next.earnint_queueorteam]];
+          if (pairs.some(([left,right]) => left && right && String(left).trim().toLowerCase() !== String(right).trim().toLowerCase())) {
+            handoffCount++; handoffCases.add(model.id);
+          }
+          const start=toTime(current.earnint_starttimestamp), end=toTime(next.earnint_starttimestamp);
+          const wait=end-start;
+          if (start===Number.MAX_SAFE_INTEGER || end===Number.MAX_SAFE_INTEGER || wait<=0) continue;
+          const activity=String(current.earnint_activityname || "Unnamed event").trim();
+          if (!bottleneckGroups.has(activity)) bottleneckGroups.set(activity,{activity,waits:[],cases:new Set()});
+          const group=bottleneckGroups.get(activity); group.waits.push(wait); group.cases.add(model.id);
+        }
+      }
+      const bottlenecks=[...bottleneckGroups.values()].map(group => ({
+        activity:group.activity, observations:group.waits.length, cases:group.cases.size,
+        medianWait:median(group.waits), maxWait:Math.max(...group.waits)
+      })).sort((left,right) => right.medianWait-left.medianWait || right.observations-left.observations);
+      return {
+        mappedCount:mapped.length, completedCount:completed.length, eventCount:allEvents.length,
+        coverageRate:models.length?mapped.length/models.length:null,
+        completionRate:mapped.length?completed.length/mapped.length:null,
+        straightThroughRate:completed.length?straightThrough/completed.length:null,
+        automationRate:allEvents.length?automatedEvents/allEvents.length:null,
+        medianCycleTime:median(cycleTimes), cycleTimeCases:cycleTimes.length,
+        handoffCount, handoffCaseCount:handoffCases.size, bottlenecks
+      };
+    }
+
+    function render() {
+      const models = state.filtered;
+      const mapped = models.filter(model => model.events.length);
+      const variants = new Map();
+      models.forEach(model => variants.set(model.variant, (variants.get(model.variant) || 0) + 1));
+      document.getElementById("content").innerHTML = `
+        <div class="kpis">
+          ${kpi(models.length,"Filtered cases")}${kpi(mapped.length,"Cases with events")}${kpi(models.filter(model=>model.completed).length,"Completed paths")}
+          ${kpi(variants.size,"Path variants")}${kpi(models.filter(model=>model.rework).length,"Rework cases","warn")}
+          ${kpi(models.filter(model=>model.reassigned).length,"Reassigned cases","warn")}${kpi(models.filter(model=>model.escalated).length,"Escalated cases","alert")}
+        </div>
+        <section class="panel"><div class="panel-head"><h2>Aggregate case flow</h2><div class="legend"><span>Transition</span><span class="loop">Rework transition</span></div></div><div class="map-wrap"><div id="processMap"></div></div></section>
+        <div class="signals">
+          <section class="panel" style="margin-bottom:0"><div class="panel-head"><h2>Operational signals</h2><span class="coverage-note">Independent measures</span></div><div class="panel-body" id="operationalMetrics"></div></section>
+          <section class="panel" style="margin-bottom:0"><div class="panel-head"><h2>Observed bottlenecks</h2><span class="coverage-note">Activity to next event</span></div><div class="table-scroll" id="bottleneckTable"></div></section>
+        </div>
+        <div class="split">
+          <section class="panel"><div class="panel-head"><h2>Path variants</h2><span class="coverage-note">${mapped.length} mapped / ${models.length} filtered</span></div><div class="table-scroll" id="variantTable"></div></section>
+          <section class="panel"><div class="panel-head"><h2>Case path drill-down</h2><span class="coverage-note">Select a Case from the list</span></div><div id="caseDetail"></div></section>
+        </div>`;
+      renderMap(models);
+      renderOperationalSignals(models);
+      renderVariants(models);
+      renderCaseDetail(models);
+    }
+
+    function kpi(value, label, tone = "") { return `<div class="kpi ${tone}"><span class="kpi-value">${value}</span><span class="kpi-label">${label}</span></div>`; }
+
+    function renderMap(models) {
+      const root = document.getElementById("processMap");
+      const data = aggregate(models);
+      if (!data.nodes.length) { root.innerHTML = '<div class="empty">No stored Process Event paths match the current filters.</div>'; return; }
+      const columns = Math.max(1, Math.ceil(Math.sqrt(data.nodes.length * 1.8)));
+      const rows = Math.ceil(data.nodes.length / columns);
+      const width = Math.max(960, columns * 225 + 90);
+      const height = Math.max(390, rows * 125 + 70);
+      root.style.width = `${width}px`; root.style.height = `${height}px`;
+      const positions = new Map();
+      data.nodes.forEach((node,index) => {
+        const x = 135 + (index % columns) * 225;
+        const y = 80 + Math.floor(index / columns) * 125;
+        positions.set(node.name,{x,y});
+      });
+      root.innerHTML = `<svg id="edgeLayer" viewBox="0 0 ${width} ${height}" aria-hidden="true"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#8293a3"></path></marker></defs>${data.edges.map(edge => edgeSvg(edge,positions,data.mappedCount)).join("")}</svg>` +
+        data.nodes.map(node => { const point=positions.get(node.name); const pct=data.mappedCount?Math.round(node.count/data.mappedCount*100):0; return `<div class="node ${node.terminal?"terminal":""} ${node.rework?"rework":""}" style="left:${point.x}px;top:${point.y}px"><span class="node-name">${escapeHtml(node.name)}</span><span class="node-meta"><span>${node.count} case${node.count===1?"":"s"}</span><span>${pct}%</span></span></div>`; }).join("");
+    }
+
+    function edgeSvg(edge, positions, mappedCount) {
+      const from=positions.get(edge.from), to=positions.get(edge.to);
+      if (!from || !to) return "";
+      const sameRow=Math.abs(from.y-to.y)<10;
+      const path=sameRow ? `M ${from.x+88} ${from.y} C ${from.x+120} ${from.y}, ${to.x-120} ${to.y}, ${to.x-88} ${to.y}` : `M ${from.x} ${from.y+40} C ${from.x} ${from.y+78}, ${to.x} ${to.y-78}, ${to.x} ${to.y-40}`;
+      const labelX=sameRow?(from.x+to.x)/2:from.x+8, labelY=sameRow?from.y-8:(from.y+to.y)/2;
+      const pct=mappedCount?Math.round(edge.count/mappedCount*100):0;
+      return `<path class="edge ${edge.rework?"rework":""}" d="${path}"></path><text class="edge-label" x="${labelX}" y="${labelY}">${edge.count} | ${pct}%</text>`;
+    }
+
+    function renderOperationalSignals(models) {
+      const metrics=operationalMetrics(models);
+      const percent=value => value==null ? "Insufficient data" : `${Math.round(value*100)}%`;
+      document.getElementById("operationalMetrics").innerHTML = `<div class="metric-grid">
+        ${metric(formatDuration(metrics.medianCycleTime),"Median cycle time",`${metrics.cycleTimeCases} completed paths measured`)}
+        ${metric(percent(metrics.completionRate),"Path completion rate",`${metrics.completedCount} of ${metrics.mappedCount} mapped cases`)}
+        ${metric(percent(metrics.straightThroughRate),"Straight-through rate","Completed paths without rework or reassignment")}
+        ${metric(percent(metrics.automationRate),"Automated event share",`${metrics.eventCount} total stored events`)}
+        ${metric(`${metrics.handoffCount}`,"Observed handoffs",`${metrics.handoffCaseCount} affected cases`)}
+        ${metric(percent(metrics.coverageRate),"Event coverage",`${metrics.mappedCount} of ${models.length} filtered cases`)}</div>
+        <div class="signal-note">Cycle and wait measures use stored occurrence timestamps. Handoffs require a populated resource, resource type, or queue/team to change between consecutive events. These observations are process signals, not configured SLA violations.</div>`;
+      const rows=metrics.bottlenecks.slice(0,8).map((item,index) => `<tr><td><span class="badge ${index===0?"alert":index<3?"warn":"neutral"}">${index+1}</span></td><td><strong>${escapeHtml(item.activity)}</strong></td><td>${item.cases}</td><td>${item.observations}</td><td>${formatDuration(item.medianWait)}</td><td>${formatDuration(item.maxWait)}</td></tr>`).join("");
+      document.getElementById("bottleneckTable").innerHTML = rows ? `<table><thead><tr><th>Rank</th><th>Activity</th><th>Cases</th><th>Intervals</th><th>Median wait</th><th>Max wait</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">At least two valid timestamped events per Case are needed to identify bottlenecks.</div>';
+    }
+
+    function metric(value,label,context) { return `<div class="metric"><span class="metric-value">${escapeHtml(value)}</span><span class="metric-label">${escapeHtml(label)}</span><span class="metric-context">${escapeHtml(context)}</span></div>`; }
+
+    function renderVariants(models) {
+      const groups = [...models.reduce((map,model) => { if(!map.has(model.variant))map.set(model.variant,[]); map.get(model.variant).push(model); return map; },new Map()).entries()].sort((a,b)=>b[1].length-a[1].length);
+      document.getElementById("variantTable").innerHTML = groups.length ? `<table><thead><tr><th>Variant</th><th>Cases</th><th>Path</th></tr></thead><tbody>${groups.map(([path,items])=>`<tr><td><span class="badge neutral">${escapeHtml(items[0].variantLabel)}</span></td><td>${items.length}</td><td>${escapeHtml(path)}</td></tr>`).join("")}</tbody></table>` : '<div class="empty">No Cases match the current filters.</div>';
+    }
+
+    function renderCaseDetail(models) {
+      const selected = models.find(model => model.id === state.selectedCaseId);
+      const caseRows = models.map(model => `<tr data-case-id="${model.id}" class="${model.id===state.selectedCaseId?"selected":""}"><td><span class="case-title">${escapeHtml(model.label)}</span><br><span class="muted">${escapeHtml(model.title)}</span></td><td>${escapeHtml(model.risk)}</td><td>${model.events.length}</td><td>${statusBadge(model)}</td></tr>`).join("");
+      const eventRows = selected && selected.events.length ? selected.events.map(event => `<tr><td>${escapeHtml(event.earnint_starttimestamp?new Date(event.earnint_starttimestamp).toLocaleString():"No timestamp")}</td><td><strong>${escapeHtml(event.earnint_activityname)}</strong></td><td>${escapeHtml(event.earnint_resource||"-")}</td><td>${escapeHtml(event.earnint_queueorteam||"-")}</td><td>${escapeHtml([event.earnint_previousstatus,event.earnint_newstatus].filter(Boolean).join(" to ")||"-")}</td><td>${escapeHtml(event.earnint_finaldisposition||"-")}</td></tr>`).join("") : '<tr><td colspan="6">This qualifying Case has no stored Process Events.</td></tr>';
+      document.getElementById("caseDetail").innerHTML = `<div class="table-scroll" style="max-height:210px"><table><thead><tr><th>Case</th><th>Risk</th><th>Events</th><th>Coverage</th></tr></thead><tbody>${caseRows||'<tr><td colspan="4">No Cases match the current filters.</td></tr>'}</tbody></table></div><div class="table-scroll" style="max-height:300px;border-top:1px solid var(--line)"><table><thead><tr><th>Timestamp</th><th>Activity</th><th>Resource</th><th>Queue / Team</th><th>Transition</th><th>Final disposition</th></tr></thead><tbody>${eventRows}</tbody></table></div>`;
+      document.querySelectorAll("tr[data-case-id]").forEach(row => row.addEventListener("click",()=>{state.selectedCaseId=row.dataset.caseId;renderCaseDetail(state.filtered);}));
+    }
+
+    function statusBadge(model) {
+      if (!model.events.length) return '<span class="badge neutral">No events</span>';
+      if (model.completed) return '<span class="badge good">Complete</span>';
+      return '<span class="badge warn">Partial path</span>';
+    }
+
+    function setMessage(text) { document.getElementById("message").innerHTML = text ? `<div class="error">${escapeHtml(text)}</div>` : ""; }
+    document.querySelectorAll("#caseSearch,#riskFilter,#statusFilter,#variantFilter,#sourceFilter").forEach(control => control.addEventListener(control.tagName === "INPUT" ? "input" : "change", applyFilters));
+    document.getElementById("refreshButton").addEventListener("click", () => loadData().catch(error => { setMessage(error.message); document.getElementById("content").innerHTML='<div class="panel empty">The process map could not be loaded. No sample data has been substituted.</div>'; }));
+    loadData().catch(error => { setMessage(error.message); document.getElementById("content").innerHTML='<div class="panel empty">The process map could not be loaded. No sample data has been substituted.</div>'; });
+  </script>
+</body>
+</html>

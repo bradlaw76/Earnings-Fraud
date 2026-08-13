@@ -1,0 +1,35 @@
+{
+  "@odata.type": "Microsoft.Dynamics.CRM.EntityMetadata",
+  "SchemaName": "earnint_processevent",
+  "DisplayName": {
+    "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "Label": "Process Event", "LanguageCode": 1033 }],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "DisplayCollectionName": {
+    "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "Label": "Process Events", "LanguageCode": 1033 }],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "Description": {
+    "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "Label": "Append-only lifecycle events for Process Mining demonstrations", "LanguageCode": 1033 }],
+    "@odata.type": "Microsoft.Dynamics.CRM.Label"
+  },
+  "HasNotes": false,
+  "HasActivities": false,
+  "IsActivity": false,
+  "OwnershipType": "UserOwned",
+  "EntityColor": "#0F6CBD",
+  "Attributes": [{
+    "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+    "IsPrimaryName": true,
+    "SchemaName": "earnint_processevent_name",
+    "AttributeType": "String",
+    "AttributeTypeName": { "Value": "StringType" },
+    "FormatName": { "Value": "Text" },
+    "MaxLength": 300,
+    "DisplayName": {
+      "LocalizedLabels": [{ "@odata.type": "Microsoft.Dynamics.CRM.LocalizedLabel", "Label": "Event Key", "LanguageCode": 1033 }],
+      "@odata.type": "Microsoft.Dynamics.CRM.Label"
+    },
+    "RequiredLevel": { "Value": "ApplicationRequired", "CanBeChanged": true, "ManagedPropertyLogicalName": "canmodifyrequirementlevelsettings" }
+  }]
+}

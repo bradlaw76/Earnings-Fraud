@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Earnings Integrity - Analyst Dashboard</title>
+  <style>
+    :root {
+      --navy: #123d72;
+      --blue: #0067b8;
+      --blue-dark: #004578;
+      --canvas: #f2f6fa;
+      --surface: #ffffff;
+      --line: #d8e0e8;
+      --text: #172334;
+      --muted: #617184;
+      --danger: #c4314b;
+      --warning: #ca7800;
+      --success: #16825d;
+      --purple: #7a3e9d;
+      --teal: #008575;
+      --shadow: 0 2px 8px rgba(20, 47, 75, .09);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--text); font-family: "Segoe UI", Tahoma, sans-serif; font-size: 13px; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .page { min-width: 320px; padding: 12px 14px 24px; }
+    .analyst-bar { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 18px; color: #fff; background: linear-gradient(105deg, #064b91, var(--navy)); border-radius: 8px; box-shadow: var(--shadow); }
+    .identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .avatar { width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; background: rgba(255,255,255,.13); font-size: 16px; font-weight: 700; }
+    .analyst-name { font-size: 14px; font-weight: 700; }
+    .analyst-role { margin-top: 2px; font-size: 11px; opacity: .9; }
+    .analyst-context { margin-top: 2px; font-size: 10px; opacity: .72; }
+    .refresh-area { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .refresh-button { min-height: 30px; padding: 0 12px; color: #fff; border: 1px solid rgba(255,255,255,.32); border-radius: 4px; background: rgba(255,255,255,.12); font-weight: 600; }
+    .updated { font-size: 10px; opacity: .72; }
+    .panel { margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); }
+    .filters { padding: 12px 14px 11px; }
+    .filter-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; color: var(--blue-dark); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .filter-grid { display: grid; grid-template-columns: minmax(260px, 2.5fr) repeat(5, minmax(110px, .65fr)) auto auto; gap: 8px; align-items: end; }
+    label { display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 600; text-transform: uppercase; }
+    input, select { width: 100%; height: 30px; padding: 0 9px; color: var(--text); border: 1px solid #cbd5df; border-radius: 4px; background: #fff; }
+    input:focus, select:focus, button:focus-visible { outline: 2px solid #60a9e6; outline-offset: 1px; }
+    .command { height: 30px; padding: 0 15px; border-radius: 4px; font-weight: 700; }
+    .apply { color: #fff; border: 1px solid var(--blue-dark); background: var(--blue-dark); }
+    .clear { color: var(--text); border: 1px solid #cbd5df; background: #fff; }
+    .scope-chip { display: inline-flex; margin-top: 8px; padding: 3px 8px; color: var(--blue); border-radius: 10px; background: #e8f3fc; font-size: 10px; font-weight: 600; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(8, minmax(104px, 1fr)); gap: 8px; margin-top: 10px; }
+    .kpi { min-height: 88px; display: grid; align-content: center; justify-items: center; gap: 2px; position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); box-shadow: var(--shadow); text-align: center; }
+    .kpi::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--accent); }
+    .kpi-icon { height: 22px; color: var(--accent); font-size: 18px; line-height: 22px; }
+    .kpi-value { font-size: 22px; font-weight: 700; line-height: 25px; }
+    .kpi-label { color: var(--muted); font-size: 9px; text-transform: uppercase; }
+    .sections { display: grid; gap: 8px; margin-top: 10px; }
+    .section { overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); box-shadow: var(--shadow); }
+    .section-toggle { width: 100%; min-height: 39px; display: flex; align-items: center; gap: 9px; padding: 0 14px; color: var(--blue-dark); border: 0; background: #fff; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .section-toggle:hover { background: #f7fafc; }
+    .section-icon { width: 16px; color: var(--accent); font-size: 15px; text-align: center; }
+    .section-count { color: #8190a0; font-weight: 400; }
+    .chevron { margin-left: auto; color: #7b8794; transition: transform .15s ease; }
+    .section.open .chevron { transform: rotate(90deg); }
+    .section-body { display: none; overflow-x: auto; border-top: 1px solid var(--line); }
+    .section.open .section-body { display: block; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { padding: 8px 12px; color: var(--muted); border-bottom: 1px solid var(--line); background: #f6f9fb; text-align: left; font-size: 9px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+    td { padding: 9px 12px; border-bottom: 1px solid #e9eef3; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #f7fbff; }
+    .record-link { padding: 0; color: var(--blue); border: 0; background: transparent; font-weight: 700; text-align: left; }
+    .record-link:hover { text-decoration: underline; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .risk-critical { color: #991b1b; background: #fee2e2; }
+    .risk-high { color: #92400e; background: #fef3c7; }
+    .risk-medium { color: #713f12; background: #fef9c3; }
+    .risk-low { color: #166534; background: #dcfce7; }
+    .status { color: #1e40af; background: #dbeafe; }
+    .status-alert { color: #9a3412; background: #ffedd5; }
+    .money { font-weight: 700; color: var(--danger); }
+    .empty { padding: 20px; color: var(--muted); text-align: center; font-style: italic; }
+    .data-note { margin-top: 9px; color: var(--muted); font-size: 10px; text-align: right; }
+    @media (max-width: 1180px) {
+      .filter-grid { grid-template-columns: 2fr repeat(3, 1fr); }
+      .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 8px; }
+      .analyst-bar { align-items: flex-start; flex-direction: column; }
+      .filter-grid { grid-template-columns: 1fr 1fr; }
+      .filter-grid label:first-child { grid-column: 1 / -1; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="analyst-bar">
+      <div class="identity">
+        <div class="avatar" id="avatar">EI</div>
+        <div>
+          <div class="analyst-name" id="analyst-name">Earnings Integrity Analyst</div>
+          <div class="analyst-role">Case Review Analyst</div>
+          <div class="analyst-context">Earnings Integrity Operations</div>
+        </div>
+      </div>
+      <div class="refresh-area">
+        <button class="refresh-button" id="refresh" type="button" title="Refresh dashboard data">↻ Refresh</button>
+        <span class="updated" id="updated">Loading...</span>
+      </div>
+    </header>
+
+    <section class="panel filters" aria-label="Dashboard filters">
+      <div class="filter-heading"><span>⌕ &nbsp;Filters</span><span id="collapse-label">Expand first section to view records</span></div>
+      <div class="filter-grid">
+        <label>Search<input id="search" type="search" placeholder="Search beneficiary, case #, employer..." autocomplete="off"></label>
+        <label>Case Age<select id="age"><option value="all">All Ages</option><option value="30">Last 30 Days</option><option value="60">Last 60 Days</option><option value="90">90+ Days</option></select></label>
+        <label>Risk Level<select id="risk"><option value="all">All Risk Levels</option><option value="100000003">Critical</option><option value="100000002">High</option><option value="100000001">Medium</option><option value="100000000">Low</option></select></label>
+        <label>Review Phase<select id="phase"><option value="all">All Phases</option><option value="intake">Intake</option><option value="risk">Risk Triage</option><option value="evidence">Evidence Validation</option><option value="analysis">Earnings Analysis</option><option value="supervisor">Supervisor Review</option><option value="disposition">Disposition</option></select></label>
+        <label>Evidence Status<select id="evidence"><option value="all">All Evidence</option><option value="100000000">Not Started</option><option value="100000001">In Progress</option><option value="100000002">Complete</option><option value="100000003">Missing Evidence</option></select></label>
+        <label>Review Type<select id="review-type"><option value="all">All Review Types</option><option value="100000001">Suspicious Wage Report</option><option value="100000002">Unreported Earnings</option><option value="100000003">Underreported Earnings</option><option value="100000004">Late Wage Reporting</option><option value="100000005">Employer Wage Mismatch</option><option value="100000008">Potential Overpayment</option></select></label>
+        <button class="command apply" id="apply" type="button">Apply</button>
+        <button class="command clear" id="clear" type="button">Clear</button>
+      </div>
+      <span class="scope-chip">Active earnings-integrity workload</span>
+    </section>
+
+    <section class="kpi-grid" id="kpis" aria-label="Workload summary"></section>
+    <section class="sections" id="sections" aria-label="Dashboard records"></section>
+    <div class="data-note" id="data-note"></div>
+  </main>
+
+  <script>
+    const LABELS = {
+      risk: {100000000: "Low", 100000001: "Medium", 100000002: "High", 100000003: "Critical"},
+      evidence: {100000000: "Not Started", 100000001: "In Progress", 100000002: "Complete", 100000003: "Missing Evidence"},
+      review: {100000000: "Earnings Integrity", 100000001: "Suspicious Wage Report", 100000002: "Unreported Earnings", 100000003: "Underreported Earnings", 100000004: "Late Wage Reporting", 100000005: "Employer Wage Mismatch", 100000006: "Identity Mismatch", 100000007: "Duplicate Wage Report", 100000008: "Potential Overpayment", 100000009: "Potential Fraud Escalation", 100000010: "Administrative Error"},
+      disposition: {100000000: "Close - No Issue", 100000001: "Request More Information", 100000002: "Create Overpayment Review", 100000003: "Refer for Further Review", 100000004: "Close - Corrected Data", 100000005: "Close - Insufficient Evidence", 100000006: "Contact Employer", 100000007: "Contact Beneficiary", 100000008: "Send for Supervisor Review", 100000009: "Create Fraud Escalation Package", 100000010: "Return for Additional Evidence"}
+    };
+    const SAMPLE = {
+      isSample: true,
+      cases: [
+        {incidentid:"a1", title:"EIR-2025-0041", beneficiary:"Robert Hargrove", employer:"Apex Logistics", earnint_riskrating:100000002, earnint_reviewtype:100000002, earnint_evidencestatus:100000001, earnint_supervisorreviewrequired:true, earnint_supervisorapproval:false, earnint_casedisposition:100000002, createdon:"2026-06-18T14:00:00Z", modifiedon:"2026-08-13T14:20:00Z", statuscode:1, exposure:24800},
+        {incidentid:"a2", title:"EIR-2025-0052", beneficiary:"Maria Castillo", employer:"Northstar Health", earnint_riskrating:100000003, earnint_reviewtype:100000005, earnint_evidencestatus:100000003, earnint_supervisorreviewrequired:true, earnint_supervisorapproval:false, earnint_casedisposition:100000001, createdon:"2026-07-02T14:00:00Z", modifiedon:"2026-08-12T16:10:00Z", statuscode:1, exposure:18400},
+        {incidentid:"a3", title:"EIR-2025-0067", beneficiary:"James Whitfield", employer:"Whitfield Services", earnint_riskrating:100000001, earnint_reviewtype:100000004, earnint_evidencestatus:100000001, earnint_supervisorreviewrequired:false, earnint_supervisorapproval:false, earnint_casedisposition:100000007, createdon:"2026-07-21T14:00:00Z", modifiedon:"2026-08-11T13:05:00Z", statuscode:1, exposure:8750},
+        {incidentid:"a4", title:"EIR-2025-0033", beneficiary:"Patricia Nguyen", employer:"Metro Retail Group", earnint_riskrating:100000002, earnint_reviewtype:100000003, earnint_evidencestatus:100000002, earnint_supervisorreviewrequired:true, earnint_supervisorapproval:true, earnint_casedisposition:100000008, createdon:"2026-05-14T14:00:00Z", modifiedon:"2026-08-10T11:40:00Z", statuscode:1, exposure:11600},
+        {incidentid:"a5", title:"EIR-2026-0014", beneficiary:"Denise Parker", employer:"Cedar Manufacturing", earnint_riskrating:100000000, earnint_reviewtype:100000001, earnint_evidencestatus:100000002, earnint_supervisorreviewrequired:false, earnint_supervisorapproval:false, earnint_casedisposition:100000000, createdon:"2026-08-01T14:00:00Z", modifiedon:"2026-08-09T15:25:00Z", statuscode:1, exposure:3200}
+      ],
+      discrepancies: [
+        {id:"d1", caseId:"a1", name:"Q1-Q2 2025 wage variance", type:"Unreported Earnings", amount:24800, employer:"Apex Logistics", manual:true},
+        {id:"d2", caseId:"a2", name:"Employer-reported wage mismatch", type:"Employer Mismatch", amount:18400, employer:"Northstar Health", manual:true},
+        {id:"d3", caseId:"a3", name:"Late wage reporting variance", type:"Late-Reported Earnings", amount:8750, employer:"Whitfield Services", manual:false},
+        {id:"d4", caseId:"a4", name:"Reported-to-authoritative variance", type:"Underreported Earnings", amount:11600, employer:"Metro Retail Group", manual:true}
+      ],
+      evidence: [
+        {id:"e1", caseId:"a1", name:"Employer wage confirmation", type:"Employer Wage Confirmation", verifiedBy:"J. Reyes", status:"Verified"},
+        {id:"e2", caseId:"a1", name:"Q2 wage statement", type:"W-2 / Tax Wage Document", verifiedBy:"", status:"Review Required"},
+        {id:"e3", caseId:"a2", name:"Beneficiary pay stubs", type:"Pay Stub", verifiedBy:"", status:"Missing Verification"},
+        {id:"e4", caseId:"a4", name:"IRS 1099 evidence", type:"W-2 / Tax Wage Document", verifiedBy:"S. Kim", status:"Verified"}
+      ],
+      findings: [
+        {id:"f1", caseId:"a1", analyst:"J. Reyes", disposition:100000002, summary:"Authoritative wages exceed reported earnings; human review remains required."},
+        {id:"f2", caseId:"a4", analyst:"S. Kim", disposition:100000008, summary:"Evidence reconciled and package prepared for supervisor decision."}
+      ],
+      tasks: [
+        {id:"t1", caseId:"a1", subject:"Validate intake and risk profile", category:"Intake and Risk", due:"2026-08-13T17:00:00Z", priority:2},
+        {id:"t2", caseId:"a1", subject:"Review earnings evidence and gaps", category:"Evidence Review", due:"2026-08-15T17:00:00Z", priority:2},
+        {id:"t3", caseId:"a2", subject:"Prepare follow-up and disposition package", category:"Follow-Up and Disposition", due:"2026-08-14T17:00:00Z", priority:2},
+        {id:"t4", caseId:"a3", subject:"Review earnings evidence and gaps", category:"Evidence Review", due:"2026-08-17T17:00:00Z", priority:1},
+        {id:"t5", caseId:"a4", subject:"Prepare follow-up and disposition package", category:"Follow-Up and Disposition", due:"2026-08-13T17:00:00Z", priority:2}
+      ]
+    };
+
+    let sourceData = SAMPLE;
+    let visibleData = SAMPLE;
+    let xrm = null;
+
+    const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;"}[char]));
+    const formatMoney = value => Number(value || 0).toLocaleString("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0});
+    const formatDate = value => value ? new Date(value).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"}) : "";
+    const caseFor = id => visibleData.cases.find(item => item.incidentid === id) || sourceData.cases.find(item => item.incidentid === id) || {};
+    const riskClass = value => `risk-${(LABELS.risk[value] || "medium").toLowerCase()}`;
+    const phaseFor = item => {
+      if (item.earnint_supervisorreviewrequired && !item.earnint_supervisorapproval && item.earnint_evidencestatus === 100000002) return "supervisor";
+      if (item.earnint_supervisorapproval || item.statuscode === 5) return "disposition";
+      if (item.earnint_evidencestatus === 100000002) return "analysis";
+      if (item.earnint_evidencestatus === 100000001 || item.earnint_evidencestatus === 100000003) return "evidence";
+      if (item.earnint_riskrating != null) return "risk";
+      return "intake";
+    };
+
+    function table(headers, rows) {
+      if (!rows.length) return '<div class="empty">No records match the current filters.</div>';
+      return `<table><thead><tr>${headers.map(header => `<th>${header}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>`;
+    }
+
+    function recordButton(entityName, id, label) {
+      return `<button class="record-link" type="button" data-entity="${entityName}" data-id="${escapeHtml(id)}">${escapeHtml(label)}</button>`;
+    }
+
+    function render() {
+      const activeCases = visibleData.cases.filter(item => item.statuscode !== 5);
+      const openTasks = visibleData.tasks;
+      const pendingEvidence = visibleData.evidence.filter(item => !item.verifiedBy);
+      const pendingFindings = activeCases.filter(item => !visibleData.findings.some(finding => finding.caseId === item.incidentid));
+      const pendingApproval = activeCases.filter(item => item.earnint_supervisorreviewrequired && !item.earnint_supervisorapproval);
+      const highRisk = activeCases.filter(item => item.earnint_riskrating >= 100000002);
+      const totalExposure = activeCases.reduce((sum, item) => sum + Number(item.exposure || 0), 0);
+      const recentCases = [...visibleData.cases].sort((a, b) => new Date(b.modifiedon) - new Date(a.modifiedon)).slice(0, 10);
+
+      const kpis = [
+        ["▤", activeCases.length, "Active Investigations", "#0067b8"],
+        ["!", highRisk.length, "High / Critical Risk", "#c4314b"],
+        ["≠", visibleData.discrepancies.length, "Earnings Discrepancies", "#7a3e9d"],
+        ["▱", pendingEvidence.length, "Evidence to Review", "#ca7800"],
+        ["✓", visibleData.findings.length, "Findings Recorded", "#008575"],
+        ["⌛", pendingApproval.length, "Pending Supervisor", "#9a5b00"],
+        ["☑", openTasks.length, "Open Tasks", "#16825d"],
+        ["$", formatMoney(totalExposure), "Open Exposure", "#123d72"]
+      ];
+      document.getElementById("kpis").innerHTML = kpis.map(([icon, value, label, color]) => `<article class="kpi" style="--accent:${color}"><div class="kpi-icon">${icon}</div><div class="kpi-value">${value}</div><div class="kpi-label">${label}</div></article>`).join("");
+
+      const caseRows = activeCases.map(item => `<tr><td>${recordButton("incident", item.incidentid, item.title)}</td><td>${escapeHtml(item.beneficiary)}</td><td>${escapeHtml(LABELS.review[item.earnint_reviewtype] || "Earnings Integrity Review")}</td><td><span class="badge ${riskClass(item.earnint_riskrating)}">${escapeHtml(LABELS.risk[item.earnint_riskrating] || "Not rated")}</span></td><td>${escapeHtml(phaseFor(item).replace(/^./, value => value.toUpperCase()))}</td><td class="money">${formatMoney(item.exposure)}</td><td>${formatDate(item.modifiedon)}</td></tr>`);
+      const discrepancyRows = visibleData.discrepancies.map(item => { const parent = caseFor(item.caseId); return `<tr><td>${recordButton("earnint_earningsdiscrepancy", item.id, item.name)}</td><td>${escapeHtml(parent.title)}</td><td>${escapeHtml(parent.beneficiary)}</td><td>${escapeHtml(item.employer)}</td><td>${escapeHtml(item.type)}</td><td class="money">${formatMoney(item.amount)}</td><td><span class="badge ${item.manual ? "status-alert" : "status"}">${item.manual ? "Manual Review" : "Analyst Review"}</span></td></tr>`; });
+      const evidenceRows = visibleData.evidence.filter(item => !item.verifiedBy).map(item => { const parent = caseFor(item.caseId); return `<tr><td>${recordButton("earnint_evidenceitem", item.id, item.name)}</td><td>${escapeHtml(parent.title)}</td><td>${escapeHtml(parent.beneficiary)}</td><td>${escapeHtml(item.type)}</td><td><span class="badge status-alert">${escapeHtml(item.status)}</span></td><td>${escapeHtml(LABELS.risk[parent.earnint_riskrating] || "")}</td></tr>`; });
+      const findingRows = visibleData.findings.map(item => { const parent = caseFor(item.caseId); return `<tr><td>${recordButton("earnint_investigationfinding", item.id, parent.title || "Finding")}</td><td>${escapeHtml(parent.beneficiary)}</td><td>${escapeHtml(item.analyst)}</td><td>${escapeHtml(LABELS.disposition[item.disposition] || "Pending")}</td><td>${escapeHtml(item.summary)}</td></tr>`; });
+      const taskRows = openTasks.map(item => { const parent = caseFor(item.caseId); const overdue = item.due && new Date(item.due) < new Date(); return `<tr><td>${recordButton("task", item.id, item.subject)}</td><td>${escapeHtml(parent.title)}</td><td>${escapeHtml(parent.beneficiary)}</td><td>${escapeHtml(item.category)}</td><td><span class="badge ${overdue ? "status-alert" : "status"}">${formatDate(item.due)}${overdue ? " · Overdue" : ""}</span></td><td>${item.priority === 2 ? "High" : "Normal"}</td></tr>`; });
+      const recentRows = recentCases.map(item => `<tr><td>${recordButton("incident", item.incidentid, item.title)}</td><td>${escapeHtml(item.beneficiary)}</td><td>${escapeHtml(LABELS.review[item.earnint_reviewtype] || "Earnings Integrity Review")}</td><td>${escapeHtml(LABELS.evidence[item.earnint_evidencestatus] || "Not set")}</td><td>${escapeHtml(LABELS.disposition[item.earnint_casedisposition] || "In review")}</td><td>${formatDate(item.modifiedon)}</td></tr>`);
+
+      const sections = [
+        {id:"cases", icon:"▤", label:"My Investigations", count:activeCases.length, color:"#0067b8", content:table(["Case", "Beneficiary", "Review Type", "Risk", "Phase", "Exposure", "Modified"], caseRows)},
+        {id:"discrepancies", icon:"≠", label:"Earnings Discrepancies", count:visibleData.discrepancies.length, color:"#7a3e9d", content:table(["Discrepancy", "Case", "Beneficiary", "Employer", "Type", "Amount", "Review"], discrepancyRows)},
+        {id:"evidence", icon:"▱", label:"Evidence Requiring Review", count:pendingEvidence.length, color:"#ca7800", content:table(["Evidence", "Case", "Beneficiary", "Type", "Status", "Case Risk"], evidenceRows)},
+        {id:"findings", icon:"✓", label:"Investigation Findings", count:visibleData.findings.length, color:"#008575", content:table(["Case", "Beneficiary", "Analyst", "Recommended Outcome", "Finding Summary"], findingRows)},
+        {id:"tasks", icon:"☑", label:"My Open Tasks", count:openTasks.length, color:"#16825d", content:table(["Task", "Case", "Beneficiary", "Work Category", "Due", "Priority"], taskRows)},
+        {id:"recent", icon:"↻", label:"Recent Case Activity", count:recentCases.length, color:"#123d72", content:table(["Case", "Beneficiary", "Review Type", "Evidence", "Outcome", "Modified"], recentRows)}
+      ];
+      const openIds = new Set([...document.querySelectorAll(".section.open")].map(section => section.dataset.section));
+      document.getElementById("sections").innerHTML = sections.map((section, index) => `<article class="section ${openIds.has(section.id) || (!openIds.size && index === 0) ? "open" : ""}" data-section="${section.id}" style="--accent:${section.color}"><button class="section-toggle" type="button" aria-expanded="${openIds.has(section.id) || (!openIds.size && index === 0)}"><span class="section-icon">${section.icon}</span><span>${section.label}</span><span class="section-count">(${section.count})</span><span class="chevron">›</span></button><div class="section-body">${section.content}</div></article>`).join("");
+      document.getElementById("data-note").textContent = sourceData.isSample ? "Preview mode: fictional sample data. Deploy as a Dataverse HTML web resource to load live records." : `Live Dataverse data · ${pendingFindings.length} active cases still need a recorded finding`;
+      bindRecordButtons();
+    }
+
+    function applyFilters() {
+      const search = document.getElementById("search").value.trim().toLowerCase();
+      const age = document.getElementById("age").value;
+      const risk = document.getElementById("risk").value;
+      const phase = document.getElementById("phase").value;
+      const evidence = document.getElementById("evidence").value;
+      const reviewType = document.getElementById("review-type").value;
+      const now = new Date();
+      const cases = sourceData.cases.filter(item => {
+        const ageDays = (now - new Date(item.createdon)) / 86400000;
+        const matchesAge = age === "all" || (age === "90" ? ageDays >= 90 : ageDays <= Number(age));
+        const text = `${item.title} ${item.beneficiary} ${item.employer}`.toLowerCase();
+        return (!search || text.includes(search)) && matchesAge && (risk === "all" || item.earnint_riskrating === Number(risk)) && (phase === "all" || phaseFor(item) === phase) && (evidence === "all" || item.earnint_evidencestatus === Number(evidence)) && (reviewType === "all" || item.earnint_reviewtype === Number(reviewType));
+      });
+      const ids = new Set(cases.map(item => item.incidentid));
+      visibleData = {...sourceData, cases, discrepancies:sourceData.discrepancies.filter(item => ids.has(item.caseId)), evidence:sourceData.evidence.filter(item => ids.has(item.caseId)), findings:sourceData.findings.filter(item => ids.has(item.caseId)), tasks:sourceData.tasks.filter(item => ids.has(item.caseId))};
+      render();
+    }
+
+    function clearFilters() {
+      document.getElementById("search").value = "";
+      ["age", "risk", "phase", "evidence", "review-type"].forEach(id => document.getElementById(id).value = "all");
+      visibleData = sourceData;
+      render();
+    }
+
+    function bindRecordButtons() {
+      document.querySelectorAll(".record-link").forEach(button => button.addEventListener("click", () => {
+        if (xrm?.Navigation?.openForm && button.dataset.id && !sourceData.isSample) xrm.Navigation.openForm({entityName:button.dataset.entity, entityId:button.dataset.id});
+      }));
+    }
+
+    async function getJson(url, headers) {
+      const response = await fetch(url, {headers});
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    }
+
+    async function loadData() {
+      document.getElementById("updated").textContent = "Refreshing...";
+      try {
+        xrm = window.parent?.Xrm || window.Xrm || null;
+        if (!xrm) throw new Error("Dataverse context is unavailable");
+        const context = xrm.Utility.getGlobalContext();
+        const clientUrl = context.getClientUrl();
+        const userName = context.userSettings.userName || "Earnings Integrity Analyst";
+        document.getElementById("analyst-name").textContent = userName;
+        document.getElementById("avatar").textContent = userName.split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+        const base = `${clientUrl}/api/data/v9.2`;
+        const headers = {"Accept":"application/json", "OData-MaxVersion":"4.0", "OData-Version":"4.0", "Prefer":'odata.include-annotations="OData.Community.Display.V1.FormattedValue"'};
+        const [caseResult, discrepancyResult, evidenceResult, findingResult, taskResult] = await Promise.all([
+          getJson(`${base}/incidents?$select=incidentid,title,createdon,modifiedon,statuscode,earnint_riskrating,earnint_reviewtype,earnint_evidencestatus,earnint_supervisorreviewrequired,earnint_supervisorapproval,earnint_casedisposition,_customerid_value&$filter=startswith(title,'EIR')&$orderby=modifiedon desc&$top=100`, headers),
+          getJson(`${base}/earnint_earningsdiscrepancies?$select=earnint_earningsdiscrepancyid,earnint_name,earnint_discrepancytype,earnint_discrepancyamount,earnint_employername,earnint_requiresmanualreview,_earnint_caseid_discrepancy_value&$top=250`, headers),
+          getJson(`${base}/earnint_evidenceitems?$select=earnint_evidenceitemid,earnint_name,earnint_evidencetype,earnint_verifiedby,_earnint_caseid_evidence_value&$top=250`, headers),
+          getJson(`${base}/earnint_investigationfindings?$select=earnint_investigationfindingid,earnint_analystname,earnint_recddisposition,earnint_findingsummary,_earnint_caseid_finding_value&$top=250`, headers),
+          getJson(`${base}/tasks?$select=activityid,subject,category,scheduledend,prioritycode,_regardingobjectid_value&$filter=statecode eq 0 and startswith(subject,'EIR Work Item ')&$orderby=scheduledend asc&$top=250`, headers)
+        ]);
+        const discrepancies = discrepancyResult.value || [];
+        const cases = (caseResult.value || []).map(item => ({...item, beneficiary:item["_customerid_value@OData.Community.Display.V1.FormattedValue"] || "", employer:"", exposure:discrepancies.filter(row => row._earnint_caseid_discrepancy_value === item.incidentid).reduce((sum, row) => sum + Number(row.earnint_discrepancyamount || 0), 0)}));
+        sourceData = {
+          isSample:false,
+          cases,
+          discrepancies:discrepancies.map(item => ({id:item.earnint_earningsdiscrepancyid, caseId:item._earnint_caseid_discrepancy_value, name:item.earnint_name || "Earnings discrepancy", type:item["earnint_discrepancytype@OData.Community.Display.V1.FormattedValue"] || "Requires Review", amount:item.earnint_discrepancyamount, employer:item.earnint_employername || "", manual:item.earnint_requiresmanualreview === true})),
+          evidence:(evidenceResult.value || []).map(item => ({id:item.earnint_evidenceitemid, caseId:item._earnint_caseid_evidence_value, name:item.earnint_name || "Evidence item", type:item["earnint_evidencetype@OData.Community.Display.V1.FormattedValue"] || "Document", verifiedBy:item.earnint_verifiedby || "", status:item.earnint_verifiedby ? "Verified" : "Review Required"})),
+          findings:(findingResult.value || []).map(item => ({id:item.earnint_investigationfindingid, caseId:item._earnint_caseid_finding_value, analyst:item.earnint_analystname || "", disposition:item.earnint_recddisposition, summary:item.earnint_findingsummary || ""})),
+          tasks:(taskResult.value || []).filter(item => cases.some(caseItem => caseItem.incidentid === item._regardingobjectid_value)).map(item => ({id:item.activityid, caseId:item._regardingobjectid_value, subject:item.subject, category:item.category || "Case Review", due:item.scheduledend, priority:item.prioritycode}))
+        };
+        visibleData = sourceData;
+      } catch (error) {
+        sourceData = SAMPLE;
+        visibleData = SAMPLE;
+      }
+      render();
+      document.getElementById("updated").textContent = `Updated ${new Date().toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit"})}`;
+    }
+
+    document.getElementById("sections").addEventListener("click", event => {
+      const toggle = event.target.closest(".section-toggle");
+      if (!toggle) return;
+      const section = toggle.closest(".section");
+      section.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(section.classList.contains("open")));
+    });
+    document.getElementById("apply").addEventListener("click", applyFilters);
+    document.getElementById("clear").addEventListener("click", clearFilters);
+    document.getElementById("refresh").addEventListener("click", loadData);
+    document.getElementById("search").addEventListener("keydown", event => { if (event.key === "Enter") applyFilters(); });
+    loadData();
+  </script>
+</body>
+</html>
