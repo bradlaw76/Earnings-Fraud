@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSA Earnings Integrity - 7-Minute Demo Talk Track</title>
+  <script>
+    (() => {
+      const requestedTheme = new URLSearchParams(window.location.search).get("clawpilotTheme");
+      const theme = requestedTheme ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ef;
+      --surface: #ffffff;
+      --surface-soft: #f5f5f5;
+      --border: #dedede;
+      --text: #242424;
+      --muted: #5c5c5c;
+      --accent: #b11f4b;
+      --accent-soft: rgba(177, 31, 75, 0.09);
+      --accent-fg: #ffffff;
+      --success: #167a3f;
+      --warning: #a15c00;
+      --link: #0067b8;
+      --shadow: 0 16px 42px rgba(0, 0, 0, 0.12);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #343231;
+      --surface: #292929;
+      --surface-soft: #333333;
+      --border: #515151;
+      --text: #f0f0f0;
+      --muted: #b8b8b8;
+      --accent: #fd8ea1;
+      --accent-soft: rgba(253, 142, 161, 0.14);
+      --accent-fg: #1a1a1a;
+      --success: #67d990;
+      --warning: #ffc66d;
+      --link: #6cb8f5;
+      --shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Aptos, Calibri, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    button { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 22px;
+      padding: 12px 28px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .brand h1 { margin: 0; font-size: 1.08rem; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 0.78rem; }
+    .timer {
+      min-width: 112px;
+      text-align: center;
+      font-size: 1.65rem;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+    }
+    .timer.overtime { color: #d13438; }
+    .controls { display: flex; gap: 7px; }
+    .button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      background: var(--surface);
+      cursor: pointer;
+    }
+    .button:hover { background: var(--surface-soft); }
+    .button.primary {
+      border-color: var(--accent);
+      color: var(--accent-fg);
+      background: var(--accent);
+      font-weight: 700;
+    }
+    .progress {
+      position: absolute;
+      inset: auto 0 -1px;
+      height: 4px;
+      background: var(--border);
+    }
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.25s linear;
+    }
+
+    main { width: min(1060px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 64px; }
+    .brief {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .panel, .scene {
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.035);
+    }
+    .panel { padding: 16px 18px; }
+    .eyebrow {
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 750;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .panel h2 { margin: 5px 0 7px; font-size: 1rem; }
+    .panel p { margin: 0; color: var(--muted); font-size: 0.84rem; }
+    .start-path { margin-top: 9px; color: var(--link); font-weight: 650; }
+    .guardrail { border-left: 4px solid var(--warning); }
+
+    .scene {
+      display: grid;
+      grid-template-columns: 105px 1fr;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .scene-time {
+      padding: 18px 12px;
+      text-align: center;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-right: 1px solid var(--border);
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+    }
+    .scene-time strong { display: block; font-size: 1rem; }
+    .scene-time span { color: var(--muted); font-size: 0.7rem; font-weight: 600; }
+    .scene-body { padding: 16px 18px 18px; }
+    .scene-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .scene-heading h2 { margin: 0; font-size: 1.02rem; }
+    .duration {
+      flex: 0 0 auto;
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: var(--success);
+      background: color-mix(in srgb, var(--success) 12%, transparent);
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+    .click-cue {
+      margin: 10px 0;
+      padding: 8px 11px;
+      border-radius: 7px;
+      background: var(--surface-soft);
+      color: var(--link);
+      font-size: 0.8rem;
+      font-weight: 650;
+    }
+    .click-cue::before { content: "ON SCREEN: "; color: var(--muted); font-size: 0.67rem; }
+    blockquote {
+      margin: 0;
+      padding: 0 0 0 14px;
+      border-left: 3px solid var(--accent);
+      color: var(--text);
+      font-size: 0.93rem;
+      line-height: 1.68;
+    }
+    blockquote p { margin: 0 0 8px; }
+    blockquote p:last-child { margin-bottom: 0; }
+    .feature-pairs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 12px;
+    }
+    .feature-pairs h3 {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--link);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .feature-pair {
+      padding: 8px 10px;
+      border: 1px solid color-mix(in srgb, var(--link) 24%, var(--border));
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--link) 6%, var(--surface));
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.4;
+    }
+    .feature-pair strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text);
+      font-size: 0.78rem;
+    }
+    .beat {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.77rem;
+      font-weight: 650;
+    }
+    .beat::before { content: "LAND THIS: "; color: var(--accent); font-size: 0.67rem; }
+
+    .checklist { list-style: none; margin: 0; padding: 0; }
+    .checklist li { display: flex; gap: 9px; padding: 4px 0; font-size: 0.84rem; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); }
+
+    @media (max-width: 760px) {
+      .topbar { grid-template-columns: 1fr auto; padding: 10px 14px; }
+      .controls { grid-column: 1 / -1; justify-content: flex-end; }
+      .brief { grid-template-columns: 1fr; }
+      .scene { grid-template-columns: 78px 1fr; }
+      .feature-pairs { grid-template-columns: 1fr; }
+      main { width: min(100% - 20px, 1060px); }
+    }
+
+    @media print {
+      .topbar { position: static; box-shadow: none; }
+      .controls, .progress { display: none; }
+      main { width: 100%; padding: 14px; }
+      .scene { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>SSA Earnings Integrity Case Review V2</h1>
+      <p>Seven-minute recording talk track | Hero case: EIR-2025-0041</p>
+    </div>
+    <div class="timer" id="timer" aria-live="polite">07:00</div>
+    <div class="controls">
+      <button class="button primary" id="timerButton" type="button">Start timer</button>
+      <button class="button" id="resetButton" type="button">Reset</button>
+      <button class="button" id="themeButton" type="button">Theme</button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+  </header>
+
+  <main>
+    <section class="brief">
+      <div class="panel">
+        <div class="eyebrow">Recording setup</div>
+        <h2>Start on the active case queue</h2>
+        <p>Pre-open the Hargrove case in a second tab. Keep browser zoom near 90% and close unrelated tabs and notifications.</p>
+        <div class="start-path">Earnings Integrity V2 Demo App &gt; Cases &gt; Active Cases - DATA</div>
+      </div>
+      <div class="panel guardrail">
+        <div class="eyebrow">Pacing guardrail</div>
+        <h2>Show the outcome, not every field</h2>
+        <p>If time slips, skip extra records. Do not skip the supervisor decision or audit-trail close.</p>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>0:00</strong><span>to 0:40</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>1. Set the mission</h2>
+          <span class="duration">40 seconds</span>
+        </div>
+        <div class="click-cue">Active Cases - DATA view; do not click yet.</div>
+        <blockquote>
+          <p>SSA receives wage information from beneficiaries, employers, and authoritative feeds. When those sources do not agree, an analyst must determine what happened, document the evidence, and route the case to the right outcome.</p>
+          <p>Dynamics 365 Customer Service supplies the case lifecycle, Dataverse supplies the connected data, and Power Platform supplies the automation and reporting. Together they turn that review into one structured, auditable process without building a new case-management platform.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Customer Service case management</strong>The discrepancy becomes a governed work item with an owner, priority, status, activities, and resolution.</div>
+          <div class="feature-pair"><strong>Power Platform foundation</strong>Dataverse, Power Automate, Power BI, and Copilot can extend the same case without creating another data silo.</div>
+        </div>
+        <div class="beat">SSA configures its process on a proven platform instead of building case management from scratch.</div>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>0:40</strong><span>to 1:25</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>2. Show the operational queue</h2>
+          <span class="duration">45 seconds</span>
+        </div>
+        <div class="click-cue">Point to priority, status, customer, and the four seeded cases.</div>
+        <blockquote>
+          <p>This is the analyst intake queue. Each referral is a standard Dynamics 365 case, with a beneficiary, priority, owner, status, timeline, and service history already built in.</p>
+          <p>Dynamics queues and unified routing can place new referrals with the right team based on risk, workload, or specialty. Views then give a supervisor a live operational picture: sort by risk, filter by status, and identify cases waiting for action. Four cases are shown for the demo, but the same model scales to thousands.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Queues and unified routing</strong>A new wage referral reaches the appropriate analyst team instead of sitting in a shared mailbox.</div>
+          <div class="feature-pair"><strong>Model-driven views and charts</strong>The supervisor sees current workload and risk from live Dataverse data without exporting a spreadsheet.</div>
+          <div class="feature-pair"><strong>Ownership and security roles</strong>Assigned analysts work the case while supervisors retain the permissions needed to review and approve.</div>
+          <div class="feature-pair"><strong>Service-level tracking</strong>SLA timers and escalation rules can make aging or high-risk referrals visible before deadlines are missed.</div>
+        </div>
+        <div class="beat">The queue is live operational visibility, not a spreadsheet or a point-in-time report.</div>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>1:25</strong><span>to 2:40</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>3. Open the Hargrove case</h2>
+          <span class="duration">75 seconds</span>
+        </div>
+        <div class="click-cue">Open EIR-2025-0041; point to the BPF, description, risk, disposition, and approval.</div>
+        <blockquote>
+          <p>Our hero record is EIR-2025-0041 for Robert Hargrove. An IRS W-2 from Apex Logistics shows 24,800 dollars in wages while the beneficiary reported zero income.</p>
+          <p>Across the top, the Business Process Flow gives every analyst the same review path and can require the right information before a stage advances. The configurable model-driven form keeps standard case fields beside SSA-specific fields: discrepancy type, risk rating, proposed disposition, and supervisor approval.</p>
+          <p>The timeline keeps calls, notes, emails, tasks, and status changes in context. The current recommendation is to create an overpayment review, but supervisor approval is still No. That explicit, role-secured decision gate prevents the case from quietly moving to resolution.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Business Process Flow</strong>The Hargrove review follows visible stages with required data and consistent handoffs from intake to resolution.</div>
+          <div class="feature-pair"><strong>Configurable case form</strong>SSA adds fraud-review vocabulary while retaining the standard case lifecycle and platform services.</div>
+          <div class="feature-pair"><strong>Timeline and activities</strong>Calls, notes, emails, and tasks remain chronologically attached to the beneficiary's case.</div>
+          <div class="feature-pair"><strong>Role-based security</strong>The analyst can recommend an outcome while the supervisor retains authority for the approval decision.</div>
+        </div>
+        <div class="beat">The custom work is SSA's domain vocabulary; workflow, security, ownership, and audit come from Dynamics 365.</div>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>2:40</strong><span>to 4:10</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>4. Trace discrepancy to evidence</h2>
+          <span class="duration">90 seconds</span>
+        </div>
+        <div class="click-cue">Show Hargrove Q1 and Q2 discrepancy records, then the evidence records.</div>
+        <blockquote>
+          <p>The quantitative core of the review is stored as structured discrepancy data. For Q1 and Q2 of 2025, Hargrove reported zero dollars. The authoritative wage source shows 12,400 dollars in each quarter, producing the 24,800-dollar total.</p>
+          <p>Dataverse relationships connect each quarter and employer to the parent case. Because these are secured records rather than text in a note, SSA can aggregate exposure, filter by employer or period, validate data, and trigger downstream automation.</p>
+          <p>The evidence package is structured the same way. The W-2, employer verification, beneficiary statement, and wage-feed match each carry a type, source reference, description, and verification status. Power Automate can create tasks or notifications when evidence is missing, while the reviewer can see exactly what supports the conclusion and what still needs attention.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Dataverse relationships</strong>Quarterly discrepancies, evidence, findings, and the beneficiary remain connected to one authoritative case.</div>
+          <div class="feature-pair"><strong>Business rules and validation</strong>Required values and controlled choices improve consistency before an analyst advances the review.</div>
+          <div class="feature-pair"><strong>Power Automate</strong>Incoming wage matches can create discrepancy records, assign follow-up tasks, and notify the responsible reviewer.</div>
+          <div class="feature-pair"><strong>Document integration</strong>Evidence metadata stays in the case while governed source documents can remain in SharePoint.</div>
+        </div>
+        <div class="beat">Every conclusion can be traced from source data to verified evidence.</div>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>4:10</strong><span>to 5:45</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>5. Move from analyst finding to supervisor decision</h2>
+          <span class="duration">95 seconds</span>
+        </div>
+        <div class="click-cue">Open the Hargrove finding, then the Supervisor Case Summary Report V2.</div>
+        <blockquote>
+          <p>The analyst's formal work product is the Investigation Finding. It combines a finding type, recommended disposition, analyst identity, and narrative details in one reviewable Dataverse record.</p>
+          <p>For the supervisor, the embedded case summary brings the key facts onto one page: beneficiary context, discrepancy totals, evidence readiness, analyst conclusion, and the proposed decision. The supervisor does not need to reconstruct the case from emails, attachments, and separate systems.</p>
+          <p>Dynamics can surface that summary directly on the case form, route an approval task, and notify the supervisor in the tools they already use. Copilot can later summarize the case and ground a draft narrative in the same approved records. The supervisor still owns the decision: approve the recommendation or return the case for more work.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Embedded web resource</strong>The Supervisor Case Summary converts connected case data into a focused decision brief without leaving the form.</div>
+          <div class="feature-pair"><strong>Power Automate approvals</strong>A completed finding can create a supervisor task, send a notification, and record the response against the case.</div>
+          <div class="feature-pair"><strong>Copilot in Customer Service</strong>Case summarization and knowledge grounding can reduce reading time while the human remains accountable.</div>
+          <div class="feature-pair"><strong>Teams and Outlook integration</strong>Notifications and collaboration can happen in familiar channels while the case remains the system of record.</div>
+        </div>
+        <div class="beat">The right information reaches the right decision-maker with a complete chain of evidence.</div>
+      </div>
+    </section>
+
+    <section class="scene">
+      <div class="scene-time"><strong>5:45</strong><span>to 7:00</span></div>
+      <div class="scene-body">
+        <div class="scene-heading">
+          <h2>6. Prove the lifecycle and close</h2>
+          <span class="duration">75 seconds</span>
+        </div>
+        <div class="click-cue">Open resolved case EIR-2025-0033, show Approval = Yes and Resolved, then return to the queue.</div>
+        <blockquote>
+          <p>The Nguyen case shows the completed lifecycle. The evidence was reviewed, the finding was documented, supervisor approval changed to Yes, and the standard case-resolution process captured an explicit disposition.</p>
+          <p>Dynamics audit history preserves who changed the decision, when it changed, and its previous value. Field security, record ownership, and retention policies protect the record throughout its lifecycle. If OIG, program leadership, or an authorized reviewer asks how SSA reached the outcome, the answer is attached to the case.</p>
+          <p>Operational charts can show cases by stage, risk, disposition, and pending approval, while Power BI can provide program-level trends from the same Dataverse data. What you have seen is one connected process: intake, triage, discrepancy analysis, evidence, finding, supervisor decision, and resolution.</p>
+          <p>The next step is to map SSA's current triage and approval stages to this workflow.</p>
+        </blockquote>
+        <div class="feature-pairs">
+          <h3>Dynamics feature paired to the story</h3>
+          <div class="feature-pair"><strong>Case resolution</strong>Nguyen closes through a defined disposition, producing a measurable outcome instead of an ambiguous completed status.</div>
+          <div class="feature-pair"><strong>Dataverse auditing</strong>The approval change retains user, timestamp, old value, and new value for a defensible review history.</div>
+          <div class="feature-pair"><strong>Dashboards and Power BI</strong>Leaders move from one resolved case to trends in exposure, aging, risk, and approval backlog.</div>
+          <div class="feature-pair"><strong>Platform governance</strong>Security roles, environment controls, solutions, and data policies support managed enterprise deployment.</div>
+        </div>
+        <div class="beat">No ambiguous outcomes, no lost handoffs, and a defensible audit trail from referral to resolution.</div>
+      </div>
+    </section>
+
+    <section class="brief">
+      <div class="panel">
+        <div class="eyebrow">Pre-record checklist</div>
+        <ul class="checklist">
+          <li><input type="checkbox" /> Hargrove case EIR-2025-0041 is open and shows Supervisor Approval = No.</li>
+          <li><input type="checkbox" /> Supervisor Case Summary Report V2 loads on the case form.</li>
+          <li><input type="checkbox" /> Nguyen case EIR-2025-0033 is resolved and shows Supervisor Approval = Yes.</li>
+          <li><input type="checkbox" /> Notifications are off and no beneficiary-sensitive production data is visible.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="eyebrow">Recovery line</div>
+        <h2>If a screen is slow</h2>
+        <p>"While that loads, the important point is that each object remains part of the same Dataverse case record, secured and audited under the same platform controls."</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const durationSeconds = 7 * 60;
+    let remainingSeconds = durationSeconds;
+    let timerId = null;
+
+    const timer = document.getElementById("timer");
+    const timerButton = document.getElementById("timerButton");
+    const progressBar = document.getElementById("progressBar");
+
+    function renderTimer() {
+      const absoluteSeconds = Math.abs(remainingSeconds);
+      const minutes = Math.floor(absoluteSeconds / 60);
+      const seconds = absoluteSeconds % 60;
+      timer.textContent = `${remainingSeconds < 0 ? "+" : ""}${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      timer.classList.toggle("overtime", remainingSeconds < 0);
+      const elapsed = Math.min(durationSeconds, durationSeconds - remainingSeconds);
+      progressBar.style.width = `${Math.max(0, elapsed / durationSeconds * 100)}%`;
+    }
+
+    function toggleTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+        timerButton.textContent = "Resume";
+        return;
+      }
+
+      timerButton.textContent = "Pause";
+      timerId = setInterval(() => {
+        remainingSeconds -= 1;
+        renderTimer();
+      }, 1000);
+    }
+
+    function resetTimer() {
+      if (timerId) clearInterval(timerId);
+      timerId = null;
+      remainingSeconds = durationSeconds;
+      timerButton.textContent = "Start timer";
+      renderTimer();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      root.setAttribute("data-theme", root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    }
+
+    timerButton.addEventListener("click", toggleTimer);
+    document.getElementById("resetButton").addEventListener("click", resetTimer);
+    document.getElementById("themeButton").addEventListener("click", toggleTheme);
+    renderTimer();
+  </script>
+</body>
+</html>
